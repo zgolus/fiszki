@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Starożytny Rzym — Fiszki</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1714;
+    --card-front: #f5f0e8;
+    --card-back: #2c2520;
+    --accent: #c4956a;
+    --accent-light: #e8c9a8;
+    --text-dark: #2c2520;
+    --text-light: #f5f0e8;
+    --text-muted: #a89880;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* Filter row: topics + priority toggle */
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #3d3530;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .priority-row {
+    display: flex;
+    gap: 8px;
+  }
+  .priority-pill {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #3d3530;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .priority-pill.active {
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .priority-pill .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .priority-pill .dot.critical { background: #d4915c; }
+  .priority-pill .dot.extra { background: #7a8b7a; }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #3d3530;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  /* Front */
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-badge {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+  }
+  .card-front .card-badge.critical {
+    background: #d4915c;
+    color: #fff;
+  }
+  .card-front .card-badge.extra {
+    background: transparent;
+    border: 1px solid #b0a090;
+    color: #8a7e70;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.12rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #b0a090;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+
+  /* Critical card accent stripe */
+  .card-front.is-critical {
+    border-top: 3px solid #d4915c;
+  }
+
+  /* Back */
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #3d3530;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #3d3530;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Starozytny Rzym</h1>
+  <div class="subtitle">Fiszki &middot; liceum &middot; poziom podstawowy</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+  <div class="priority-row" id="priorityRow"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+// c = critical (from textbook summary), e = extra (supplementary)
+const ALL_FLASHCARDS = [
+
+  // ========== 1. REPUBLIKA RZYMSKA ==========
+  // --- critical ---
+  { topic: "Republika rzymska", p: "c", q: "Kto i kiedy -- wedlug tradycji -- zalozyl Rzym?", a: ["Romulus, w 753 r. p.n.e.", "Po nim rzadzilo jeszcze szesciu krolow", "Ostatni krol zostal wygnany w 509 r. p.n.e."] },
+  { topic: "Republika rzymska", p: "c", q: "Co oznaczalo ustanowienie republiki w 509 r. p.n.e.?", a: ["Najwyzsza wladza nalezala do ludu rzymskiego", "Na zgromadzeniach decydowano o ustawach i wyborze urzednikow", "Zastapiono rzady krolewskie systemem wybieralnych urzedow"] },
+  { topic: "Republika rzymska", p: "c", q: "Jakie zasady obowiazywaly przy pelnieniu urzedow w republice?", a: ["Urzedy byly wybieralne, kadencyjne i pelnione nieodplatnie", "Najwazniejsi urzednicy: konsulowie, pretorzy, cenzorzy, dyktator"] },
+  { topic: "Republika rzymska", p: "c", q: "Jaka funkcje pelnil senat w republice rzymskiej?", a: ["Organ doradczy liczacy ok. 300 czlonkow", "Skladal sie z bylych urzednikow", "W praktyce mial ogromny wplyw na polityke panstwa"] },
+  { topic: "Republika rzymska", p: "c", q: "Z jakich grup skladalo sie spoleczenstwo republikanskiego Rzymu?", a: ["Ludzie wolni: obywatele, cudzoziemcy, wyzwolency", "Niewolnicy -- pozbawieni praw", "Wsrod obywateli wyrosniano patrycjuszy i plebejuszy"] },
+  { topic: "Republika rzymska", p: "c", q: "O co toczyl sie spor miedzy patrycjuszami a plebejuszami?", a: ["O udzial w sprawowaniu wladzy i spisanie prawa", "Plebejusze wywalczyli urzad trybuna ludowego", "W 449 r. p.n.e. ogloszono Prawo XII tablic"] },
+  { topic: "Republika rzymska", p: "c", q: "Czym bylo Prawo XII tablic i dlaczego bylo wazne?", a: ["Pierwszy spisany zbior praw rzymskich (449 r. p.n.e.)", "Ograniczalo samowole patrycjuszy wobec plebejuszy", "Stalo sie fundamentem pozniejszych systemow prawnych"] },
+  // --- extra ---
+  { topic: "Republika rzymska", p: "e", q: "Jakie kompetencje mieli konsulowie?", a: ["Najwyzsi urzednicy -- dwoch wybieranych na rok", "Dowodzili armia i przewodniczyli obradom senatu", "Mogli wzajemnie wetowac swoje decyzje"] },
+  { topic: "Republika rzymska", p: "e", q: "Kiedy i po co powolywano dyktatora?", a: ["W sytuacji wyjatkowego zagrozenia panstwa", "Otrzymywal pelnie wladzy, ale tylko na 6 miesiecy", "Po uplywie kadencji musial ja oddac"] },
+  { topic: "Republika rzymska", p: "e", q: "Kim byl trybun ludowy i jakie mial uprawnienia?", a: ["Urzednik chroniacy interesy plebejuszy", "Mial prawo weta wobec decyzji innych urzednikow", "Jego osoba byla nietykalna (sacrosanctus)"] },
+  { topic: "Republika rzymska", p: "e", q: "Jaka byla sytuacja niewolnikow w Rzymie?", a: ["Byli traktowani jako wlasnosc -- nie mieli zadnych praw", "Pracowali w gospodarstwach, kopalniach, jako sluzba domowa", "Mogli zostac wyzwoleni i zyskac status wyzwolenca"] },
+  { topic: "Republika rzymska", p: "e", q: "Czym roznil sie ustroj republiki od wspolczesnej demokracji?", a: ["Prawa polityczne mieli tylko wolni obywatele-mezczyzni", "Senat -- organ niewybrany -- mial ogromna wladze", "Instytucja dyktatury pozwalala na zawieszenie zwyklych praw"] },
+
+  // ========== 2. PODBOJE RZYMU ==========
+  // --- critical ---
+  { topic: "Podboje Rzymu", p: "c", q: "Jaki charakter miala armia republiki rzymskiej?", a: ["Armia miala charakter obywatelski", "Trzon stanowila piechota podzielona na legiony", "Liczebnosc i organizacja legionow zmienialy sie w czasie"] },
+  { topic: "Podboje Rzymu", p: "c", q: "Jak przebiegal podboj Italii przez Rzym?", a: ["Trwal w latach 396\u2013264 p.n.e.", "Podbite ludy musialy wspierac Rzym wojskowo", "Dalo to Rzymowi kontrole nad calym polwyspem"] },
+  { topic: "Podboje Rzymu", p: "c", q: "Ile bylo wojen punickich i kiedy sie toczyly?", a: ["Trzy wojny, w latach 264\u2013146 p.n.e.", "Byly to starcia Rzymu z Kartagina", "Zakonczyly sie calkowitym zniszczeniem Kartaginy"] },
+  { topic: "Podboje Rzymu", p: "c", q: "Dlaczego druga wojna punicka byla szczegolnie krwawa?", a: ["Kartaginczykow pod wodza Hannibala wkroczyli do Italii", "Prowadzili dzialania zbrojne na terytorium wroga", "Bylo to najwieksze zagrozenie dla Rzymu w tych wojnach"] },
+  { topic: "Podboje Rzymu", p: "c", q: "Jak zakonczyla sie trzecia wojna punicka?", a: ["Rzymianie zburzyli Kartagine w 146 r. p.n.e.", "Miasto zostalo doszczetnie zniszczone", "Rzym stal sie hegemonem zachodniego Srodziemnomorza"] },
+  { topic: "Podboje Rzymu", p: "c", q: "W jakim kierunku Rzym rozszerzal sie od II w. p.n.e.?", a: ["Na wschod basenu Morza Srodziemnego", "Opanowal dawne panstwa hellenistyczne", "Rzym kontrolowal praktycznie cale Morze Srodziemne"] },
+  { topic: "Podboje Rzymu", p: "c", q: "Jakie byly skutki podbojow dla spoleczenstwa rzymskiego?", a: ["Powstaly nowe prowincje", "Masowy naplyw dobr i niewolnikow do Rzymu", "Trwale zmienil sie charakter spoleczenstwa"] },
+  // --- extra ---
+  { topic: "Podboje Rzymu", p: "e", q: "Czym wyrozniala sie organizacja legionu rzymskiego?", a: ["Legion dzielil sie na kohorty i centurie", "Zolnierze byli zdyscyplinowani i doskonale wyszkoleni", "Budowali obozy warowne nawet na jednonoctnym postoju"] },
+  { topic: "Podboje Rzymu", p: "e", q: "Kim byl Hannibal i czym zaslynol?", a: ["Kartaginski wodzz z II wojny punickiej", "Przeprawil armie (ze sloniami) przez Alpy do Italii", "Zadal Rzymianom kleski, m.in. pod Kannami (216 p.n.e.)"] },
+  { topic: "Podboje Rzymu", p: "e", q: "Jak Rzym traktowal podbite ludy?", a: ["Nadawal im rozny status -- od sprzymierzencow po prowincje", "Podbici musieli dostarczac zolnierzy i placic daniny", "Czesc elit lokalnych otrzymywala z czasem obywatelstwo"] },
+  { topic: "Podboje Rzymu", p: "e", q: "Czym byla prowincja rzymska?", a: ["Podbite terytorium poza Italia zarzadzane przez namiestnika", "Mieszkancy placili podatki na rzecz Rzymu", "Prowincje byly zrodlem bogactwa i niewolnikow"] },
+  { topic: "Podboje Rzymu", p: "e", q: "Jak podboje wplynely na role niewolnikow w gospodarce?", a: ["Masowy naplyw jencow obnizyl cene niewolnikow", "Niewolnicy zastapili wolnych robotnikow w latyfundiach", "Prowadziilo to do zubozenia drobnych rolnikow"] },
+
+  // ========== 3. POCZATKI CESARSTWA ==========
+  // --- critical ---
+  { topic: "Poczatki cesarstwa", p: "c", q: "Jakie napiecia spoleczne wywolaly podboje?", a: ["Konflikty o ziemie i sytuacje ludow sprzymierzonych", "Masowy naplyw niewolnikow uderzyl w drobnych rolnikow", "Rosla pozycja wodzow armii -- zagrozenie dla republiki"] },
+  { topic: "Poczatki cesarstwa", p: "c", q: "Czym byl I triumwirat i kto go zawarl?", a: ["Umowa polityczna z 60 r. p.n.e.", "Zawarli ja Pompejusz, Krassus i Juliusz Cezar", "Okreslala ich wplywy w republice"] },
+  { topic: "Poczatki cesarstwa", p: "c", q: "Jak Juliusz Cezar doszedl do wladzy i jak zginal?", a: ["Po podboju Galii w 49 r. p.n.e. wkroczyl z armia do Italii", "Wygral wojne domowa z senatem", "Zamordowany 15 marca 44 r. p.n.e."] },
+  { topic: "Poczatki cesarstwa", p: "c", q: "Czym byl II triumwirat i co z niego wyniklo?", a: ["W 43 r. p.n.e. zawarli go Lepidus, Antoniusz i Oktawian", "Spor miedzy nimi doprowadzil do wojny", "Oktawian pokonal Antoniusza w 31 r. p.n.e. pod Akcjum"] },
+  { topic: "Poczatki cesarstwa", p: "c", q: "Czym byl pryncypat wprowadzony przez Oktawiana?", a: ["Nowy ustroj dajacy wladcy pelnie wladzy", "Przy zachowaniu pozorow republiki", "Oktawian przyjal tytul Augusta -- pierwszy cesarz"] },
+  { topic: "Poczatki cesarstwa", p: "c", q: "Co oznacza data 27 r. p.n.e.?", a: ["Poczatek pryncypatu -- nowego ustroju", "Oktawian August formalnie otrzymal wladze", "Symboliczny koniec republiki i poczatek cesarstwa"] },
+  // --- extra ---
+  { topic: "Poczatki cesarstwa", p: "e", q: "Kim byli bracia Grakchowie i o co walczyli?", a: ["Tyberiusz i Gajusz Grakchus -- trybuni ludowi (II w. p.n.e.)", "Proponowali reformy rolne na rzecz ubogich obywateli", "Obaj zgineli w wyniku oporow senatu -- poczatek kryzysu republiki"] },
+  { topic: "Poczatki cesarstwa", p: "e", q: "Kim byl Spartakus?", a: ["Gladiator, ktory w 73\u201371 r. p.n.e. poprowadzil powstanie niewolnikow", "Zgromadzil armie liczaca dziesiatki tysiecy ludzi", "Powstanie zostalo krwawo stlumione przez Rzymian"] },
+  { topic: "Poczatki cesarstwa", p: "e", q: "Dlaczego zamordowano Juliusza Cezara?", a: ["Senatorowie obawiali sie jego rosnacych ambicji wladzy", "Uznano, ze chce zostac krolem, co godzilo w tradycje republiki", "Spisek poprowadzili m.in. Brutus i Kasjusz"] },
+  { topic: "Poczatki cesarstwa", p: "e", q: "Na czym polegala bitwa pod Akcjum (31 r. p.n.e.)?", a: ["Bitwa morska miedzy flotami Oktawiana i Antoniusza", "Oktawian zwyciezzyl, Antoniusz i Kleopatra uciekli do Egiptu", "Koniec wojen domowych i poczatek jedynowladztwa Oktawiana"] },
+  { topic: "Poczatki cesarstwa", p: "e", q: "Jakie tytuly i uprawnienia przyjaol Oktawian August?", a: ["Tytul Augustus (podwyzzszony) nadany przez senat", "Laczyl funkcje konsula, trybuna ludowego i najwyzszego kaplana", "Kontrolowal armie i prowincje, zachowujac pozory republiki"] },
+
+  // ========== 4. IMPERIUM RZYMSKIE ==========
+  // --- critical ---
+  { topic: "Imperium Rzymskie", p: "c", q: "Jak dlugo trwal pryncypat i na czym opierala sie wladza cesarzy?", a: ["Pryncypat przetrwal ok. 300 lat", "Podstawa wladzy byla kontrola nad armia", "Formalnie zachowywano pozory republiki"] },
+  { topic: "Imperium Rzymskie", p: "c", q: "Czym byl pax Romana?", a: ["Okres stabilizacji wewnetrznej i zewnetrznej", "Rzym odszedl od polityki podbojow za Oktawiana", "Sprzyjaol rozwojowi gospodarki, handlu i kultury"] },
+  { topic: "Imperium Rzymskie", p: "c", q: "Czym byl limes i jaka pelnil funkcje?", a: ["System umocnien wzdluz granic imperium", "Kontrolowal przeplyw ludzi i towarow", "Chronil panstwo przed najazdami"] },
+  { topic: "Imperium Rzymskie", p: "c", q: "Na czym polegala romanizacja prowincji?", a: ["Rozwijaly sie miasta (urbanizacja)", "Mieszkancy przejmowali jezyk i zwyczaje Rzymian", "Kultura rzymska rozprzestrzeniala sie w calym imperium"] },
+  { topic: "Imperium Rzymskie", p: "c", q: "Jakie prowincje dolaczono do imperium po Oktawianie?", a: ["Najwazniejsze: Brytania i Dacja", "Przylaczyli je kolejni cesarze", "Potem Rzym skupil sie raczej na obronie granic"] },
+  { topic: "Imperium Rzymskie", p: "c", q: "Jak wygladala religia Rzymian w okresie pryncypatu?", a: ["Rzymianie byli politeistami -- czcili wielu bogow", "Panteon ksztaltowal sie stopniowo, istota byla poboznosc i kult", "W okresie pryncypatu rozwijal sie kult cesarski"] },
+  // --- extra ---
+  { topic: "Imperium Rzymskie", p: "e", q: "Co to znaczy pojecie imperium?", a: ["Okreslenie na ogromne, wielonarodowe panstwo", "W Rzymie wiazalo sie z wladza wojskowa (imperium) wodza", "Z czasem stalo sie synonimem calego panstwa rzymskiego"] },
+  { topic: "Imperium Rzymskie", p: "e", q: "Kim byl Neron i dlaczego jest znany?", a: ["Cesarz z dynastii julijsko-klaudyjskiej (54\u201368 n.e.)", "Znany z okrucienstwa i przsladowania chrzescijan", "Tradycja wiaze go z wielkim pozarem Rzymu w 64 r. n.e."] },
+  { topic: "Imperium Rzymskie", p: "e", q: "Za ktorych cesarzy imperium osiagnelo najwiekszy zasieg?", a: ["Za Trajana (98\u2013117 n.e.) imperium bylo najwieksze", "Objelo Mezopotamie, Dacje, Arabie", "Potem Hadrian skoncentrowal sie na obronie granic (np. Wal Hadriana)"] },
+  { topic: "Imperium Rzymskie", p: "e", q: "Jak wygladalo zycie codzienne w miastach rzymskich?", a: ["Miasta mialy forum, termy, amfiteatry, akwedukty", "Rzymianie korzystali z laznie publicznych i widowisk", "Rozwinieta siec kanalizacji i drog ulatwiala zycie"] },
+  { topic: "Imperium Rzymskie", p: "e", q: "Co laczylo prowincje z centrum imperium?", a: ["Siec drog, szlaki morskie i administracja", "Lacina jako wspolny jezyk urzedowy (na zachodzie)", "Jednolity system prawny i monetarny"] },
+
+  // ========== 5. OSIAGNIECIA RZYMIAN ==========
+  // --- critical ---
+  { topic: "Osiagniecia Rzymian", p: "c", q: "Dlaczego prawo rzymskie jest uwazane za trwale osiagniecie?", a: ["Spisane po raz pierwszy w 449 r. p.n.e. (Prawo XII tablic)", "Rozwijane i modyfikowane az do VI w. n.e.", "Fundament wiekszosci dzisiejszych systemow prawnych"] },
+  { topic: "Osiagniecia Rzymian", p: "c", q: "Jakie nowosci wprowadzili Rzymianie w architekturze?", a: ["Wykorzystali beton i cegle; opanowali luk i kopule", "Stworzyli nowe formy budowli", "Amfiteatry, bazyliki, cyrki, akwedukty"] },
+  { topic: "Osiagniecia Rzymian", p: "c", q: "Jaka role pelnila siec drog w imperium?", a: ["Zapewniala sprawna komunikacje w calym panstwie", "Drogi i szlaki morskie pelnily funkcje handlowe i militarne", "Budowe Via Appia rozpoczeto w 312 r. p.n.e."] },
+  { topic: "Osiagniecia Rzymian", p: "c", q: "Jak kultura grecka wplynela na kulture rzymska?", a: ["Kultura rzymska rozwijala sie w cieniu greckiej", "Chetnie kopiowano wzorce w sztuce i literaturze", "Szczyt literatury: I w. p.n.e. -- Cyceron, Cezar, Wergiliusz, Owidiusz, Horacy"] },
+  { topic: "Osiagniecia Rzymian", p: "c", q: "Czym bylo Koloseum?", a: ["Amfiteatr Flawiuszow -- najwiekszy amfiteatr starozytnosci", "Miescil ok. 50 tys. widzow; walki gladiatorow", "Symbol potegi Rzymu i rzymskiej inzynierii"] },
+  { topic: "Osiagniecia Rzymian", p: "c", q: "Co Rzymianie wniesli do kultury europejskiej?", a: ["Prawo rzymskie -- podstawa systemow prawnych", "Lacina -- fundament jezykow romanskich i jezyk nauki", "Wzorce architektoniczne, urbanistyczne i administracyjne"] },
+  // --- extra ---
+  { topic: "Osiagniecia Rzymian", p: "e", q: "Czym byly akwedukty i dlaczego byly wazne?", a: ["Kamienne kanaly doprowadzajace wode do miast", "Umozliwialy dzialanie term, fontann i kanalizacji", "Niektoree stoja do dzis, np. Pont du Gard we Francji"] },
+  { topic: "Osiagniecia Rzymian", p: "e", q: "Kim byl Cyceron i czym sie wyroznil?", a: ["Mowca, polityk i filozof z I w. p.n.e.", "Uznaawany za mistrza retoryki i stylu lacinskiego", "Jego pisma wplynely na filozofie i prawo europejskie"] },
+  { topic: "Osiagniecia Rzymian", p: "e", q: "Czym byla Eneida Wergiliusza?", a: ["Epos opisujacy wedrowke Eneasza z Troi do Italii", "Mial uzasadniac boskie pochodzenie Rzymian", "Jedno z najwazniejszych dziel literatury antycznej"] },
+  { topic: "Osiagniecia Rzymian", p: "e", q: "Dlaczego kalendarz julianski byl waznym osiagnieciem?", a: ["Wprowadzony przez Cezara w 45 r. p.n.e.", "Oparty na roku slonecznym (365,25 dnia)", "Stal sie podstawa kalendarza gregorianskiego, uzzywanego do dzis"] },
+  { topic: "Osiagniecia Rzymian", p: "e", q: "Czym byly termy rzymskie?", a: ["Publiczne laznie pelniace funkcje spoleczne i kulturalne", "Zawieraly baseny, sale do cwiczen, biblioteki", "Byly dostepne dla roznych warstw spolecznych"] },
+
+  // ========== 6. NARODZINY CHRZESCIJANSTWA ==========
+  // --- critical ---
+  { topic: "Narodziny chrzescijanstwa", p: "c", q: "Czym jest chrzescijanstwo i skad sie wywodzi?", a: ["Religia monoteistyczna wywodzaca sie z judaizmu", "Uksztaltowana przez Jezusa z Nazaretu", "Jezus nauczal w latach 20.\u201330. I w. n.e. w Palestynie"] },
+  { topic: "Narodziny chrzescijanstwa", p: "c", q: "Jak nauka Jezusa dotarla poza spolecznosc zydowska?", a: ["Poczatkowo skierowana byla do Zydow", "Apostolowie zaczeli glosic ja takze innym ludom", "Ich podroze doprowadzily do powstania gmin chrzescijanskich w miastach imperium"] },
+  { topic: "Narodziny chrzescijanstwa", p: "c", q: "Kiedy zaczal ksztaltowac sie Kosciol katolicki?", a: ["Proces jednoczenia gmin rozpoczal sie na przelomie II i III w. n.e.", "Tworzyly sie struktury i hierarchia koscielna", "Kosciol stawal sie zorganizowana instytucja"] },
+  { topic: "Narodziny chrzescijanstwa", p: "c", q: "Dlaczego chrzescijanie byli przesladowani?", a: ["Nie uczestniczyli w obrzedach ku czci bostw rzymskich", "Sciagali niechec wyznawcow tradycyjnej religii i gniew wladcow", "Masowe przesladowania -- III i poczatek IV w. n.e."] },
+  { topic: "Narodziny chrzescijanstwa", p: "c", q: "Co zmienil edykt mediolanski z 313 r. n.e.?", a: ["Wydal go cesarz Konstantyn Wielki", "Zapewnil rownouprawnienie chrzescijan", "Zakonczyl okres oficjalnych przesladowan"] },
+  { topic: "Narodziny chrzescijanstwa", p: "c", q: "Kiedy chrzescijanstwo stalo sie religia panstwowa?", a: ["W 392 r. n.e. cesarz Teodozjusz Wielki zakazal innych kultow", "Chrzescijanstwo stalo sie jedyna religia panstwowa", "Pelne zwyciestwo nowej religii w imperium"] },
+  // --- extra ---
+  { topic: "Narodziny chrzescijanstwa", p: "e", q: "Czym judaizm roznil sie od religii rzymskiej?", a: ["Judaizm to religia monoteistyczna (wiara w jednego Boga)", "Religia rzymska byla politeistyczna (wielu bogow)", "Judaizm zakazywaal oddawania czci innym bostwom i wizerunkom"] },
+  { topic: "Narodziny chrzescijanstwa", p: "e", q: "Kim byl sw. Pawel z Tarsu i jaka odegral role?", a: ["Apostol, ktory najbardziej przyczynilsie do szerzenia chrzescijanstwa", "Glosil nauke Jezusa wsrod nie-Zydow (pogan)", "Jego listy sa czescia Nowego Testamentu"] },
+  { topic: "Narodziny chrzescijanstwa", p: "e", q: "Jakie wartosci glosilo chrzescijanstwo?", a: ["Milosc blizniego, przebaczenie, rownosc ludzi wobec Boga", "Nadzieja na zycie wieczne po smierci", "Te idee przyciagaly zwlaszcza ubogich i niewolnikow"] },
+  { topic: "Narodziny chrzescijanstwa", p: "e", q: "Kim byl Konstantyn Wielki i co zmienil w dziejach chrzescijanstwa?", a: ["Cesarz, ktory w 313 r. wydal edykt mediolanski", "Przeniosl stolice do Konstantynopola (330 r.)", "Uznaawany za pierwszego cesarza wspierajacego chrzescijanstwo"] },
+  { topic: "Narodziny chrzescijanstwa", p: "e", q: "Co zmienilo sie w kulturze Rzymian po przyjeeciu chrzescijanstwa?", a: ["Zanikly tradycyjne kulty i ofiary dla bogow", "Zaprzestano walk gladiatorow i krwawych widowisk", "Kosciol wplynal na sztuke, architekture (bazyliki) i obyczaje"] },
+
+  // ========== 7. UPADEK CESARSTWA ==========
+  // --- critical ---
+  { topic: "Upadek cesarstwa", p: "c", q: "Jakie problemy dotknely cesarstwo w III w. n.e.?", a: ["Najazdy zewnetrzne i liczne uzurpacje wladzy", "Powazny kryzys gospodarczy", "Imperium znalazlo sie na skraju rozpadu"] },
+  { topic: "Upadek cesarstwa", p: "c", q: "Czym byla tetrarchia Dioklecjana?", a: ["System rzadow czterech cesarzy (przelom III/IV w.)", "Miala usprawniac zarzadzanie ogromnym panstwem", "Wladza stala sie absolutna -- nowy ustroj to dominat"] },
+  { topic: "Upadek cesarstwa", p: "c", q: "Czym dominat roznil sie od pryncypatu?", a: ["Wladza cesarza byla otwarcie absolutna", "Rozbudowany ceremonial dworski", "Cesarz byl panem (dominus), nie pierwszym wsrod rownych"] },
+  { topic: "Upadek cesarstwa", p: "c", q: "Kiedy i dlaczego podzielono cesarstwo?", a: ["Trwaly podzial w 395 r. n.e., po smierci Teodozjusza Wielkiego", "Rosnace roznice miedzy wschodem a zachodem", "Powstaly dwa oddzielne panstwa"] },
+  { topic: "Upadek cesarstwa", p: "c", q: "Jakie ludy zagrazaly cesarstwu pod koniec IV i w V w.?", a: ["Hunowie -- ich napor zmusil Gotow do osiedlenia sie w cesarstwie", "W 406 r. granice przekroczyli Wandalowie, Swebowie i Alanowie", "Plemiona osiedlaly sie w cesarstwie zachodnim"] },
+  { topic: "Upadek cesarstwa", p: "c", q: "Kiedy i jak upadlo cesarstwo zachodniorzymskie?", a: ["Symboliczna data: 476 r. n.e.", "Cesarz Romulus Augustulus pozbawiony wladzy", "Dokonal tego germanski wodz Odoaker"] },
+  { topic: "Upadek cesarstwa", p: "c", q: "Wymien przyczyny wewnetrzne i zewnetrzne upadku cesarstwa zachodniego.", a: ["Wewnetrzne: kryzys gospodarczy, uzurpacje, slabosc armii", "Zewnetrzne: najazdy Germanow i Hunow", "Osiedlanie sie plemion w granicach imperium przyspieszylo rozpad"] },
+  // --- extra ---
+  { topic: "Upadek cesarstwa", p: "e", q: "Kim byli Hunowie i jaka odegrali role?", a: ["Koczowniczy lud z Azji, ktory w IV w. najechaloEurope", "Ich napor wyzwolil wielka wedrowke ludow", "Pod wodza Attyli (V w.) zagrazali zarowno zachodowi, jak i wschodowi"] },
+  { topic: "Upadek cesarstwa", p: "e", q: "Czym byla wielka wedrowka ludow?", a: ["Masowe migracje plemion germanskich i innych od konca IV w.", "Wywolana naporem Hunow ze wschodu", "Doprowadzila do osiedlania sie plemion w granicach cesarstwa"] },
+  { topic: "Upadek cesarstwa", p: "e", q: "Dlaczego cesarstwo wschodnie przetrwalo, a zachodnie upadlo?", a: ["Wschod byl bogatszy i bardziej zurbanizowany", "Mialo silniejsza administracje i armie", "Konstantynopol byl doskonale obwarowany -- przetrwal do 1453 r."] },
+  { topic: "Upadek cesarstwa", p: "e", q: "Kim byl Odoaker?", a: ["Germanski wodzz, ktory w 476 r. obalil ostatniego cesarza zachodniego", "Nie przyjal tytulu cesarza -- uznal wladze cesarza wschodniego", "Jego czyn uwazany jest za symboliczny koniec starozytnosci"] },
+  { topic: "Upadek cesarstwa", p: "e", q: "Co stalo sie z cesarstwem wschodnim po 476 r.?", a: ["Przetrwalo jako cesarstwo bizantyjskie", "Ze stolica w Konstantynopolu", "Trwalo az do zdobycia miasta przez Turkow w 1453 r."] },
+
+  // ========== KLUCZOWE DATY ==========
+  // --- critical ---
+  { topic: "Kluczowe daty", p: "c", q: "Podaj daty: zalozenie Rzymu, poczatek republiki, Prawo XII tablic.", a: ["753 r. p.n.e. -- zalozenie Rzymu", "509 r. p.n.e. -- poczatek republiki", "449 r. p.n.e. -- Prawo XII tablic"] },
+  { topic: "Kluczowe daty", p: "c", q: "Podaj daty zwiazane z wojnami punickimi.", a: ["264 r. p.n.e. -- poczatek wojen punickich", "146 r. p.n.e. -- zburzenie Kartaginy", "Trzy wojny trwaly lacznie ponad sto lat"] },
+  { topic: "Kluczowe daty", p: "c", q: "Podaj daty: I triumwirat, smierc Cezara, Akcjum, pryncypat.", a: ["60 r. p.n.e. -- I triumwirat", "44 r. p.n.e. -- zamordowanie Cezara", "31 r. p.n.e. -- bitwa pod Akcjum; 27 r. p.n.e. -- poczatek pryncypatu"] },
+  { topic: "Kluczowe daty", p: "c", q: "Podaj daty: edykt mediolanski, podzial cesarstwa, upadek Zachodu.", a: ["313 r. n.e. -- edykt mediolanski", "395 r. n.e. -- podzial cesarstwa", "476 r. n.e. -- upadek cesarstwa zachodniorzymskiego"] }
+];
+
+// --- State ---
+const TOPICS = ["Wszystkie", ...new Set(ALL_FLASHCARDS.map(f => f.topic))];
+let activeTopic = "Wszystkie";
+let activeFilter = "all"; // "all", "c", "e"
+let filteredCards = [...ALL_FLASHCARDS];
+let currentIndex = 0;
+let isFlipped = false;
+let isAnimating = false;
+
+const card = document.getElementById('card');
+const cardFront = document.getElementById('cardFront');
+const cardBack = document.getElementById('cardBack');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const topicBar = document.getElementById('topicBar');
+const priorityRow = document.getElementById('priorityRow');
+
+function applyFilters() {
+  let cards = activeTopic === "Wszystkie"
+    ? [...ALL_FLASHCARDS]
+    : ALL_FLASHCARDS.filter(f => f.topic === activeTopic);
+  if (activeFilter === "c") cards = cards.filter(f => f.p === "c");
+  else if (activeFilter === "e") cards = cards.filter(f => f.p === "e");
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  TOPICS.forEach(t => {
+    const pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.onclick = () => { activeTopic = t; buildTopicBar(); applyFilters(); };
+    topicBar.appendChild(pill);
+  });
+}
+
+function buildPriorityRow() {
+  const opts = [
+    { key: "all", label: "Wszystkie", dotClass: "" },
+    { key: "c",   label: "Kluczowe",  dotClass: "critical" },
+    { key: "e",   label: "Dodatkowe", dotClass: "extra" }
+  ];
+  priorityRow.innerHTML = '';
+  opts.forEach(o => {
+    const pill = document.createElement('button');
+    pill.className = 'priority-pill' + (activeFilter === o.key ? ' active' : '');
+    pill.innerHTML = (o.dotClass ? '<span class="dot ' + o.dotClass + '"></span>' : '') + o.label;
+    pill.onclick = () => { activeFilter = o.key; buildPriorityRow(); applyFilters(); };
+    priorityRow.appendChild(pill);
+  });
+}
+
+function renderCard() {
+  if (filteredCards.length === 0) {
+    cardFront.innerHTML = '<div class="card-question">Brak fiszek dla tego filtra</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    return;
+  }
+  const fc = filteredCards[currentIndex];
+  const isCritical = fc.p === "c";
+
+  cardFront.className = 'card-face card-front' + (isCritical ? ' is-critical' : '');
+
+  const badgeHTML = isCritical
+    ? '<span class="card-badge critical">kluczowe</span>'
+    : '<span class="card-badge extra">dodatkowe</span>';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div>' + badgeHTML + '</div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryc odpowiedz</div>';
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedz</div>' +
+    '<ul class="answer-list">' + fc.a.map(function(point) { return '<li>' + point + '</li>'; }).join('') + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrocic do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+
+  setTimeout(function() {
+    currentIndex = newIndex;
+    renderCard();
+  }, 140);
+
+  setTimeout(function() {
+    card.classList.remove(animClass);
+    isAnimating = false;
+  }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) {
+    if (diff > 0) nextCard(); else prevCard();
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+buildTopicBar();
+buildPriorityRow();
+renderCard();
+</script>
+</body>
+</html>
