@@ -16,9 +16,7 @@
     --text-light: #eaf0f5;
     --text-muted: #7a8ea0;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--bg);
@@ -30,335 +28,55 @@
     overflow-x: hidden;
     user-select: none;
   }
-
-  .header {
-    width: 100%;
-    max-width: 480px;
-    padding: 28px 24px 8px;
-    text-align: center;
-  }
-  .header h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.45rem;
-    color: var(--accent-light);
-    letter-spacing: 0.02em;
-  }
-  .header .subtitle {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    margin-top: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-  }
-
-  .filters {
-    width: 100%;
-    max-width: 480px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 14px 20px 6px;
-  }
-  .topic-bar {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
+  .header { width: 100%; max-width: 480px; padding: 28px 24px 8px; text-align: center; }
+  .header h1 { font-family: 'DM Serif Display', serif; font-size: 1.45rem; color: var(--accent-light); letter-spacing: 0.02em; }
+  .header .subtitle { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.12em; }
+  .filters { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 8px; padding: 14px 20px 6px; }
+  .topic-bar { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
   .topic-bar::-webkit-scrollbar { display: none; }
-  .topic-pill {
-    flex-shrink: 0;
-    padding: 6px 13px;
-    border-radius: 20px;
-    border: 1px solid #2a3545;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 0.72rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.25s;
-    white-space: nowrap;
-  }
-  .topic-pill.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-
-  .priority-row {
-    display: flex;
-    gap: 8px;
-  }
-  .priority-pill {
-    flex-shrink: 0;
-    padding: 5px 12px;
-    border-radius: 20px;
-    border: 1px solid #2a3545;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 0.68rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.25s;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .priority-pill.active {
-    border-color: var(--accent);
-    color: var(--accent-light);
-  }
-  .priority-pill .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    display: inline-block;
-  }
+  .topic-pill { flex-shrink: 0; padding: 6px 13px; border-radius: 20px; border: 1px solid #2a3545; background: transparent; color: var(--text-muted); font-size: 0.72rem; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.25s; white-space: nowrap; }
+  .topic-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .priority-row { display: flex; gap: 8px; }
+  .priority-pill { flex-shrink: 0; padding: 5px 12px; border-radius: 20px; border: 1px solid #2a3545; background: transparent; color: var(--text-muted); font-size: 0.68rem; font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.25s; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+  .priority-pill.active { border-color: var(--accent); color: var(--accent-light); }
+  .priority-pill .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
   .priority-pill .dot.critical { background: #5b9bd5; }
   .priority-pill .dot.extra { background: #6b8a6b; }
-
-  .progress-area {
-    width: 100%;
-    max-width: 480px;
-    padding: 10px 24px 4px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .progress-track {
-    flex: 1;
-    height: 3px;
-    background: #2a3545;
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width 0.4s ease;
-  }
-  .progress-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    min-width: 48px;
-    text-align: right;
-  }
-
-  .card-container {
-    width: 100%;
-    max-width: 480px;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px 24px;
-    perspective: 1000px;
-  }
-
-  .card {
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    max-height: 420px;
-    position: relative;
-    cursor: pointer;
-    transform-style: preserve-3d;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+  .progress-area { width: 100%; max-width: 480px; padding: 10px 24px 4px; display: flex; align-items: center; gap: 12px; }
+  .progress-track { flex: 1; height: 3px; background: #2a3545; border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+  .progress-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; min-width: 48px; text-align: right; }
+  .card-container { width: 100%; max-width: 480px; flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px 24px; perspective: 1000px; }
+  .card { width: 100%; aspect-ratio: 3 / 4; max-height: 420px; position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
   .card.flipped { transform: rotateY(180deg); }
   .card.slide-left { animation: slideLeft 0.35s ease both; }
   .card.slide-right { animation: slideRight 0.35s ease both; }
-  @keyframes slideLeft {
-    0% { opacity: 1; transform: translateX(0); }
-    40% { opacity: 0; transform: translateX(-60px); }
-    60% { opacity: 0; transform: translateX(60px); }
-    100% { opacity: 1; transform: translateX(0); }
-  }
-  @keyframes slideRight {
-    0% { opacity: 1; transform: translateX(0); }
-    40% { opacity: 0; transform: translateX(60px); }
-    60% { opacity: 0; transform: translateX(-60px); }
-    100% { opacity: 1; transform: translateX(0); }
-  }
-
-  .card-face {
-    position: absolute;
-    inset: 0;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    padding: 26px 22px;
-    overflow-y: auto;
-  }
-
-  .card-front {
-    background: var(--card-front);
-    color: var(--text-dark);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-  }
-  .card-front .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: auto;
-  }
-  .card-front .card-topic {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--accent);
-    font-weight: 600;
-  }
-  .card-front .card-badge {
-    font-size: 0.58rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 10px;
-  }
-  .card-front .card-badge.critical {
-    background: #5b9bd5;
-    color: #fff;
-  }
-  .card-front .card-badge.extra {
-    background: transparent;
-    border: 1px solid #9aacbb;
-    color: #7a8ea0;
-  }
-  .card-front .card-question {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.1rem;
-    line-height: 1.5;
-    text-align: center;
-    padding: 0 2px;
-  }
-  .card-front .tap-hint {
-    font-size: 0.7rem;
-    color: #8a9aaa;
-    text-align: center;
-    margin-top: auto;
-    padding-top: 14px;
-  }
-  .card-front.is-critical {
-    border-top: 3px solid #5b9bd5;
-  }
-
-  .card-back {
-    background: var(--card-back);
-    color: var(--text-light);
-    transform: rotateY(180deg);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-  }
-  .card-back .card-topic {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--accent);
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  .card-back .answer-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    margin-bottom: 14px;
-    font-weight: 600;
-  }
-  .card-back .answer-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 11px;
-    flex: 1;
-    justify-content: center;
-  }
-  .card-back .answer-list li {
-    position: relative;
-    padding-left: 18px;
-    font-size: 0.86rem;
-    line-height: 1.5;
-    color: var(--accent-light);
-  }
-  .card-back .answer-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 8px;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-  }
-  .card-back .tap-hint {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-align: center;
-    margin-top: auto;
-    padding-top: 12px;
-  }
-
-  .nav-area {
-    width: 100%;
-    max-width: 480px;
-    padding: 6px 24px 34px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-  }
-  .nav-btn {
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    border: 1.5px solid #2a3545;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 1.3rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-  }
-  .nav-btn:active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-    transform: scale(0.92);
-  }
+  @keyframes slideLeft { 0%{opacity:1;transform:translateX(0)}40%{opacity:0;transform:translateX(-60px)}60%{opacity:0;transform:translateX(60px)}100%{opacity:1;transform:translateX(0)} }
+  @keyframes slideRight { 0%{opacity:1;transform:translateX(0)}40%{opacity:0;transform:translateX(60px)}60%{opacity:0;transform:translateX(-60px)}100%{opacity:1;transform:translateX(0)} }
+  .card-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 20px; display: flex; flex-direction: column; padding: 26px 22px; overflow-y: auto; }
+  .card-front { background: var(--card-front); color: var(--text-dark); box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
+  .card-front .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: auto; }
+  .card-front .card-topic { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); font-weight: 600; }
+  .card-front .card-badge { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; padding: 3px 8px; border-radius: 10px; }
+  .card-front .card-badge.critical { background: #5b9bd5; color: #fff; }
+  .card-front .card-badge.extra { background: transparent; border: 1px solid #9aacbb; color: #7a8ea0; }
+  .card-front .card-question { font-family: 'DM Serif Display', serif; font-size: 1.1rem; line-height: 1.5; text-align: center; padding: 0 2px; }
+  .card-front .tap-hint { font-size: 0.7rem; color: #8a9aaa; text-align: center; margin-top: auto; padding-top: 14px; }
+  .card-front.is-critical { border-top: 3px solid #5b9bd5; }
+  .card-back { background: var(--card-back); color: var(--text-light); transform: rotateY(180deg); box-shadow: 0 8px 40px rgba(0,0,0,0.5); }
+  .card-back .card-topic { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+  .card-back .answer-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 14px; font-weight: 600; }
+  .card-back .answer-list { list-style: none; display: flex; flex-direction: column; gap: 11px; flex: 1; justify-content: center; }
+  .card-back .answer-list li { position: relative; padding-left: 18px; font-size: 0.86rem; line-height: 1.5; color: var(--accent-light); }
+  .card-back .answer-list li::before { content: ''; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .card-back .tap-hint { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: auto; padding-top: 12px; }
+  .nav-area { width: 100%; max-width: 480px; padding: 6px 24px 34px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .nav-btn { width: 54px; height: 54px; border-radius: 50%; border: 1.5px solid #2a3545; background: transparent; color: var(--text-muted); font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .nav-btn:active { background: var(--accent); border-color: var(--accent); color: #fff; transform: scale(0.92); }
   .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
-  .shuffle-btn {
-    padding: 11px 22px;
-    border-radius: 28px;
-    border: 1.5px solid #2a3545;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 0.78rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    cursor: pointer;
-    letter-spacing: 0.08em;
-    transition: all 0.2s;
-  }
-  .shuffle-btn:active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .shuffle-btn { padding: 11px 22px; border-radius: 28px; border: 1.5px solid #2a3545; background: transparent; color: var(--text-muted); font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; letter-spacing: 0.08em; transition: all 0.2s; }
+  .shuffle-btn:active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
   .header { animation: fadeUp 0.5s ease both; }
   .filters { animation: fadeUp 0.5s 0.05s ease both; }
   .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
@@ -367,142 +85,396 @@
 </style>
 </head>
 <body>
-
 <div class="header">
   <h1>Chemia &middot; klasa 7</h1>
   <div class="subtitle">Kod chemiczny &middot; Budowa materii</div>
 </div>
-
 <div class="filters">
   <div class="topic-bar" id="topicBar"></div>
   <div class="priority-row" id="priorityRow"></div>
 </div>
-
 <div class="progress-area">
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
   <div class="progress-label" id="progressLabel"></div>
 </div>
-
 <div class="card-container">
   <div class="card" id="card">
     <div class="card-face card-front" id="cardFront"></div>
     <div class="card-face card-back" id="cardBack"></div>
   </div>
 </div>
-
 <div class="nav-area">
   <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
   <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
   <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
 </div>
-
 <script>
-var ALL_FLASHCARDS = [
+var ALL_FLASHCARDS = [];
+function F(topic, p, q, a) { ALL_FLASHCARDS.push({topic:topic, p:p, q:q, a:a}); }
 
-  // =============================================
-  // ROZDZIAL 2: KOD CHEMICZNY
-  // =============================================
+// =============================================
+// ROZDZIA\u0141 2: KOD CHEMICZNY
+// =============================================
 
-  // --- Ziarnista budowa materii (critical) ---
-  { topic: "Ziarnista budowa materii", p: "c", q: "Na czym polega ziarnistosc (nieciaglosc) materii?", a: ["Wszystkie substancje skladaja sie z bardzo malych czasteczek zwanych drobinami", "Drobiny nie wypelniaja przestrzeni w sposob ciagly -- sa miedzy nimi przerwy"] },
-  { topic: "Ziarnista budowa materii", p: "c", q: "Jakie zjawiska dowodza ziarnistej budowy materii?", a: ["Dyfuzja -- samorzutne mieszanie sie substancji", "Kontrakcja objetosci -- zmniejszenie objetosci przy mieszaniu cieczy", "Rozpuszczanie i zmiany stanow skupienia"] },
-  { topic: "Ziarnista budowa materii", p: "c", q: "Jakie sa rodzaje drobin?", a: ["Atomy -- najmniejsze czastki pierwiastkow", "Czasteczki -- zespoly atomow polaczonych ze soba"] },
-  // extra
-  { topic: "Ziarnista budowa materii", p: "e", q: "Czym jest dyfuzja? Podaj przyklad.", a: ["Samorzutne mieszanie sie czasteczek roznych substancji", "Np. rozprzestrzenianie sie zapachu perfum w pokoju", "Zachodzi bez mieszania -- drobiny poruszaja sie same"] },
-  { topic: "Ziarnista budowa materii", p: "e", q: "Czym jest kontrakcja objetosci?", a: ["Zmniejszenie lacznej objetosci przy mieszaniu dwoch cieczy", "Np. 50 ml wody + 50 ml spirytusu daje mniej niz 100 ml", "Dowodzi, ze miedzy drobinami sa przerwy"] },
-  { topic: "Ziarnista budowa materii", p: "e", q: "Dlaczego rozpuszczanie cukru w wodzie dowodzi ziarnistosci materii?", a: ["Cukier znika, bo jego drobiny wchodza w przerwy miedzy drobinami wody", "Objetosc roztworu nie wzrasta znaczaco", "Smak slodki w calym roztworze -- drobiny rozproszyly sie rownomiernie"] },
+// --- Ziarnista budowa materii ---
+F("Ziarnista budowa materii","c",
+  "Na czym polega ziarnisto\u015b\u0107 (nieci\u0105g\u0142o\u015b\u0107) materii?",
+  ["Wszystkie substancje sk\u0142adaj\u0105 si\u0119 z bardzo ma\u0142ych cz\u0105steczek zwanych drobinami",
+   "Drobiny nie wype\u0142niaj\u0105 przestrzeni w spos\u00f3b ci\u0105g\u0142y \u2013 s\u0105 mi\u0119dzy nimi przerwy"]);
 
-  // --- Atomy i czasteczki (critical) ---
-  { topic: "Atomy i czasteczki", p: "c", q: "Czym jest atom?", a: ["Najmniejsza ilosc pierwiastka zdolna do samodzielnego istnienia", "Wszystkie atomy sa kuliste", "Roznia sie masa i rozmiarami (promieniem atomowym)"] },
-  { topic: "Atomy i czasteczki", p: "c", q: "Jakie sa fizyczne i chemiczne cechy atomu?", a: ["Fizyczne: masa, ksztalt (kulisty), rozmiary (promien)", "Chemiczne: zdolnosc lub brak zdolnosci laczenia sie z innymi atomami", "Atom jednego pierwiastka nie moze zamienic sie w atom innego w reakcji chemicznej"] },
-  { topic: "Atomy i czasteczki", p: "c", q: "Czym jest czasteczka i czym jest zwiazek chemiczny?", a: ["Czasteczka to zespol atomow polaczonych ze soba", "Zwiazek chemiczny to zbior czasteczek zlozonych z atomow roznych pierwiastkow", "Wszystkie czasteczki danego zwiazku maja taki sam sklad"] },
-  { topic: "Atomy i czasteczki", p: "c", q: "Ktore niemetale tworza czasteczki dwuatomowe?", a: ["Wodor (H2), tlen (O2), azot (N2), chlor (Cl2)", "Atomy tego samego pierwiastka lacza sie w pary", "Jest to cecha wiekszosci niemetali"] },
-  // extra
-  { topic: "Atomy i czasteczki", p: "e", q: "Czym roznia sie atomy od czasteczek?", a: ["Atom to pojedyncza czastka pierwiastka", "Czasteczka sklada sie z dwoch lub wiecej atomow polaczonych ze soba", "Czasteczka moze zawierac atomy tego samego lub roznych pierwiastkow"] },
-  { topic: "Atomy i czasteczki", p: "e", q: "Jakie rodzaje czasteczek mozna wyroznic ze wzgledu na sklad?", a: ["Czasteczki pierwiastkow -- np. O2, N2 (te same atomy)", "Czasteczki zwiazkow chemicznych -- np. H2O, CO2 (rozne atomy)", "Czasteczki moga miec rozna liczbe atomow: AB, AB2, AB3, A2B3..."] },
-  { topic: "Atomy i czasteczki", p: "e", q: "Dlaczego atom jednego pierwiastka nie moze zamienic sie w inny w reakcji chemicznej?", a: ["Reakcja chemiczna zmienia tylko sposob polaczenia atomow", "Nie zmienia rodzaju ani liczby atomow", "Przemiany jadra (zmiana pierwiastka) to reakcje jadrowe, nie chemiczne"] },
+F("Ziarnista budowa materii","c",
+  "Jakie zjawiska dowodz\u0105 ziarnistej budowy materii?",
+  ["Dyfuzja \u2013 samorzutne mieszanie si\u0119 substancji",
+   "Kontrakcja obj\u0119to\u015bci \u2013 zmniejszenie obj\u0119to\u015bci przy mieszaniu cieczy",
+   "Rozpuszczanie i zmiany stan\u00f3w skupienia"]);
 
-  // --- Wzory strukturalne i sumaryczne (critical) ---
-  { topic: "Wzory chemiczne", p: "c", q: "Czym jest wzor sumaryczny?", a: ["Informuje o skladzie jakosciowym i ilosciowym substancji", "Sklada sie z symboli pierwiastkow i indeksow stechiometrycznych", "Np. H2O -- 2 atomy wodoru i 1 atom tlenu"] },
-  { topic: "Wzory chemiczne", p: "c", q: "Czym jest wzor strukturalny i czym rozni sie od sumarycznego?", a: ["Zawiera te same informacje co sumaryczny", "Dodatkowo pokazuje kolejnosc i sposob wiazania sie atomow", "Wiazania przedstawia sie za pomoca kresek miedzy symbolami"] },
-  { topic: "Wzory chemiczne", p: "c", q: "Co to jest wartosciowosc pierwiastka?", a: ["Liczba wiazan chemicznych, ktore tworzy atom w czasteczce", "We wzorze strukturalnym -- tyle kresek, ile wynosi wartosciowosc", "Np. tlen ma wartosciowosc II, wodor I"] },
-  // extra
-  { topic: "Wzory chemiczne", p: "e", q: "Co mozna odczytac ze wzoru sumarycznego CO2?", a: ["Sklad jakosciowy: wegiel (C) i tlen (O)", "Sklad ilosciowy: 1 atom wegla i 2 atomy tlenu", "Jest to tlenek wegla(IV) -- dwutlenek wegla"] },
-  { topic: "Wzory chemiczne", p: "e", q: "Narysuj mentalnie wzor strukturalny wody (H2O). Jaka jest wartosciowosc tlenu i wodoru?", a: ["H--O--H (tlen w srodku, po bokach wodory)", "Tlen tworzy 2 wiazania -- wartosciowosc II", "Wodor tworzy 1 wiazanie -- wartosciowosc I"] },
-  { topic: "Wzory chemiczne", p: "e", q: "Czym sa indeksy stechiometryczne we wzorze sumarycznym?", a: ["Male cyfry przy symbolach pierwiastkow (np. 2 w H2O)", "Okreslaja liczbe atomow danego pierwiastka w czasteczce", "Jesli indeks wynosi 1, nie zapisuje sie go"] },
-  { topic: "Wzory chemiczne", p: "e", q: "Jaki jest wzor sumaryczny i strukturalny amoniaku?", a: ["Sumaryczny: NH3 (1 azot, 3 wodory)", "Strukturalny: H--N z trzema kreskami do trzech H", "Azot ma wartosciowosc III, wodor I"] },
+F("Ziarnista budowa materii","c",
+  "Jakie s\u0105 rodzaje drobin?",
+  ["Atomy \u2013 najmniejsze cz\u0105stki pierwiastk\u00f3w",
+   "Cz\u0105steczki \u2013 zespo\u0142y atom\u00f3w po\u0142\u0105czonych ze sob\u0105"]);
 
-  // =============================================
-  // ROZDZIAL 3: WEWNETRZNA BUDOWA MATERII
-  // =============================================
+F("Ziarnista budowa materii","e",
+  "Czym jest dyfuzja? Podaj przyk\u0142ad.",
+  ["Samorzutne mieszanie si\u0119 cz\u0105steczek r\u00f3\u017cnych substancji",
+   "Np. rozprzestrzenianie si\u0119 zapachu perfum w pokoju",
+   "Zachodzi bez mieszania \u2013 drobiny poruszaj\u0105 si\u0119 same"]);
 
-  // --- Struktura atomu (critical) ---
-  { topic: "Struktura atomu", p: "c", q: "Z czego sklada sie atom?", a: ["Z jadra atomowego i krazacych wokol niego elektronow", "Jadro zawiera protony (ladunek +1) i neutrony (ladunek 0)", "Elektrony maja ladunek -1 i bardzo mala mase (1/1870 u)"] },
-  { topic: "Struktura atomu", p: "c", q: "Dlaczego atom jest elektrycznie obojetny?", a: ["Liczba protonow (+) w jadrze rowna sie liczbie elektronow (-)", "Ladunki dodatnie i ujemne sie rownowaza", "Dzieki temu atom nie ma ladunku netto"] },
-  { topic: "Struktura atomu", p: "c", q: "Co to jest liczba atomowa Z?", a: ["Liczba protonow w jadrze atomu", "Rownoczesnie rowna liczbie elektronow w atomie obojetnym", "Kazdy pierwiastek ma unikalna liczbe atomowa"] },
-  { topic: "Struktura atomu", p: "c", q: "Ile pierwiastkow odkryto na Ziemi i jakie sa granice?", a: ["92 pierwiastki naturalne: od wodoru (Z=1) do uranu (Z=92)", "Transuranowce (Z>92) sa otrzymywane sztucznie", "Ich jadra sa nietrwale"] },
-  // extra
-  { topic: "Struktura atomu", p: "e", q: "Porownaj mase i ladunek protonu, neutronu i elektronu.", a: ["Proton: masa ok. 1 u, ladunek +1", "Neutron: masa ok. 1 u, ladunek 0", "Elektron: masa 1/1870 u (pomijalna), ladunek -1"] },
-  { topic: "Struktura atomu", p: "e", q: "Gdzie skupiona jest praktycznie cala masa atomu?", a: ["W jadrze atomowym (protony + neutrony)", "Elektrony maja zaniedbywalnie mala mase", "Jadro jest bardzo male w porownaniu z calym atomem"] },
-  { topic: "Struktura atomu", p: "e", q: "Co okresla symbol pierwiastka z liczba atomowa i masowa?", a: ["Zapisujemy: A (u gory) i Z (u dolu) po lewej stronie symbolu", "Z -- liczba protonow, A -- suma protonow i neutronow", "A - Z = liczba neutronow"] },
+F("Ziarnista budowa materii","e",
+  "Czym jest kontrakcja obj\u0119to\u015bci?",
+  ["Zmniejszenie \u0142\u0105cznej obj\u0119to\u015bci przy mieszaniu dw\u00f3ch cieczy",
+   "Np. 50 ml wody + 50 ml spirytusu daje mniej ni\u017c 100 ml",
+   "Dowodzi, \u017ce mi\u0119dzy drobinami s\u0105 przerwy"]);
 
-  // --- Izotopy (critical) ---
-  { topic: "Izotopy", p: "c", q: "Czym sa izotopy?", a: ["Odmiany tego samego pierwiastka o roznej liczbie neutronow", "Maja taka sama liczbe atomowa Z, ale rozna liczbe masowa A", "Te same wlasciwosci chemiczne, ale nieco inne fizyczne"] },
-  { topic: "Izotopy", p: "c", q: "Co to jest liczba masowa A?", a: ["Suma protonow i neutronow w jadrze (A = Z + n)", "Roznica A - Z daje liczbe neutronow", "Rozne izotopy maja rozne A, ale to samo Z"] },
-  { topic: "Izotopy", p: "c", q: "Jak oblicza sie srednia mase atomowa pierwiastka?", a: ["Ze wzoru: Ar = (A1*p1 + A2*p2 + ...)/100%", "A1, A2 -- masy poszczegolnych izotopow", "p1, p2 -- ich udzialy procentowe w przyrodzie"] },
-  // extra
-  { topic: "Izotopy", p: "e", q: "Podaj przyklad izotopow jednego pierwiastka.", a: ["Magnez: Mg-24, Mg-25, Mg-26 (wszystkie Z=12)", "Roznia sie liczba neutronow: 12, 13, 14", "Srednia masa atomowa Mg z ukladu okresowego uwzglednia ich udzialy"] },
-  { topic: "Izotopy", p: "e", q: "Dlaczego masy atomowe w ukladzie okresowym nie sa liczbami calkowitymi?", a: ["Bo sa to srednie wazzone mas izotopow danego pierwiastka", "Uwzgledniaja procentowy udzial kazdego izotopu w przyrodzie", "Np. chlor: ok. 35,5 u (mieszanina Cl-35 i Cl-37)"] },
-  { topic: "Izotopy", p: "e", q: "Czym roznia sie izotopy pod wzgledem wlasciwosci?", a: ["Wlasciwosci chemiczne sa takie same (ta sama liczba elektronow)", "Wlasciwosci fizyczne nieco sie roznia (np. masa, temperatura topnienia)", "Bo roznia sie tylko liczba neutronow w jadrze"] },
+F("Ziarnista budowa materii","e",
+  "Dlaczego rozpuszczanie cukru w wodzie dowodzi ziarnisto\u015bci materii?",
+  ["Cukier znika, bo jego drobiny wchodz\u0105 w przerwy mi\u0119dzy drobinami wody",
+   "Obj\u0119to\u015b\u0107 roztworu nie wzrasta znacz\u0105co",
+   "Smak s\u0142odki w ca\u0142ym roztworze \u2013 drobiny rozproszy\u0142y si\u0119 r\u00f3wnomiernie"]);
 
-  // --- Masy atomow i czasteczek (critical) ---
-  { topic: "Masy atomow", p: "c", q: "Czym jest atomowa jednostka masy (u)?", a: ["Jednostka do okreslania mas drobin (atomow i czasteczek)", "Jest 602 tryliardy razy mniejsza od grama", "1 g = 6,02 * 10^23 u"] },
-  { topic: "Masy atomow", p: "c", q: "Czym jest masa atomowa i masa czasteczkowa?", a: ["Masa atomowa: masa jednego atomu wyrazona w u", "Masa czasteczkowa: masa jednej czasteczki wyrazona w u", "Nie ma dwoch pierwiastkow o tej samej masie atomowej"] },
-  { topic: "Masy atomow", p: "c", q: "Co mowi prawo stalosci skladu?", a: ["Sklad ilosciowy zwiazku chemicznego jest staly i charakterystyczny", "Kazda czasteczka danego zwiazku ma taki sam sklad atomowy", "To najwazniejsza roznica miedzy zwiazkiem chemicznym a mieszanina"] },
-  { topic: "Masy atomow", p: "c", q: "Jak mozna przedstawic sklad ilosciowy zwiazku chemicznego?", a: ["Stosunek atomowy -- proporcja liczby atomow", "Stosunek masowy -- proporcja mas pierwiastkow", "Sklad procentowy: %E = (masa pierwiastka / masa czasteczki) * 100%"] },
-  // extra
-  { topic: "Masy atomow", p: "e", q: "Jak obliczyc mase czasteczkowa wody (H2O)?", a: ["Masa H = ok. 1 u, masa O = ok. 16 u", "M(H2O) = 2 * 1 + 16 = 18 u", "Mase czasteczkowa liczymy sumujac masy wszystkich atomow w czasteczce"] },
-  { topic: "Masy atomow", p: "e", q: "Czym rozni sie zwiazek chemiczny od mieszaniny pod wzgledem skladu?", a: ["Zwiazek ma staly sklad (prawo stalosci skladu)", "Mieszanina moze miec dowolne proporcje skladnikow", "Np. woda to zawsze H2O, ale woda z cukrem moze miec rozne stezenia"] },
-  { topic: "Masy atomow", p: "e", q: "Jak obliczyc sklad procentowy CO2?", a: ["M(CO2) = 12 + 2*16 = 44 u", "%C = (12/44)*100% = 27,3%", "%O = (32/44)*100% = 72,7%"] },
+// --- Atomy i cz\u0105steczki ---
+F("Atomy i cz\u0105steczki","c",
+  "Czym jest atom?",
+  ["Najmniejsza ilo\u015b\u0107 pierwiastka zdolna do samodzielnego istnienia",
+   "Wszystkie atomy s\u0105 kuliste",
+   "R\u00f3\u017cni\u0105 si\u0119 mas\u0105 i rozmiarami (promieniem atomowym)"]);
 
-  // --- Prawo okresowosci i uklad okresowy (critical) ---
-  { topic: "Uklad okresowy", p: "c", q: "Co mowi prawo okresowosci (ujeccie makroskopowe)?", a: ["Wlasciwosci pierwiastkow zmieniaja sie okresowo", "Wraz ze wzrostem liczby atomowej Z", "Pierwiastki o podobnych wlasciwosciach pojawiaja sie regularnie"] },
-  { topic: "Uklad okresowy", p: "c", q: "Co mowi prawo okresowosci w ujeciu mikroskopowym?", a: ["Konfiguracje elektronowe pierwiastkow zmieniaja sie okresowo", "Wraz ze wzrostem liczby atomowej Z", "To elektronowa struktura tlumacy podobienstwo wlasciwosci"] },
-  { topic: "Uklad okresowy", p: "c", q: "Czym jest uklad okresowy (tablica Mendelejewa)?", a: ["Tablica, w ktorej zestawiono wszystkie znane pierwiastki", "Kolumny to grupy -- pierwiastki o podobnych wlasciwosciach", "Wiersze to okresy -- wlasciwosci zmieniaja sie od metali do niemetali"] },
-  { topic: "Uklad okresowy", p: "c", q: "Czym sa grupy w ukladzie okresowym?", a: ["Kolumny pionowe -- zawieraja pierwiastki o podobnych wlasciwosciach", "Grupy glowne: 1., 2. i 13.-18.", "Grupy poboczne (podgrupy): 3.-12.", ] },
-  { topic: "Uklad okresowy", p: "c", q: "Czym sa okresy w ukladzie okresowym?", a: ["Szeregi poziome pierwiastkow", "W kazdym okresie wlasciwosci zmieniaja sie stopniowo", "Od metali (po lewej) do niemetali (po prawej)"] },
-  // extra
-  { topic: "Uklad okresowy", p: "e", q: "Skad biora sie nazwy grup w ukladzie okresowym?", a: ["Od nazwy pierwszego pierwiastka stojakego najwyzej w kolumnie", "Np. grupa 16. to tlenowce, grupa 2. to berylowce", "Wyjatek: grupa 1. to litowce (nie od wodoru, lecz od litu)"] },
-  { topic: "Uklad okresowy", p: "e", q: "Jak zmienia sie charakter pierwiastkow w okresie (od lewej do prawej)?", a: ["Od typowych metali do typowych niemetali", "Np. w 3. okresie: Na, Mg (metale) -> Si (polmetal) -> Cl, Ar (niemetale)", "Na koncu okresu jest gaz szlachetny (bardzo malo reaktywny)"] },
-  { topic: "Uklad okresowy", p: "e", q: "Co laczy pierwiastki tej samej grupy glownej?", a: ["Maja taka sama liczbe elektronow walencyjnych", "Dzieki temu maja podobne wlasciwosci chemiczne", "Np. grupa 1. (litowce): Li, Na, K -- wszystkie sa aktywnymi metalami"] },
+F("Atomy i cz\u0105steczki","c",
+  "Jakie s\u0105 fizyczne i chemiczne cechy atomu?",
+  ["Fizyczne: masa, kszta\u0142t (kulisty), rozmiary (promie\u0144)",
+   "Chemiczne: zdolno\u015b\u0107 lub brak zdolno\u015bci \u0142\u0105czenia si\u0119 z innymi atomami",
+   "Atom danego pierwiastka nie mo\u017ce zamieni\u0107 si\u0119 w atom innego w reakcji chemicznej"]);
 
-  // --- Konfiguracja elektronowa (critical) ---
-  { topic: "Konfiguracja elektronowa", p: "c", q: "Czym sa powloki elektronowe?", a: ["Zespoly elektronow o zblizonej energii w atomie", "Oznaczane literami: K, L, M, N...", "Liczba powlok rowna sie numerowi okresu w ukladzie okresowym"] },
-  { topic: "Konfiguracja elektronowa", p: "c", q: "Co to sa elektrony walencyjne?", a: ["Elektrony na ostatniej (zewnetrznej) powloce", "Dla grup glownych ich liczba = cyfra jednosci numeru grupy", "Okreslaja wlasciwosci chemiczne pierwiastka"] },
-  { topic: "Konfiguracja elektronowa", p: "c", q: "Co to jest rdzen atomowy?", a: ["Jadro atomu wraz z elektronami niewalencyjnymi", "Czyli caly atom bez elektronow z ostatniej powloki", "Rdzen jest silnie zwiazany i malo reaktywny"] },
-  { topic: "Konfiguracja elektronowa", p: "c", q: "Czym jest konfiguracja elektronowa?", a: ["Rozmieszczenie elektronow w poszczegolnych powlokach", "Np. sod (Na): K2 L8 M1", "Wlasciwosci chemiczne zaleza od konfiguracji walencyjnej"] },
-  // extra
-  { topic: "Konfiguracja elektronowa", p: "e", q: "Ile elektronow maksymalnie miesci sie na powlokach K, L, M?", a: ["K: maksymalnie 2 elektrony", "L: maksymalnie 8 elektronow", "M: maksymalnie 18 elektronow"] },
-  { topic: "Konfiguracja elektronowa", p: "e", q: "Jak zapisac konfiguracje elektronowa glinu (Al, Z=13)?", a: ["Al ma 13 elektronow", "K2 L8 M3", "3 elektrony walencyjne (grupa 13., 3. okres)"] },
-  { topic: "Konfiguracja elektronowa", p: "e", q: "Dlaczego pierwiastki z tej samej grupy maja podobne wlasciwosci?", a: ["Maja taka sama liczbe elektronow walencyjnych", "Elektrony walencyjne decyduja o reaktywnosci", "Np. fluor (F) i chlor (Cl) -- oba w grupie 17., oba maja 7 e. walencyjnych"] },
-  { topic: "Konfiguracja elektronowa", p: "e", q: "Jak z ukladu okresowego odczytac liczbe powlok i elektronow walencyjnych?", a: ["Liczba powlok = numer okresu (wiersza)", "Elektrony walencyjne = cyfra jednosci numeru grupy glownej", "Np. siarka (S): okres 3, grupa 16 -> 3 powloki, 6 e. walencyjnych"] }
-];
+F("Atomy i cz\u0105steczki","c",
+  "Czym jest cz\u0105steczka i czym jest zwi\u0105zek chemiczny?",
+  ["Cz\u0105steczka to zesp\u00f3\u0142 atom\u00f3w po\u0142\u0105czonych ze sob\u0105",
+   "Zwi\u0105zek chemiczny to zbi\u00f3r cz\u0105steczek z\u0142o\u017conych z atom\u00f3w r\u00f3\u017cnych pierwiastk\u00f3w",
+   "Wszystkie cz\u0105steczki danego zwi\u0105zku maj\u0105 taki sam sk\u0142ad"]);
 
-// --- Engine (same as Rome flashcards) ---
+F("Atomy i cz\u0105steczki","c",
+  "Kt\u00f3re niemetale tworz\u0105 cz\u0105steczki dwuatomowe?",
+  ["Wod\u00f3r (H\u2082), tlen (O\u2082), azot (N\u2082), chlor (Cl\u2082)",
+   "Atomy tego samego pierwiastka \u0142\u0105cz\u0105 si\u0119 w pary",
+   "Jest to cecha wi\u0119kszo\u015bci niemetali"]);
+
+F("Atomy i cz\u0105steczki","e",
+  "Czym r\u00f3\u017cni\u0105 si\u0119 atomy od cz\u0105steczek?",
+  ["Atom to pojedyncza cz\u0105stka pierwiastka",
+   "Cz\u0105steczka sk\u0142ada si\u0119 z dw\u00f3ch lub wi\u0119cej atom\u00f3w po\u0142\u0105czonych ze sob\u0105",
+   "Cz\u0105steczka mo\u017ce zawiera\u0107 atomy tego samego lub r\u00f3\u017cnych pierwiastk\u00f3w"]);
+
+F("Atomy i cz\u0105steczki","e",
+  "Jakie rodzaje cz\u0105steczek mo\u017cna wyr\u00f3\u017cni\u0107 ze wzgl\u0119du na sk\u0142ad?",
+  ["Cz\u0105steczki pierwiastk\u00f3w \u2013 np. O\u2082, N\u2082 (te same atomy)",
+   "Cz\u0105steczki zwi\u0105zk\u00f3w chemicznych \u2013 np. H\u2082O, CO\u2082 (r\u00f3\u017cne atomy)",
+   "Cz\u0105steczki mog\u0105 mie\u0107 r\u00f3\u017cn\u0105 liczb\u0119 atom\u00f3w: AB, AB\u2082, AB\u2083, A\u2082B\u2083..."]);
+
+F("Atomy i cz\u0105steczki","e",
+  "Dlaczego atom jednego pierwiastka nie mo\u017ce zamieni\u0107 si\u0119 w inny w reakcji chemicznej?",
+  ["Reakcja chemiczna zmienia tylko spos\u00f3b po\u0142\u0105czenia atom\u00f3w",
+   "Nie zmienia rodzaju ani liczby atom\u00f3w",
+   "Przemiany j\u0105dra (zmiana pierwiastka) to reakcje j\u0105drowe, nie chemiczne"]);
+
+// --- Wzory chemiczne ---
+F("Wzory chemiczne","c",
+  "Czym jest wz\u00f3r sumaryczny?",
+  ["Informuje o sk\u0142adzie jako\u015bciowym i ilo\u015bciowym substancji",
+   "Sk\u0142ada si\u0119 z symboli pierwiastk\u00f3w i indeks\u00f3w stechiometrycznych",
+   "Np. H\u2082O \u2013 2 atomy wodoru i 1 atom tlenu"]);
+
+F("Wzory chemiczne","c",
+  "Czym jest wz\u00f3r strukturalny i czym r\u00f3\u017cni si\u0119 od sumarycznego?",
+  ["Zawiera te same informacje co sumaryczny",
+   "Dodatkowo pokazuje kolejno\u015b\u0107 i spos\u00f3b wi\u0105zania si\u0119 atom\u00f3w",
+   "Wi\u0105zania przedstawia si\u0119 za pomoc\u0105 kresek mi\u0119dzy symbolami"]);
+
+F("Wzory chemiczne","c",
+  "Co to jest warto\u015bciowo\u015b\u0107 pierwiastka?",
+  ["Liczba wi\u0105za\u0144 chemicznych, kt\u00f3re tworzy atom w cz\u0105steczce",
+   "We wzorze strukturalnym \u2013 tyle kresek, ile wynosi warto\u015bciowo\u015b\u0107",
+   "Np. tlen ma warto\u015bciowo\u015b\u0107 II, wod\u00f3r I"]);
+
+F("Wzory chemiczne","e",
+  "Co mo\u017cna odczyta\u0107 ze wzoru sumarycznego CO\u2082?",
+  ["Sk\u0142ad jako\u015bciowy: w\u0119giel (C) i tlen (O)",
+   "Sk\u0142ad ilo\u015bciowy: 1 atom w\u0119gla i 2 atomy tlenu",
+   "Jest to tlenek w\u0119gla(IV) \u2013 dwutlenek w\u0119gla"]);
+
+F("Wzory chemiczne","e",
+  "Jaki jest wz\u00f3r strukturalny wody (H\u2082O)? Jaka jest warto\u015bciowo\u015b\u0107 tlenu i wodoru?",
+  ["H\u2013O\u2013H (tlen w \u015brodku, po bokach wodory)",
+   "Tlen tworzy 2 wi\u0105zania \u2013 warto\u015bciowo\u015b\u0107 II",
+   "Wod\u00f3r tworzy 1 wi\u0105zanie \u2013 warto\u015bciowo\u015b\u0107 I"]);
+
+F("Wzory chemiczne","e",
+  "Czym s\u0105 indeksy stechiometryczne we wzorze sumarycznym?",
+  ["Ma\u0142e cyfry przy symbolach pierwiastk\u00f3w (np. 2 w H\u2082O)",
+   "Okre\u015blaj\u0105 liczb\u0119 atom\u00f3w danego pierwiastka w cz\u0105steczce",
+   "Je\u015bli indeks wynosi 1, nie zapisuje si\u0119 go"]);
+
+F("Wzory chemiczne","e",
+  "Jaki jest wz\u00f3r sumaryczny i strukturalny amoniaku?",
+  ["Sumaryczny: NH\u2083 (1 azot, 3 wodory)",
+   "Strukturalny: azot po\u0142\u0105czony trzema kreskami z trzema wodorami",
+   "Azot ma warto\u015bciowo\u015b\u0107 III, wod\u00f3r I"]);
+
+// =============================================
+// ROZDZIA\u0141 3: WEWN\u0118TRZNA BUDOWA MATERII
+// =============================================
+
+// --- Struktura atomu ---
+F("Struktura atomu","c",
+  "Z czego sk\u0142ada si\u0119 atom?",
+  ["Z j\u0105dra atomowego i kr\u0105\u017c\u0105cych wok\u00f3\u0142 niego elektron\u00f3w",
+   "J\u0105dro zawiera protony (\u0142adunek +1) i neutrony (\u0142adunek 0)",
+   "Elektrony maj\u0105 \u0142adunek \u22121 i bardzo ma\u0142\u0105 mas\u0119 (1/1870 u)"]);
+
+F("Struktura atomu","c",
+  "Dlaczego atom jest elektrycznie oboj\u0119tny?",
+  ["Liczba proton\u00f3w (+) w j\u0105drze r\u00f3wna si\u0119 liczbie elektron\u00f3w (\u2212)",
+   "\u0141adunki dodatnie i ujemne si\u0119 r\u00f3wnowa\u017c\u0105",
+   "Dzi\u0119ki temu atom nie ma \u0142adunku netto"]);
+
+F("Struktura atomu","c",
+  "Co to jest liczba atomowa Z?",
+  ["Liczba proton\u00f3w w j\u0105drze atomu",
+   "R\u00f3wnocze\u015bnie r\u00f3wna liczbie elektron\u00f3w w atomie oboj\u0119tnym",
+   "Ka\u017cdy pierwiastek ma unikaln\u0105 liczb\u0119 atomow\u0105"]);
+
+F("Struktura atomu","c",
+  "Ile pierwiastk\u00f3w odkryto na Ziemi i jakie s\u0105 granice?",
+  ["92 pierwiastki naturalne: od wodoru (Z=1) do uranu (Z=92)",
+   "Transuranowce (Z>92) s\u0105 otrzymywane sztucznie",
+   "Ich j\u0105dra s\u0105 nietrwa\u0142e"]);
+
+F("Struktura atomu","e",
+  "Por\u00f3wnaj mas\u0119 i \u0142adunek protonu, neutronu i elektronu.",
+  ["Proton: masa ok. 1 u, \u0142adunek +1",
+   "Neutron: masa ok. 1 u, \u0142adunek 0",
+   "Elektron: masa 1/1870 u (pomijalna), \u0142adunek \u22121"]);
+
+F("Struktura atomu","e",
+  "Gdzie skupiona jest praktycznie ca\u0142a masa atomu?",
+  ["W j\u0105drze atomowym (protony + neutrony)",
+   "Elektrony maj\u0105 zaniedbywalnie ma\u0142\u0105 mas\u0119",
+   "J\u0105dro jest bardzo ma\u0142e w por\u00f3wnaniu z ca\u0142ym atomem"]);
+
+F("Struktura atomu","e",
+  "Co okre\u015bla symbol pierwiastka z liczb\u0105 atomow\u0105 i masow\u0105?",
+  ["Zapisujemy: A (u g\u00f3ry) i Z (u do\u0142u) po lewej stronie symbolu",
+   "Z \u2013 liczba proton\u00f3w, A \u2013 suma proton\u00f3w i neutron\u00f3w",
+   "A \u2212 Z = liczba neutron\u00f3w"]);
+
+// --- Izotopy ---
+F("Izotopy","c",
+  "Czym s\u0105 izotopy?",
+  ["Odmiany tego samego pierwiastka o r\u00f3\u017cnej liczbie neutron\u00f3w",
+   "Maj\u0105 tak\u0105 sam\u0105 liczb\u0119 atomow\u0105 Z, ale r\u00f3\u017cn\u0105 liczb\u0119 masow\u0105 A",
+   "Te same w\u0142a\u015bciwo\u015bci chemiczne, ale nieco inne fizyczne"]);
+
+F("Izotopy","c",
+  "Co to jest liczba masowa A?",
+  ["Suma proton\u00f3w i neutron\u00f3w w j\u0105drze (A = Z + n)",
+   "R\u00f3\u017cnica A \u2212 Z daje liczb\u0119 neutron\u00f3w",
+   "R\u00f3\u017cne izotopy maj\u0105 r\u00f3\u017cne A, ale to samo Z"]);
+
+F("Izotopy","c",
+  "Jak oblicza si\u0119 \u015bredni\u0105 mas\u0119 atomow\u0105 pierwiastka?",
+  ["Ze wzoru: Ar = (A\u2081\u00b7p\u2081 + A\u2082\u00b7p\u2082 + ...) / 100%",
+   "A\u2081, A\u2082 \u2013 masy poszczeg\u00f3lnych izotop\u00f3w",
+   "p\u2081, p\u2082 \u2013 ich udzia\u0142y procentowe w przyrodzie"]);
+
+F("Izotopy","e",
+  "Podaj przyk\u0142ad izotop\u00f3w jednego pierwiastka.",
+  ["Magnez: Mg-24, Mg-25, Mg-26 (wszystkie Z=12)",
+   "R\u00f3\u017cni\u0105 si\u0119 liczb\u0105 neutron\u00f3w: 12, 13, 14",
+   "\u015arednia masa atomowa Mg z uk\u0142adu okresowego uwzgl\u0119dnia ich udzia\u0142y"]);
+
+F("Izotopy","e",
+  "Dlaczego masy atomowe w uk\u0142adzie okresowym nie s\u0105 liczbami ca\u0142kowitymi?",
+  ["Bo s\u0105 to \u015brednie wa\u017cone mas izotop\u00f3w danego pierwiastka",
+   "Uwzgl\u0119dniaj\u0105 procentowy udzia\u0142 ka\u017cdego izotopu w przyrodzie",
+   "Np. chlor: ok. 35,5 u (mieszanina Cl-35 i Cl-37)"]);
+
+F("Izotopy","e",
+  "Czym r\u00f3\u017cni\u0105 si\u0119 izotopy pod wzgl\u0119dem w\u0142a\u015bciwo\u015bci?",
+  ["W\u0142a\u015bciwo\u015bci chemiczne s\u0105 takie same (ta sama liczba elektron\u00f3w)",
+   "W\u0142a\u015bciwo\u015bci fizyczne nieco si\u0119 r\u00f3\u017cni\u0105 (np. masa, temperatura topnienia)",
+   "Bo r\u00f3\u017cni\u0105 si\u0119 tylko liczb\u0105 neutron\u00f3w w j\u0105drze"]);
+
+// --- Masy atom\u00f3w i cz\u0105steczek ---
+F("Masy atom\u00f3w","c",
+  "Czym jest atomowa jednostka masy (u)?",
+  ["Jednostka do okre\u015blania mas drobin (atom\u00f3w i cz\u0105steczek)",
+   "Jest 602 tryliardy razy mniejsza od grama",
+   "1 g = 6,02 \u00b7 10\u00b2\u00b3 u"]);
+
+F("Masy atom\u00f3w","c",
+  "Czym jest masa atomowa i masa cz\u0105steczkowa?",
+  ["Masa atomowa: masa jednego atomu wyra\u017cona w u",
+   "Masa cz\u0105steczkowa: masa jednej cz\u0105steczki wyra\u017cona w u",
+   "Nie ma dw\u00f3ch pierwiastk\u00f3w o tej samej masie atomowej"]);
+
+F("Masy atom\u00f3w","c",
+  "Co m\u00f3wi prawo sta\u0142o\u015bci sk\u0142adu?",
+  ["Sk\u0142ad ilo\u015bciowy zwi\u0105zku chemicznego jest sta\u0142y i charakterystyczny",
+   "Ka\u017cda cz\u0105steczka danego zwi\u0105zku ma taki sam sk\u0142ad atomowy",
+   "To najwa\u017cniejsza r\u00f3\u017cnica mi\u0119dzy zwi\u0105zkiem chemicznym a mieszanin\u0105"]);
+
+F("Masy atom\u00f3w","c",
+  "Jak mo\u017cna przedstawi\u0107 sk\u0142ad ilo\u015bciowy zwi\u0105zku chemicznego?",
+  ["Stosunek atomowy \u2013 proporcja liczby atom\u00f3w",
+   "Stosunek masowy \u2013 proporcja mas pierwiastk\u00f3w",
+   "Sk\u0142ad procentowy: %E = (masa pierwiastka / masa cz\u0105steczki) \u00b7 100%"]);
+
+F("Masy atom\u00f3w","e",
+  "Jak obliczy\u0107 mas\u0119 cz\u0105steczkow\u0105 wody (H\u2082O)?",
+  ["Masa H = ok. 1 u, masa O = ok. 16 u",
+   "M(H\u2082O) = 2 \u00b7 1 + 16 = 18 u",
+   "Mas\u0119 cz\u0105steczkow\u0105 liczymy sumuj\u0105c masy wszystkich atom\u00f3w w cz\u0105steczce"]);
+
+F("Masy atom\u00f3w","e",
+  "Czym r\u00f3\u017cni si\u0119 zwi\u0105zek chemiczny od mieszaniny pod wzgl\u0119dem sk\u0142adu?",
+  ["Zwi\u0105zek ma sta\u0142y sk\u0142ad (prawo sta\u0142o\u015bci sk\u0142adu)",
+   "Mieszanina mo\u017ce mie\u0107 dowolne proporcje sk\u0142adnik\u00f3w",
+   "Np. woda to zawsze H\u2082O, ale woda z cukrem mo\u017ce mie\u0107 r\u00f3\u017cne st\u0119\u017cenia"]);
+
+F("Masy atom\u00f3w","e",
+  "Jak obliczy\u0107 sk\u0142ad procentowy CO\u2082?",
+  ["M(CO\u2082) = 12 + 2\u00b716 = 44 u",
+   "%C = (12/44)\u00b7100% = 27,3%",
+   "%O = (32/44)\u00b7100% = 72,7%"]);
+
+// --- Uk\u0142ad okresowy ---
+F("Uk\u0142ad okresowy","c",
+  "Co m\u00f3wi prawo okresowo\u015bci (uj\u0119cie makroskopowe)?",
+  ["W\u0142a\u015bciwo\u015bci pierwiastk\u00f3w zmieniaj\u0105 si\u0119 okresowo",
+   "Wraz ze wzrostem liczby atomowej Z",
+   "Pierwiastki o podobnych w\u0142a\u015bciwo\u015bciach pojawiaj\u0105 si\u0119 regularnie"]);
+
+F("Uk\u0142ad okresowy","c",
+  "Co m\u00f3wi prawo okresowo\u015bci w uj\u0119ciu mikroskopowym?",
+  ["Konfiguracje elektronowe pierwiastk\u00f3w zmieniaj\u0105 si\u0119 okresowo",
+   "Wraz ze wzrostem liczby atomowej Z",
+   "To elektronowa struktura t\u0142umaczy podobie\u0144stwo w\u0142a\u015bciwo\u015bci"]);
+
+F("Uk\u0142ad okresowy","c",
+  "Czym jest uk\u0142ad okresowy (tablica Mendelejewa)?",
+  ["Tablica, w kt\u00f3rej zestawiono wszystkie znane pierwiastki",
+   "Kolumny to grupy \u2013 pierwiastki o podobnych w\u0142a\u015bciwo\u015bciach",
+   "Wiersze to okresy \u2013 w\u0142a\u015bciwo\u015bci zmieniaj\u0105 si\u0119 od metali do niemetali"]);
+
+F("Uk\u0142ad okresowy","c",
+  "Czym s\u0105 grupy w uk\u0142adzie okresowym?",
+  ["Kolumny pionowe \u2013 zawieraj\u0105 pierwiastki o podobnych w\u0142a\u015bciwo\u015bciach",
+   "Grupy g\u0142\u00f3wne: 1., 2. i 13.\u201318.",
+   "Grupy poboczne (podgrupy): 3.\u201312."]);
+
+F("Uk\u0142ad okresowy","c",
+  "Czym s\u0105 okresy w uk\u0142adzie okresowym?",
+  ["Szeregi poziome pierwiastk\u00f3w",
+   "W ka\u017cdym okresie w\u0142a\u015bciwo\u015bci zmieniaj\u0105 si\u0119 stopniowo",
+   "Od metali (po lewej) do niemetali (po prawej)"]);
+
+F("Uk\u0142ad okresowy","e",
+  "Sk\u0105d bior\u0105 si\u0119 nazwy grup w uk\u0142adzie okresowym?",
+  ["Od nazwy pierwszego pierwiastka stoj\u0105cego najwy\u017cej w kolumnie",
+   "Np. grupa 16. to tlenowce, grupa 2. to berylowce",
+   "Wyj\u0105tek: grupa 1. to litowce (nie od wodoru, lecz od litu)"]);
+
+F("Uk\u0142ad okresowy","e",
+  "Jak zmienia si\u0119 charakter pierwiastk\u00f3w w okresie (od lewej do prawej)?",
+  ["Od typowych metali do typowych niemetali",
+   "Np. w 3. okresie: Na, Mg (metale) \u2192 Si (p\u00f3\u0142metal) \u2192 Cl, Ar (niemetale)",
+   "Na ko\u0144cu okresu jest gaz szlachetny (bardzo ma\u0142o reaktywny)"]);
+
+F("Uk\u0142ad okresowy","e",
+  "Co \u0142\u0105czy pierwiastki tej samej grupy g\u0142\u00f3wnej?",
+  ["Maj\u0105 tak\u0105 sam\u0105 liczb\u0119 elektron\u00f3w walencyjnych",
+   "Dzi\u0119ki temu maj\u0105 podobne w\u0142a\u015bciwo\u015bci chemiczne",
+   "Np. grupa 1. (litowce): Li, Na, K \u2013 wszystkie s\u0105 aktywnymi metalami"]);
+
+// --- Konfiguracja elektronowa ---
+F("Konfiguracja elektronowa","c",
+  "Czym s\u0105 pow\u0142oki elektronowe?",
+  ["Zespo\u0142y elektron\u00f3w o zbli\u017conej energii w atomie",
+   "Oznaczane literami: K, L, M, N...",
+   "Liczba pow\u0142ok r\u00f3wna si\u0119 numerowi okresu w uk\u0142adzie okresowym"]);
+
+F("Konfiguracja elektronowa","c",
+  "Co to s\u0105 elektrony walencyjne?",
+  ["Elektrony na ostatniej (zewn\u0119trznej) pow\u0142oce",
+   "Dla grup g\u0142\u00f3wnych ich liczba = cyfra jedno\u015bci numeru grupy",
+   "Okre\u015blaj\u0105 w\u0142a\u015bciwo\u015bci chemiczne pierwiastka"]);
+
+F("Konfiguracja elektronowa","c",
+  "Co to jest rdze\u0144 atomowy?",
+  ["J\u0105dro atomu wraz z elektronami niewalencyjnymi",
+   "Czyli ca\u0142y atom bez elektron\u00f3w z ostatniej pow\u0142oki",
+   "Rdze\u0144 jest silnie zwi\u0105zany i ma\u0142o reaktywny"]);
+
+F("Konfiguracja elektronowa","c",
+  "Czym jest konfiguracja elektronowa?",
+  ["Rozmieszczenie elektron\u00f3w w poszczeg\u00f3lnych pow\u0142okach",
+   "Np. s\u00f3d (Na): K\u00b2L\u2078M\u00b9",
+   "W\u0142a\u015bciwo\u015bci chemiczne zale\u017c\u0105 od konfiguracji walencyjnej"]);
+
+F("Konfiguracja elektronowa","e",
+  "Ile elektron\u00f3w maksymalnie mie\u015bci si\u0119 na pow\u0142okach K, L, M?",
+  ["K: maksymalnie 2 elektrony",
+   "L: maksymalnie 8 elektron\u00f3w",
+   "M: maksymalnie 18 elektron\u00f3w"]);
+
+F("Konfiguracja elektronowa","e",
+  "Jak zapisa\u0107 konfiguracj\u0119 elektronow\u0105 glinu (Al, Z=13)?",
+  ["Al ma 13 elektron\u00f3w",
+   "K\u00b2L\u2078M\u00b3",
+   "3 elektrony walencyjne (grupa 13., 3. okres)"]);
+
+F("Konfiguracja elektronowa","e",
+  "Dlaczego pierwiastki z tej samej grupy maj\u0105 podobne w\u0142a\u015bciwo\u015bci?",
+  ["Maj\u0105 tak\u0105 sam\u0105 liczb\u0119 elektron\u00f3w walencyjnych",
+   "Elektrony walencyjne decyduj\u0105 o reaktywno\u015bci",
+   "Np. fluor (F) i chlor (Cl) \u2013 oba w grupie 17., oba maj\u0105 7 e. walencyjnych"]);
+
+F("Konfiguracja elektronowa","e",
+  "Jak z uk\u0142adu okresowego odczyta\u0107 liczb\u0119 pow\u0142ok i elektron\u00f3w walencyjnych?",
+  ["Liczba pow\u0142ok = numer okresu (wiersza)",
+   "Elektrony walencyjne = cyfra jedno\u015bci numeru grupy g\u0142\u00f3wnej",
+   "Np. siarka (S): okres 3, grupa 16 \u2192 3 pow\u0142oki, 6 e. walencyjnych"]);
+
+// === ENGINE ===
 var TOPICS = ["Wszystkie"];
 var seen = {};
 for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
   var t = ALL_FLASHCARDS[i].topic;
   if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
 }
-
 var activeTopic = "Wszystkie";
 var activeFilter = "all";
 var filteredCards = ALL_FLASHCARDS.slice();
 var currentIndex = 0;
 var isFlipped = false;
 var isAnimating = false;
-
 var card = document.getElementById('card');
 var cardFront = document.getElementById('cardFront');
 var cardBack = document.getElementById('cardBack');
@@ -528,7 +500,6 @@ function applyFilters() {
   card.classList.remove('flipped');
   renderCard();
 }
-
 function buildTopicBar() {
   topicBar.innerHTML = '';
   for (var i = 0; i < TOPICS.length; i++) {
@@ -537,134 +508,69 @@ function buildTopicBar() {
     pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
     pill.textContent = t;
     pill.setAttribute('data-topic', t);
-    pill.onclick = function() {
-      activeTopic = this.getAttribute('data-topic');
-      buildTopicBar();
-      applyFilters();
-    };
+    pill.onclick = function() { activeTopic = this.getAttribute('data-topic'); buildTopicBar(); applyFilters(); };
     topicBar.appendChild(pill);
   }
 }
-
 function buildPriorityRow() {
-  var opts = [
-    { key: "all", label: "Wszystkie", dotClass: "" },
-    { key: "c", label: "Kluczowe", dotClass: "critical" },
-    { key: "e", label: "Dodatkowe", dotClass: "extra" }
-  ];
+  var opts = [{key:"all",label:"Wszystkie",dc:""},{key:"c",label:"Kluczowe",dc:"critical"},{key:"e",label:"Dodatkowe",dc:"extra"}];
   priorityRow.innerHTML = '';
   for (var i = 0; i < opts.length; i++) {
     var o = opts[i];
     var pill = document.createElement('button');
     pill.className = 'priority-pill' + (activeFilter === o.key ? ' active' : '');
-    pill.innerHTML = (o.dotClass ? '<span class="dot ' + o.dotClass + '"></span>' : '') + o.label;
+    pill.innerHTML = (o.dc ? '<span class="dot '+o.dc+'"></span>' : '') + o.label;
     pill.setAttribute('data-key', o.key);
-    pill.onclick = function() {
-      activeFilter = this.getAttribute('data-key');
-      buildPriorityRow();
-      applyFilters();
-    };
+    pill.onclick = function() { activeFilter = this.getAttribute('data-key'); buildPriorityRow(); applyFilters(); };
     priorityRow.appendChild(pill);
   }
 }
-
 function renderCard() {
   if (filteredCards.length === 0) {
     cardFront.innerHTML = '<div class="card-question">Brak fiszek dla tego filtra</div>';
     cardBack.innerHTML = '';
     progressFill.style.width = '0%';
     progressLabel.textContent = '0 / 0';
-    prevBtn.disabled = true;
-    nextBtn.disabled = true;
+    prevBtn.disabled = true; nextBtn.disabled = true;
     return;
   }
   var fc = filteredCards[currentIndex];
   var isCritical = fc.p === "c";
-
   cardFront.className = 'card-face card-front' + (isCritical ? ' is-critical' : '');
-
-  var badgeHTML = isCritical
-    ? '<span class="card-badge critical">kluczowe</span>'
-    : '<span class="card-badge extra">dodatkowe</span>';
-
-  cardFront.innerHTML =
-    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div>' + badgeHTML + '</div>' +
-    '<div class="card-question">' + fc.q + '</div>' +
-    '<div class="tap-hint">dotknij, aby odkryc odpowiedz</div>';
-
-  var answersHTML = '';
-  for (var i = 0; i < fc.a.length; i++) {
-    answersHTML += '<li>' + fc.a[i] + '</li>';
-  }
-
-  cardBack.innerHTML =
-    '<div class="card-topic">' + fc.topic + '</div>' +
-    '<div class="answer-label">Odpowiedz</div>' +
-    '<ul class="answer-list">' + answersHTML + '</ul>' +
-    '<div class="tap-hint">dotknij, aby wrocic do pytania</div>';
-
-  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
-  progressFill.style.width = progress + '%';
-  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
-
+  var badgeHTML = isCritical ? '<span class="card-badge critical">kluczowe</span>' : '<span class="card-badge extra">dodatkowe</span>';
+  cardFront.innerHTML = '<div class="card-header"><div class="card-topic">'+fc.topic+'</div>'+badgeHTML+'</div><div class="card-question">'+fc.q+'</div><div class="tap-hint">dotknij, aby odkry\u0107 odpowied\u017a</div>';
+  var aHTML = '';
+  for (var i = 0; i < fc.a.length; i++) aHTML += '<li>'+fc.a[i]+'</li>';
+  cardBack.innerHTML = '<div class="card-topic">'+fc.topic+'</div><div class="answer-label">Odpowied\u017a</div><ul class="answer-list">'+aHTML+'</ul><div class="tap-hint">dotknij, aby wr\u00f3ci\u0107 do pytania</div>';
+  var progress = ((currentIndex+1)/filteredCards.length)*100;
+  progressFill.style.width = progress+'%';
+  progressLabel.textContent = (currentIndex+1)+' / '+filteredCards.length;
   prevBtn.disabled = currentIndex === 0;
-  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+  nextBtn.disabled = currentIndex === filteredCards.length-1;
 }
-
-function flipCard() {
-  if (isAnimating) return;
-  isFlipped = !isFlipped;
-  card.classList.toggle('flipped', isFlipped);
+function flipCard() { if (isAnimating) return; isFlipped = !isFlipped; card.classList.toggle('flipped', isFlipped); }
+function navigateTo(ni, dir) {
+  if (isAnimating || ni < 0 || ni >= filteredCards.length) return;
+  isAnimating = true; isFlipped = false; card.classList.remove('flipped');
+  var ac = dir === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(ac);
+  setTimeout(function(){currentIndex=ni;renderCard();},140);
+  setTimeout(function(){card.classList.remove(ac);isAnimating=false;},350);
 }
-
-function navigateTo(newIndex, direction) {
-  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
-  isAnimating = true;
-  isFlipped = false;
-  card.classList.remove('flipped');
-  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
-  card.classList.add(animClass);
-  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
-  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+function prevCard(){navigateTo(currentIndex-1,'right');}
+function nextCard(){navigateTo(currentIndex+1,'left');}
+function shuffleDeck(){
+  if(isAnimating)return;
+  for(var i=filteredCards.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=filteredCards[i];filteredCards[i]=filteredCards[j];filteredCards[j]=tmp;}
+  isFlipped=false;card.classList.remove('flipped');navigateTo(0,'left');
 }
-
-function prevCard() { navigateTo(currentIndex - 1, 'right'); }
-function nextCard() { navigateTo(currentIndex + 1, 'left'); }
-
-function shuffleDeck() {
-  if (isAnimating) return;
-  for (var i = filteredCards.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var tmp = filteredCards[i];
-    filteredCards[i] = filteredCards[j];
-    filteredCards[j] = tmp;
-  }
-  isFlipped = false;
-  card.classList.remove('flipped');
-  navigateTo(0, 'left');
-}
-
-card.addEventListener('click', flipCard);
-
-var touchStartX = 0;
-var cardContainer = document.querySelector('.card-container');
-cardContainer.addEventListener('touchstart', function(e) {
-  touchStartX = e.changedTouches[0].screenX;
-}, { passive: true });
-cardContainer.addEventListener('touchend', function(e) {
-  var diff = touchStartX - e.changedTouches[0].screenX;
-  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
-});
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowLeft') prevCard();
-  else if (e.key === 'ArrowRight') nextCard();
-  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
-});
-
-buildTopicBar();
-buildPriorityRow();
-renderCard();
+card.addEventListener('click',flipCard);
+var touchStartX=0;
+var cardContainer=document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart',function(e){touchStartX=e.changedTouches[0].screenX;},{passive:true});
+cardContainer.addEventListener('touchend',function(e){var diff=touchStartX-e.changedTouches[0].screenX;if(Math.abs(diff)>60){if(diff>0)nextCard();else prevCard();}});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')prevCard();else if(e.key==='ArrowRight')nextCard();else if(e.key===' '){e.preventDefault();flipCard();}});
+buildTopicBar();buildPriorityRow();renderCard();
 </script>
 </body>
 </html>
