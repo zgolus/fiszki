@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Chemia kl. 7 — Fiszki</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #121820;
+    --card-front: #eaf0f5;
+    --card-back: #1c2530;
+    --accent: #5b9bd5;
+    --accent-light: #a8cce8;
+    --text-dark: #1c2530;
+    --text-light: #eaf0f5;
+    --text-muted: #7a8ea0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #2a3545;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .priority-row {
+    display: flex;
+    gap: 8px;
+  }
+  .priority-pill {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #2a3545;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .priority-pill.active {
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .priority-pill .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .priority-pill .dot.critical { background: #5b9bd5; }
+  .priority-pill .dot.extra { background: #6b8a6b; }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #2a3545;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-badge {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+  }
+  .card-front .card-badge.critical {
+    background: #5b9bd5;
+    color: #fff;
+  }
+  .card-front .card-badge.extra {
+    background: transparent;
+    border: 1px solid #9aacbb;
+    color: #7a8ea0;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #8a9aaa;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-front.is-critical {
+    border-top: 3px solid #5b9bd5;
+  }
+
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #2a3545;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #2a3545;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Chemia &middot; klasa 7</h1>
+  <div class="subtitle">Kod chemiczny &middot; Budowa materii</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+  <div class="priority-row" id="priorityRow"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+var ALL_FLASHCARDS = [
+
+  // =============================================
+  // ROZDZIAL 2: KOD CHEMICZNY
+  // =============================================
+
+  // --- Ziarnista budowa materii (critical) ---
+  { topic: "Ziarnista budowa materii", p: "c", q: "Na czym polega ziarnistosc (nieciaglosc) materii?", a: ["Wszystkie substancje skladaja sie z bardzo malych czasteczek zwanych drobinami", "Drobiny nie wypelniaja przestrzeni w sposob ciagly -- sa miedzy nimi przerwy"] },
+  { topic: "Ziarnista budowa materii", p: "c", q: "Jakie zjawiska dowodza ziarnistej budowy materii?", a: ["Dyfuzja -- samorzutne mieszanie sie substancji", "Kontrakcja objetosci -- zmniejszenie objetosci przy mieszaniu cieczy", "Rozpuszczanie i zmiany stanow skupienia"] },
+  { topic: "Ziarnista budowa materii", p: "c", q: "Jakie sa rodzaje drobin?", a: ["Atomy -- najmniejsze czastki pierwiastkow", "Czasteczki -- zespoly atomow polaczonych ze soba"] },
+  // extra
+  { topic: "Ziarnista budowa materii", p: "e", q: "Czym jest dyfuzja? Podaj przyklad.", a: ["Samorzutne mieszanie sie czasteczek roznych substancji", "Np. rozprzestrzenianie sie zapachu perfum w pokoju", "Zachodzi bez mieszania -- drobiny poruszaja sie same"] },
+  { topic: "Ziarnista budowa materii", p: "e", q: "Czym jest kontrakcja objetosci?", a: ["Zmniejszenie lacznej objetosci przy mieszaniu dwoch cieczy", "Np. 50 ml wody + 50 ml spirytusu daje mniej niz 100 ml", "Dowodzi, ze miedzy drobinami sa przerwy"] },
+  { topic: "Ziarnista budowa materii", p: "e", q: "Dlaczego rozpuszczanie cukru w wodzie dowodzi ziarnistosci materii?", a: ["Cukier znika, bo jego drobiny wchodza w przerwy miedzy drobinami wody", "Objetosc roztworu nie wzrasta znaczaco", "Smak slodki w calym roztworze -- drobiny rozproszyly sie rownomiernie"] },
+
+  // --- Atomy i czasteczki (critical) ---
+  { topic: "Atomy i czasteczki", p: "c", q: "Czym jest atom?", a: ["Najmniejsza ilosc pierwiastka zdolna do samodzielnego istnienia", "Wszystkie atomy sa kuliste", "Roznia sie masa i rozmiarami (promieniem atomowym)"] },
+  { topic: "Atomy i czasteczki", p: "c", q: "Jakie sa fizyczne i chemiczne cechy atomu?", a: ["Fizyczne: masa, ksztalt (kulisty), rozmiary (promien)", "Chemiczne: zdolnosc lub brak zdolnosci laczenia sie z innymi atomami", "Atom jednego pierwiastka nie moze zamienic sie w atom innego w reakcji chemicznej"] },
+  { topic: "Atomy i czasteczki", p: "c", q: "Czym jest czasteczka i czym jest zwiazek chemiczny?", a: ["Czasteczka to zespol atomow polaczonych ze soba", "Zwiazek chemiczny to zbior czasteczek zlozonych z atomow roznych pierwiastkow", "Wszystkie czasteczki danego zwiazku maja taki sam sklad"] },
+  { topic: "Atomy i czasteczki", p: "c", q: "Ktore niemetale tworza czasteczki dwuatomowe?", a: ["Wodor (H2), tlen (O2), azot (N2), chlor (Cl2)", "Atomy tego samego pierwiastka lacza sie w pary", "Jest to cecha wiekszosci niemetali"] },
+  // extra
+  { topic: "Atomy i czasteczki", p: "e", q: "Czym roznia sie atomy od czasteczek?", a: ["Atom to pojedyncza czastka pierwiastka", "Czasteczka sklada sie z dwoch lub wiecej atomow polaczonych ze soba", "Czasteczka moze zawierac atomy tego samego lub roznych pierwiastkow"] },
+  { topic: "Atomy i czasteczki", p: "e", q: "Jakie rodzaje czasteczek mozna wyroznic ze wzgledu na sklad?", a: ["Czasteczki pierwiastkow -- np. O2, N2 (te same atomy)", "Czasteczki zwiazkow chemicznych -- np. H2O, CO2 (rozne atomy)", "Czasteczki moga miec rozna liczbe atomow: AB, AB2, AB3, A2B3..."] },
+  { topic: "Atomy i czasteczki", p: "e", q: "Dlaczego atom jednego pierwiastka nie moze zamienic sie w inny w reakcji chemicznej?", a: ["Reakcja chemiczna zmienia tylko sposob polaczenia atomow", "Nie zmienia rodzaju ani liczby atomow", "Przemiany jadra (zmiana pierwiastka) to reakcje jadrowe, nie chemiczne"] },
+
+  // --- Wzory strukturalne i sumaryczne (critical) ---
+  { topic: "Wzory chemiczne", p: "c", q: "Czym jest wzor sumaryczny?", a: ["Informuje o skladzie jakosciowym i ilosciowym substancji", "Sklada sie z symboli pierwiastkow i indeksow stechiometrycznych", "Np. H2O -- 2 atomy wodoru i 1 atom tlenu"] },
+  { topic: "Wzory chemiczne", p: "c", q: "Czym jest wzor strukturalny i czym rozni sie od sumarycznego?", a: ["Zawiera te same informacje co sumaryczny", "Dodatkowo pokazuje kolejnosc i sposob wiazania sie atomow", "Wiazania przedstawia sie za pomoca kresek miedzy symbolami"] },
+  { topic: "Wzory chemiczne", p: "c", q: "Co to jest wartosciowosc pierwiastka?", a: ["Liczba wiazan chemicznych, ktore tworzy atom w czasteczce", "We wzorze strukturalnym -- tyle kresek, ile wynosi wartosciowosc", "Np. tlen ma wartosciowosc II, wodor I"] },
+  // extra
+  { topic: "Wzory chemiczne", p: "e", q: "Co mozna odczytac ze wzoru sumarycznego CO2?", a: ["Sklad jakosciowy: wegiel (C) i tlen (O)", "Sklad ilosciowy: 1 atom wegla i 2 atomy tlenu", "Jest to tlenek wegla(IV) -- dwutlenek wegla"] },
+  { topic: "Wzory chemiczne", p: "e", q: "Narysuj mentalnie wzor strukturalny wody (H2O). Jaka jest wartosciowosc tlenu i wodoru?", a: ["H--O--H (tlen w srodku, po bokach wodory)", "Tlen tworzy 2 wiazania -- wartosciowosc II", "Wodor tworzy 1 wiazanie -- wartosciowosc I"] },
+  { topic: "Wzory chemiczne", p: "e", q: "Czym sa indeksy stechiometryczne we wzorze sumarycznym?", a: ["Male cyfry przy symbolach pierwiastkow (np. 2 w H2O)", "Okreslaja liczbe atomow danego pierwiastka w czasteczce", "Jesli indeks wynosi 1, nie zapisuje sie go"] },
+  { topic: "Wzory chemiczne", p: "e", q: "Jaki jest wzor sumaryczny i strukturalny amoniaku?", a: ["Sumaryczny: NH3 (1 azot, 3 wodory)", "Strukturalny: H--N z trzema kreskami do trzech H", "Azot ma wartosciowosc III, wodor I"] },
+
+  // =============================================
+  // ROZDZIAL 3: WEWNETRZNA BUDOWA MATERII
+  // =============================================
+
+  // --- Struktura atomu (critical) ---
+  { topic: "Struktura atomu", p: "c", q: "Z czego sklada sie atom?", a: ["Z jadra atomowego i krazacych wokol niego elektronow", "Jadro zawiera protony (ladunek +1) i neutrony (ladunek 0)", "Elektrony maja ladunek -1 i bardzo mala mase (1/1870 u)"] },
+  { topic: "Struktura atomu", p: "c", q: "Dlaczego atom jest elektrycznie obojetny?", a: ["Liczba protonow (+) w jadrze rowna sie liczbie elektronow (-)", "Ladunki dodatnie i ujemne sie rownowaza", "Dzieki temu atom nie ma ladunku netto"] },
+  { topic: "Struktura atomu", p: "c", q: "Co to jest liczba atomowa Z?", a: ["Liczba protonow w jadrze atomu", "Rownoczesnie rowna liczbie elektronow w atomie obojetnym", "Kazdy pierwiastek ma unikalna liczbe atomowa"] },
+  { topic: "Struktura atomu", p: "c", q: "Ile pierwiastkow odkryto na Ziemi i jakie sa granice?", a: ["92 pierwiastki naturalne: od wodoru (Z=1) do uranu (Z=92)", "Transuranowce (Z>92) sa otrzymywane sztucznie", "Ich jadra sa nietrwale"] },
+  // extra
+  { topic: "Struktura atomu", p: "e", q: "Porownaj mase i ladunek protonu, neutronu i elektronu.", a: ["Proton: masa ok. 1 u, ladunek +1", "Neutron: masa ok. 1 u, ladunek 0", "Elektron: masa 1/1870 u (pomijalna), ladunek -1"] },
+  { topic: "Struktura atomu", p: "e", q: "Gdzie skupiona jest praktycznie cala masa atomu?", a: ["W jadrze atomowym (protony + neutrony)", "Elektrony maja zaniedbywalnie mala mase", "Jadro jest bardzo male w porownaniu z calym atomem"] },
+  { topic: "Struktura atomu", p: "e", q: "Co okresla symbol pierwiastka z liczba atomowa i masowa?", a: ["Zapisujemy: A (u gory) i Z (u dolu) po lewej stronie symbolu", "Z -- liczba protonow, A -- suma protonow i neutronow", "A - Z = liczba neutronow"] },
+
+  // --- Izotopy (critical) ---
+  { topic: "Izotopy", p: "c", q: "Czym sa izotopy?", a: ["Odmiany tego samego pierwiastka o roznej liczbie neutronow", "Maja taka sama liczbe atomowa Z, ale rozna liczbe masowa A", "Te same wlasciwosci chemiczne, ale nieco inne fizyczne"] },
+  { topic: "Izotopy", p: "c", q: "Co to jest liczba masowa A?", a: ["Suma protonow i neutronow w jadrze (A = Z + n)", "Roznica A - Z daje liczbe neutronow", "Rozne izotopy maja rozne A, ale to samo Z"] },
+  { topic: "Izotopy", p: "c", q: "Jak oblicza sie srednia mase atomowa pierwiastka?", a: ["Ze wzoru: Ar = (A1*p1 + A2*p2 + ...)/100%", "A1, A2 -- masy poszczegolnych izotopow", "p1, p2 -- ich udzialy procentowe w przyrodzie"] },
+  // extra
+  { topic: "Izotopy", p: "e", q: "Podaj przyklad izotopow jednego pierwiastka.", a: ["Magnez: Mg-24, Mg-25, Mg-26 (wszystkie Z=12)", "Roznia sie liczba neutronow: 12, 13, 14", "Srednia masa atomowa Mg z ukladu okresowego uwzglednia ich udzialy"] },
+  { topic: "Izotopy", p: "e", q: "Dlaczego masy atomowe w ukladzie okresowym nie sa liczbami calkowitymi?", a: ["Bo sa to srednie wazzone mas izotopow danego pierwiastka", "Uwzgledniaja procentowy udzial kazdego izotopu w przyrodzie", "Np. chlor: ok. 35,5 u (mieszanina Cl-35 i Cl-37)"] },
+  { topic: "Izotopy", p: "e", q: "Czym roznia sie izotopy pod wzgledem wlasciwosci?", a: ["Wlasciwosci chemiczne sa takie same (ta sama liczba elektronow)", "Wlasciwosci fizyczne nieco sie roznia (np. masa, temperatura topnienia)", "Bo roznia sie tylko liczba neutronow w jadrze"] },
+
+  // --- Masy atomow i czasteczek (critical) ---
+  { topic: "Masy atomow", p: "c", q: "Czym jest atomowa jednostka masy (u)?", a: ["Jednostka do okreslania mas drobin (atomow i czasteczek)", "Jest 602 tryliardy razy mniejsza od grama", "1 g = 6,02 * 10^23 u"] },
+  { topic: "Masy atomow", p: "c", q: "Czym jest masa atomowa i masa czasteczkowa?", a: ["Masa atomowa: masa jednego atomu wyrazona w u", "Masa czasteczkowa: masa jednej czasteczki wyrazona w u", "Nie ma dwoch pierwiastkow o tej samej masie atomowej"] },
+  { topic: "Masy atomow", p: "c", q: "Co mowi prawo stalosci skladu?", a: ["Sklad ilosciowy zwiazku chemicznego jest staly i charakterystyczny", "Kazda czasteczka danego zwiazku ma taki sam sklad atomowy", "To najwazniejsza roznica miedzy zwiazkiem chemicznym a mieszanina"] },
+  { topic: "Masy atomow", p: "c", q: "Jak mozna przedstawic sklad ilosciowy zwiazku chemicznego?", a: ["Stosunek atomowy -- proporcja liczby atomow", "Stosunek masowy -- proporcja mas pierwiastkow", "Sklad procentowy: %E = (masa pierwiastka / masa czasteczki) * 100%"] },
+  // extra
+  { topic: "Masy atomow", p: "e", q: "Jak obliczyc mase czasteczkowa wody (H2O)?", a: ["Masa H = ok. 1 u, masa O = ok. 16 u", "M(H2O) = 2 * 1 + 16 = 18 u", "Mase czasteczkowa liczymy sumujac masy wszystkich atomow w czasteczce"] },
+  { topic: "Masy atomow", p: "e", q: "Czym rozni sie zwiazek chemiczny od mieszaniny pod wzgledem skladu?", a: ["Zwiazek ma staly sklad (prawo stalosci skladu)", "Mieszanina moze miec dowolne proporcje skladnikow", "Np. woda to zawsze H2O, ale woda z cukrem moze miec rozne stezenia"] },
+  { topic: "Masy atomow", p: "e", q: "Jak obliczyc sklad procentowy CO2?", a: ["M(CO2) = 12 + 2*16 = 44 u", "%C = (12/44)*100% = 27,3%", "%O = (32/44)*100% = 72,7%"] },
+
+  // --- Prawo okresowosci i uklad okresowy (critical) ---
+  { topic: "Uklad okresowy", p: "c", q: "Co mowi prawo okresowosci (ujeccie makroskopowe)?", a: ["Wlasciwosci pierwiastkow zmieniaja sie okresowo", "Wraz ze wzrostem liczby atomowej Z", "Pierwiastki o podobnych wlasciwosciach pojawiaja sie regularnie"] },
+  { topic: "Uklad okresowy", p: "c", q: "Co mowi prawo okresowosci w ujeciu mikroskopowym?", a: ["Konfiguracje elektronowe pierwiastkow zmieniaja sie okresowo", "Wraz ze wzrostem liczby atomowej Z", "To elektronowa struktura tlumacy podobienstwo wlasciwosci"] },
+  { topic: "Uklad okresowy", p: "c", q: "Czym jest uklad okresowy (tablica Mendelejewa)?", a: ["Tablica, w ktorej zestawiono wszystkie znane pierwiastki", "Kolumny to grupy -- pierwiastki o podobnych wlasciwosciach", "Wiersze to okresy -- wlasciwosci zmieniaja sie od metali do niemetali"] },
+  { topic: "Uklad okresowy", p: "c", q: "Czym sa grupy w ukladzie okresowym?", a: ["Kolumny pionowe -- zawieraja pierwiastki o podobnych wlasciwosciach", "Grupy glowne: 1., 2. i 13.-18.", "Grupy poboczne (podgrupy): 3.-12.", ] },
+  { topic: "Uklad okresowy", p: "c", q: "Czym sa okresy w ukladzie okresowym?", a: ["Szeregi poziome pierwiastkow", "W kazdym okresie wlasciwosci zmieniaja sie stopniowo", "Od metali (po lewej) do niemetali (po prawej)"] },
+  // extra
+  { topic: "Uklad okresowy", p: "e", q: "Skad biora sie nazwy grup w ukladzie okresowym?", a: ["Od nazwy pierwszego pierwiastka stojakego najwyzej w kolumnie", "Np. grupa 16. to tlenowce, grupa 2. to berylowce", "Wyjatek: grupa 1. to litowce (nie od wodoru, lecz od litu)"] },
+  { topic: "Uklad okresowy", p: "e", q: "Jak zmienia sie charakter pierwiastkow w okresie (od lewej do prawej)?", a: ["Od typowych metali do typowych niemetali", "Np. w 3. okresie: Na, Mg (metale) -> Si (polmetal) -> Cl, Ar (niemetale)", "Na koncu okresu jest gaz szlachetny (bardzo malo reaktywny)"] },
+  { topic: "Uklad okresowy", p: "e", q: "Co laczy pierwiastki tej samej grupy glownej?", a: ["Maja taka sama liczbe elektronow walencyjnych", "Dzieki temu maja podobne wlasciwosci chemiczne", "Np. grupa 1. (litowce): Li, Na, K -- wszystkie sa aktywnymi metalami"] },
+
+  // --- Konfiguracja elektronowa (critical) ---
+  { topic: "Konfiguracja elektronowa", p: "c", q: "Czym sa powloki elektronowe?", a: ["Zespoly elektronow o zblizonej energii w atomie", "Oznaczane literami: K, L, M, N...", "Liczba powlok rowna sie numerowi okresu w ukladzie okresowym"] },
+  { topic: "Konfiguracja elektronowa", p: "c", q: "Co to sa elektrony walencyjne?", a: ["Elektrony na ostatniej (zewnetrznej) powloce", "Dla grup glownych ich liczba = cyfra jednosci numeru grupy", "Okreslaja wlasciwosci chemiczne pierwiastka"] },
+  { topic: "Konfiguracja elektronowa", p: "c", q: "Co to jest rdzen atomowy?", a: ["Jadro atomu wraz z elektronami niewalencyjnymi", "Czyli caly atom bez elektronow z ostatniej powloki", "Rdzen jest silnie zwiazany i malo reaktywny"] },
+  { topic: "Konfiguracja elektronowa", p: "c", q: "Czym jest konfiguracja elektronowa?", a: ["Rozmieszczenie elektronow w poszczegolnych powlokach", "Np. sod (Na): K2 L8 M1", "Wlasciwosci chemiczne zaleza od konfiguracji walencyjnej"] },
+  // extra
+  { topic: "Konfiguracja elektronowa", p: "e", q: "Ile elektronow maksymalnie miesci sie na powlokach K, L, M?", a: ["K: maksymalnie 2 elektrony", "L: maksymalnie 8 elektronow", "M: maksymalnie 18 elektronow"] },
+  { topic: "Konfiguracja elektronowa", p: "e", q: "Jak zapisac konfiguracje elektronowa glinu (Al, Z=13)?", a: ["Al ma 13 elektronow", "K2 L8 M3", "3 elektrony walencyjne (grupa 13., 3. okres)"] },
+  { topic: "Konfiguracja elektronowa", p: "e", q: "Dlaczego pierwiastki z tej samej grupy maja podobne wlasciwosci?", a: ["Maja taka sama liczbe elektronow walencyjnych", "Elektrony walencyjne decyduja o reaktywnosci", "Np. fluor (F) i chlor (Cl) -- oba w grupie 17., oba maja 7 e. walencyjnych"] },
+  { topic: "Konfiguracja elektronowa", p: "e", q: "Jak z ukladu okresowego odczytac liczbe powlok i elektronow walencyjnych?", a: ["Liczba powlok = numer okresu (wiersza)", "Elektrony walencyjne = cyfra jednosci numeru grupy glownej", "Np. siarka (S): okres 3, grupa 16 -> 3 powloki, 6 e. walencyjnych"] }
+];
+
+// --- Engine (same as Rome flashcards) ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var activeTopic = "Wszystkie";
+var activeFilter = "all";
+var filteredCards = ALL_FLASHCARDS.slice();
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var priorityRow = document.getElementById('priorityRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    if (activeFilter === "c" && f.p !== "c") continue;
+    if (activeFilter === "e" && f.p !== "e") continue;
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+  }
+}
+
+function buildPriorityRow() {
+  var opts = [
+    { key: "all", label: "Wszystkie", dotClass: "" },
+    { key: "c", label: "Kluczowe", dotClass: "critical" },
+    { key: "e", label: "Dodatkowe", dotClass: "extra" }
+  ];
+  priorityRow.innerHTML = '';
+  for (var i = 0; i < opts.length; i++) {
+    var o = opts[i];
+    var pill = document.createElement('button');
+    pill.className = 'priority-pill' + (activeFilter === o.key ? ' active' : '');
+    pill.innerHTML = (o.dotClass ? '<span class="dot ' + o.dotClass + '"></span>' : '') + o.label;
+    pill.setAttribute('data-key', o.key);
+    pill.onclick = function() {
+      activeFilter = this.getAttribute('data-key');
+      buildPriorityRow();
+      applyFilters();
+    };
+    priorityRow.appendChild(pill);
+  }
+}
+
+function renderCard() {
+  if (filteredCards.length === 0) {
+    cardFront.innerHTML = '<div class="card-question">Brak fiszek dla tego filtra</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    return;
+  }
+  var fc = filteredCards[currentIndex];
+  var isCritical = fc.p === "c";
+
+  cardFront.className = 'card-face card-front' + (isCritical ? ' is-critical' : '');
+
+  var badgeHTML = isCritical
+    ? '<span class="card-badge critical">kluczowe</span>'
+    : '<span class="card-badge extra">dodatkowe</span>';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div>' + badgeHTML + '</div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryc odpowiedz</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedz</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrocic do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+buildTopicBar();
+buildPriorityRow();
+renderCard();
+</script>
+</body>
+</html>
