@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Historia kl. 7 — Ziemie polskie po Wiośnie Ludów</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #16100f;
+    --card-front: #f5f0ee;
+    --card-back: #231510;
+    --accent: #b03030;
+    --accent-light: #e8b0a8;
+    --text-dark: #231510;
+    --text-light: #f5f0ee;
+    --text-muted: #9a8582;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #3a2020;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .priority-row {
+    display: flex;
+    gap: 8px;
+  }
+  .priority-pill {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #3a2020;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .priority-pill.active {
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .priority-pill .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .priority-pill .dot.critical { background: #b03030; }
+  .priority-pill .dot.extra { background: #6b8a6b; }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #3a2020;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-badge {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+  }
+  .card-front .card-badge.critical {
+    background: #b03030;
+    color: #fff;
+  }
+  .card-front .card-badge.extra {
+    background: transparent;
+    border: 1px solid #b0a0a0;
+    color: #8a7070;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #9a8a8a;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-front.is-critical {
+    border-top: 3px solid #b03030;
+  }
+
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #3a2020;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #3a2020;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Ziemie polskie po Wiośnie Ludów</h1>
+  <div class="subtitle">Historia kl. 7 &middot; Wczoraj i dzisiaj &middot; Dział IV</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+  <div class="priority-row" id="priorityRow"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+// p: "c" = kluczowe (z podsumowania podręcznika), "e" = dodatkowe
+var ALL_FLASHCARDS = [
+
+  // =============================================
+  // 1. POWSTANIE STYCZNIOWE
+  // =============================================
+
+  // --- kluczowe (z podręcznika) ---
+  { topic: "Powstanie styczniowe", p: "c", q: "Czym była praca organiczna?", a: ["Miała na celu rozwój polskiego społeczeństwa", "Duży nacisk na rozwój gospodarczy, społeczny i kulturalny", "Propagowana jako sposób walki o polskość bez sięgania po broń"] },
+  { topic: "Powstanie styczniowe", p: "c", q: "Czym była „rewolucja moralna” i jakie stronnictwa z niej wynikły?", a: ["Polegała na rozbudzeniu nastrojów patriotycznych w polskim społeczeństwie", "Czerwoni: chcieli jak najszybciej doprowadzić do powstania zbrojnego", "Biali: uzależniali wybuch powstania od pomocy zachodnich mocarstw"] },
+  { topic: "Powstanie styczniowe", p: "c", q: "Jakie były przyczyny wybuchu powstania styczniowego?", a: ["Wzrastający patriotyzm Polaków i chęć uzyskania większej autonomii", "Bezpośredni impuls: ogłoszenie branki – poboru Polaków do armii carskiej", "Powstanie wybuchło 22 stycznia 1863 r."] },
+  { topic: "Powstanie styczniowe", p: "c", q: "Jaki charakter miały walki powstania i dlaczego upadło?", a: ["Walki miały charakter wojny partyzanckiej", "Nad działaniami czuwało polskie państwo konspiracyjne z Rządem Narodowym na czele", "Uwłaszczenie chłopów przez cara (marzec 1864 r.) i śmierć dyktatora Romualda Traugutta przyspieszyły upadek"] },
+
+  // --- dodatkowe ---
+  { topic: "Powstanie styczniowe", p: "e", q: "Co to była branka i dlaczego wywołała powstanie?", a: ["Nadzwyczajny pobór Polaków do armii carskiej ogłoszony w styczniu 1863 r.", "Wymierzony w środowiska spiskowe, by rozbić konspirację", "Paradoksalnie przyspieszył wybuch powstania – zagrożeni poborem chwycili za broń"] },
+  { topic: "Powstanie styczniowe", p: "e", q: "Kim był Romuald Traugutt?", a: ["Ostatni dyktator powstania styczniowego", "Przejął dowodzenie w październiku 1863 r. i próbował zreorganizować walki", "Aresztowany przez Rosjan i stracony w Cytadeli Warszawskiej w sierpniu 1864 r."] },
+  { topic: "Powstanie styczniowe", p: "e", q: "Czym był Rząd Narodowy?", a: ["Tajne polskie państwo konspiracyjne działające podczas powstania", "Koordynował działania zbrojne i wydawał dekrety (m.in. o uwłaszczeniu chłopów)", "Funkcjonował w ukryciu, zmieniając skład i przywódców przez cały czas walk"] },
+  { topic: "Powstanie styczniowe", p: "e", q: "Czym różnili się Czerwoni od Białych?", a: ["Czerwoni: radykałowie, chcieli natychmiastowego powstania i reform społecznych, w tym uwłaszczenia chłopów", "Biali: ziemiaństwo i burżuazja, woleli działania dyplomatyczne i liczyli na pomoc mocarstw zachodnich", "Ostatecznie oba stronnictwa wzięły udział w powstaniu"] },
+  { topic: "Powstanie styczniowe", p: "e", q: "Jak długo trwało powstanie i czym różniło się od listopadowego?", a: ["Trwało od 22 stycznia 1863 do jesieni 1864 r. – ponad półtora roku", "Miało charakter partyzancki, bez regularnych bitew i ustalonego frontu", "Było największym i najdłuższym polskim powstaniem narodowym w XIX w."] },
+
+  // =============================================
+  // 2. PO POWSTANIU STYCZNIOWYM
+  // =============================================
+
+  // --- kluczowe (z podręcznika) ---
+  { topic: "Po powstaniu styczniowym", p: "c", q: "Jakie były konsekwencje upadku powstania styczniowego?", a: ["Masowe represje wobec uczestników powstania", "Zlikwidowano odrębność Królestwa Polskiego – zastąpił je Kraj Przywiślański ze stanem wojennym", "Prześladowania objęły też Kościół katolicki"] },
+  { topic: "Po powstaniu styczniowym", p: "c", q: "Na czym polegały rusyfikacja i germanizacja?", a: ["Narzucanie Polakom kultury i języka zaborców", "W odpowiedzi Polacy prowadzili tajne nauczanie", "Popularność zyskali warszawscy pozytywiści rozwijający ideę pracy organicznej"] },
+  { topic: "Po powstaniu styczniowym", p: "c", q: "Skąd wzięła się autonomia galicyjska i jakie miała znaczenie?", a: ["Galicja zyskała szeroką autonomię dzięki przemianom w monarchii Habsburgów w latach 60. XIX w.", "Było to wynikiem osłabienia Austrii po przegranej wojnie z Prusami (1866)", "Galicja stała się ważnym centrum polskiego życia kulturalnego i politycznego"] },
+  { topic: "Po powstaniu styczniowym", p: "c", q: "Na czym polegała postawa lojalistyczna Polaków po 1864 r.?", a: ["Starania o niepodległość odłożono na bardziej sprzyjający moment", "Polacy skupili się na zachowaniu polskości: legalne protesty, instytucje kulturalno-oświatowe", "Zakładano spółdzielnie wspierające polskie inwestycje i gospodarkę"] },
+
+  // --- dodatkowe ---
+  { topic: "Po powstaniu styczniowym", p: "e", q: "Czym był Kraj Przywiślański?", a: ["Jednostka administracyjna Rosji utworzona w miejsce Królestwa Polskiego po 1864 r.", "Dawne Królestwo straciło resztki autonomii i zostało de facto wcielone do Rosji", "Wprowadzono język rosyjski jako urzędowy i stan wojenny"] },
+  { topic: "Po powstaniu styczniowym", p: "e", q: "Czym był Kulturkampf w zaborze pruskim?", a: ["Kampania kanclerza Bismarcka (lata 70. XIX w.) wymierzona w Kościół katolicki i polskość", "Usunięto język polski ze szkół i urzędów", "Polacy odpowiedzieli tajnym nauczaniem i tworzeniem polskich instytucji kulturalnych"] },
+  { topic: "Po powstaniu styczniowym", p: "e", q: "Czym była Hakata?", a: ["Niemieckie Towarzystwo Popierania Niemczyzny na Kresach Wschodnich, założone w 1894 r.", "Nazwa pochodzi od pierwszych liter nazwisk założycieli: Hansemann, Kennemann, Tiedemann", "Prowadziło antypolską propagandę i wspierało wykup polskiej ziemi przez Niemców"] },
+  { topic: "Po powstaniu styczniowym", p: "e", q: "Jakie instytucje zapewniała autonomia galicyjska?", a: ["Sejm Krajowy – galicyjski parlament z polskim językiem obrad", "Rada Szkolna Krajowa – nadzór nad polskim szkolnictwem", "Język polski jako oficjalny w administracji i sądach"] },
+  { topic: "Po powstaniu styczniowym", p: "e", q: "Czym było tajne nauczanie pod zaborami?", a: ["Nielegalne lekcje języka polskiego, historii i literatury, organizowane w prywatnych domach", "Działało w zaborze rosyjskim i pruskim, gdzie zakazano polskiego w szkołach", "Uczestniczyły w nim tysiące dzieci – podtrzymywało polską tożsamość narodową"] },
+
+  // =============================================
+  // 3. ZMIANY SPOŁECZNO-GOSPODARCZE
+  // =============================================
+
+  // --- kluczowe (z podręcznika) ---
+  { topic: "Zmiany społeczno-gospodarcze", p: "c", q: "Jak przebiegał rozwój gospodarczy w poszczególnych zaborach?", a: ["Różnym tempem – zależał od polityki zaborców i rozwiązania kwestii chłopskiej", "Najbardziej ożywioną gospodarkę miało Królestwo Polskie (zabór rosyjski)", "Galicja była najbardziej zacofana gospodarczo"] },
+  { topic: "Zmiany społeczno-gospodarcze", p: "c", q: "Jak wyglądał zabór pruski pod względem gospodarczym?", a: ["Władze pruskie sprzyjały modernizacji przemysłu i rolnictwa", "Polacy zakładali fabryki i instytucje wspierające rozwój gospodarczy", "Zabór pruski był gospodarczo bardziej rozwinięty niż galicyjski"] },
+  { topic: "Zmiany społeczno-gospodarcze", p: "c", q: "Jaka była sytuacja gospodarcza Galicji?", a: ["Galicja była zacofana pod względem gospodarczym", "Wielu mieszkańców emigrowało za chlebem – do USA, Niemiec i Brazylii", "Przemysł zaczął się tam rozwijać dopiero pod koniec XIX w."] },
+  { topic: "Zmiany społeczno-gospodarcze", p: "c", q: "Jakie zmiany społeczne i cywilizacyjne zaszły na ziemiach polskich?", a: ["Powstały nowe grupy społeczne: robotnicy, inteligencja i ziemianie", "Wprowadzono nowe środki transportu: kolej i tramwaje", "Upowszechniła się elektryczność"] },
+
+  // --- dodatkowe ---
+  { topic: "Zmiany społeczno-gospodarcze", p: "e", q: "Czym było uwłaszczenie chłopów i dlaczego było ważne?", a: ["Nadanie chłopom na własność ziemi, którą dotychczas użytkowali za pańszczyznę", "W Królestwie Polskim przeprowadził je car w 1864 r. – m.in. by odciągnąć chłopów od powstania", "Uwolniło miliony ludzi i dało impuls do migracji do miast i fabryk"] },
+  { topic: "Zmiany społeczno-gospodarcze", p: "e", q: "Dlaczego Królestwo Polskie rozwijało się gospodarczo najszybciej?", a: ["Szybkie uwłaszczenie chłopów dostarczyło taniej siły roboczej do fabryk", "Duże miasta (Warszawa, Łódź) stały się centrami przemysłowymi", "Bliskość ogromnego rynku rosyjskiego sprzyjała eksportowi wyrobów przemysłowych"] },
+  { topic: "Zmiany społeczno-gospodarcze", p: "e", q: "Czym była klasa robotnicza i jak powstała?", a: ["Nowa grupa społeczna złożona z dawnych chłopów przybyłych do miast po uwłaszczeniu", "Pracowała w fabrykach w ciężkich warunkach za niskie wynagrodzenie", "Stała się bazą dla rozwijającego się ruchu socjalistycznego"] },
+  { topic: "Zmiany społeczno-gospodarcze", p: "e", q: "Dlaczego Galicjanie emigrowali i dokąd?", a: ["Galicja była przeludniona i zacofana – brak pracy i za mało ziemi", "Emigrowano głównie do Stanów Zjednoczonych, Niemiec i Brazylii", "Emigracja zarobkowa objęła setki tysięcy ludzi z galicyjskiej wsi"] },
+  { topic: "Zmiany społeczno-gospodarcze", p: "e", q: "Jaką rolę odgrywała kolej w rozwoju ziem polskich?", a: ["Łączyła miasta i ułatwiała transport towarów i ludzi na wielkie odległości", "Przyspieszyła industrializację i powstawanie nowych ośrodków przemysłowych", "Kolej budowana przez zaborców służyła też ich celom militarnym"] },
+
+  // =============================================
+  // 4. DZIAŁALNOŚĆ POLITYCZNA
+  // =============================================
+
+  // --- kluczowe (z podręcznika) ---
+  { topic: "Działalność polityczna", p: "c", q: "Jak rozwijał się ruch socjalistyczny na ziemiach polskich?", a: ["Zapoczątkowany w 1882 r. przez pierwszą polską partię socjalistyczną – Wielki Proletariat", "Na pocz. lat 90. XIX w. podzielił się na nurt niepodległościowy (PPS) i internacjonalistyczny (SDKPiL)", "PPS dążył do odzyskania niepodległości połączonego z reformami społecznymi"] },
+  { topic: "Działalność polityczna", p: "c", q: "Czym był ruch narodowy i kto go reprezentował?", a: ["Reprezentowany przez Narodową Demokrację (endecję)", "Głosił hasło solidaryzmu narodowego – jedności wszystkich Polaków ponad podziałami klasowymi", "Głównym ideologiem był Roman Dmowski"] },
+  { topic: "Działalność polityczna", p: "c", q: "Czym był ruch ludowy i kiedy powstał?", a: ["Działał na rzecz poprawy sytuacji mieszkańców wsi galicyjskiej", "W 1895 r. powołano Stronnictwo Ludowe, które później przekształciło się w PSL", "Rozwinął się głównie w Galicji, gdzie chłopi mogli legalnie działać politycznie"] },
+  { topic: "Działalność polityczna", p: "c", q: "Jakie skutki miała rewolucja 1905 r. dla ziem polskich?", a: ["Objęła Królestwo Polskie – protesty robotnicze zostały krwawo stłumione", "Władze carskie zostały zmuszone do ograniczonych reform", "Pozwolono na zakładanie stowarzyszeń oraz rozwój polskiego szkolnictwa"] },
+  { topic: "Działalność polityczna", p: "c", q: "Jakie dwie orientacje polityczne wykształciły się wśród Polaków na pocz. XX w.?", a: ["Orientacja proaustriacka – PPS z Józefem Piłsudskim: liczono na wojnę Austrii z Rosją", "Orientacja prorosyjska – endecja z Romanem Dmowskim: liczono na wojnę Rosji z Niemcami", "Obie orientacje widziały w konflikcie mocarstw szansę na odzyskanie niepodległości"] },
+
+  // --- dodatkowe ---
+  { topic: "Działalność polityczna", p: "e", q: "Kim był Józef Piłsudski i jaką rolę odegrał w ruchu niepodległościowym?", a: ["Działacz PPS, redaktor podziemnego pisma „Robotnik”", "Tworzył organizacje paramilitarne (Organizacja Bojowa PPS) przygotowujące zbrojną walkę", "Reprezentował orientację proaustriacką – liczył na sojusz z Austro-Węgrami przeciw Rosji"] },
+  { topic: "Działalność polityczna", p: "e", q: "Kim był Roman Dmowski i jakie były jego poglądy?", a: ["Główny ideolog Narodowej Demokracji (endecji)", "Głosił solidaryzm narodowy – jedność Polaków bez względu na klasy społeczne", "Reprezentował orientację prorosyjską – liczył na sojusz z Rosją przeciw Niemcom"] },
+  { topic: "Działalność polityczna", p: "e", q: "Czym był Wielki Proletariat?", a: ["Pierwsza polska partia socjalistyczna, założona w 1882 r. przez Ludwika Waryńskiego", "Działała w Królestwie Polskim w głębokiej konspiracji", "Rozbita przez policję carską w 1883–1884 r., lecz zapoczątkowała polski ruch socjalistyczny"] },
+  { topic: "Działalność polityczna", p: "e", q: "Czym różniły się PPS i SDKPiL?", a: ["PPS (Polska Partia Socjalistyczna): łączyła walkę o niepodległość z postulatami socjalnymi", "SDKPiL (Socjaldemokracja Królestwa Polskiego i Litwy): internacjonalistyczna, nie stawiała sprawy polskiej niepodległości", "Spór: najpierw niepodległość czy najpierw rewolucja społeczna?"] },
+  { topic: "Działalność polityczna", p: "e", q: "Dlaczego ruch ludowy rozwinął się głównie w Galicji?", a: ["Tylko w Galicji chłopi mieli prawa polityczne i mogli uczestniczyć w wyborach do Sejmu Krajowego", "Autonomia galicyjska pozwalała na legalne działanie partii i stowarzyszeń", "W zaborach rosyjskim i pruskim działalność polityczna chłopów była znacznie utrudniona"] },
+
+  // =============================================
+  // 5. KULTURA POLSKA PRZEŁOMU XIX I XX W.
+  // =============================================
+
+  // --- kluczowe (z podręcznika) ---
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "c", q: "Jak kształtowała się polska kultura narodowa w XIX w.?", a: ["Ukształtowała się w XIX w. w warunkach braku własnego państwa", "Walka z germanizacją i rusyfikacją wzmocniła tożsamość narodową Polaków", "Kultura stała się orężem w walce o zachowanie polskości"] },
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "c", q: "Czym był pozytywizm na ziemiach polskich?", a: ["Ruch intelektualny zainicjowany przez środowisko warszawskiej inteligencji", "Pozytywiści głosili potrzebę pracy organicznej i pracy u podstaw", "Stawiał na edukację, naukę i pracę społeczną zamiast walki zbrojnej"] },
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "c", q: "Jaką rolę odgrywała historia w podtrzymaniu świadomości narodowej?", a: ["Odgrywała istotną rolę w kształtowaniu i umacnianiu świadomości narodowej", "W II poł. XIX w. nastąpił rozwój ważnych badań naukowych o dziejach Polski", "Historia Polski była tematem chętnie podejmowanym w literaturze i malarstwie"] },
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "c", q: "Jaką rolę odgrywały literatura i malarstwo historyczne?", a: ["Były bardzo popularne na przełomie XIX i XX w.", "Liczne instytucje dbały o szerzenie wiedzy historycznej w społeczeństwie", "Na ziemiach polskich rozwijała się też kultura masowa: prasa, teatr, muzea"] },
+
+  // --- dodatkowe ---
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "e", q: "Kim byli czołowi twórcy polskiego pozytywizmu?", a: ["Bolesław Prus (Aleksander Głowacki) – powieściopisarz i publicysta, autor „Lalki” i „Faraona”", "Eliza Orzeszkowa – pisarka, autorka „Nad Niemnem”, głosiła hasła pracy organicznej i pracy u podstaw", "Henryk Sienkiewicz – autor „Trylogii” i „Quo vadis”, laureat Nagrody Nobla w 1905 r."] },
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "e", q: "Czym była Młoda Polska i czym różniła się od pozytywizmu?", a: ["Ruch kulturalny przełomu XIX i XX w., zwany też modernizmem lub neoromantyzamem", "Odrzucał pozytywistyczny nacisk na pracę i naukę na rzecz sztuki, piękna i indywidualizmu", "Wybitni twórcy: Stanisław Wyspiański, Stefan Żeromski, Kazimierz Przerwa-Tetmajer"] },
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "e", q: "Kim był Jan Matejko i czym zajmowało się malarstwo historyczne?", a: ["Wybitny malarz historyczny (1838–1893), tworzył wielkoformatowe obrazy z dziejów Polski", "Jego dzieła (m.in. „Bitwa pod Grunwaldem”, „Konstytucja 3 maja”) budziły ducha narodowego", "Malarstwo historyczne przypominało Polakom o dawnej chwale i mobilizowało do oporu"] },
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "e", q: "Na czym polegała praca u podstaw?", a: ["Hasło pozytywistów: edukacja i podniesienie poziomu życia najuboższych warstw społecznych", "Chodziło o oświatę chłopów i robotników jako fundament silnego narodu", "Głosiły je m.in. Eliza Orzeszkowa i Bolesław Prus w publicystyce i powieściach"] },
+  { topic: "Kultura polska przełomu XIX i XX w.", p: "e", q: "Jaką rolę odgrywały muzea, teatry i prasa w podtrzymywaniu polskości?", a: ["Muzea (np. Muzeum Narodowe w Krakowie) gromadziły i chroniły dorobek kultury polskiej", "Teatry wystawiały polskie sztuki i podtrzymywały język ojczysty", "Prasa polska (mimo cenzury) informowała społeczeństwo i kształtowała świadomość narodową"] }
+];
+
+// --- Engine ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var activeTopic = "Wszystkie";
+var activeFilter = "all";
+var filteredCards = ALL_FLASHCARDS.slice();
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var priorityRow = document.getElementById('priorityRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    if (activeFilter === "c" && f.p !== "c") continue;
+    if (activeFilter === "e" && f.p !== "e") continue;
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+  }
+}
+
+function buildPriorityRow() {
+  var opts = [
+    { key: "all", label: "Wszystkie", dotClass: "" },
+    { key: "c",   label: "Kluczowe",  dotClass: "critical" },
+    { key: "e",   label: "Dodatkowe", dotClass: "extra" }
+  ];
+  priorityRow.innerHTML = '';
+  for (var i = 0; i < opts.length; i++) {
+    var o = opts[i];
+    var pill = document.createElement('button');
+    pill.className = 'priority-pill' + (activeFilter === o.key ? ' active' : '');
+    pill.innerHTML = (o.dotClass ? '<span class="dot ' + o.dotClass + '"></span>' : '') + o.label;
+    pill.setAttribute('data-key', o.key);
+    pill.onclick = function() {
+      activeFilter = this.getAttribute('data-key');
+      buildPriorityRow();
+      applyFilters();
+    };
+    priorityRow.appendChild(pill);
+  }
+}
+
+function renderCard() {
+  if (filteredCards.length === 0) {
+    cardFront.innerHTML = '<div class="card-question">Brak fiszek dla tego filtra</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    return;
+  }
+  var fc = filteredCards[currentIndex];
+  var isCritical = fc.p === "c";
+
+  cardFront.className = 'card-face card-front' + (isCritical ? ' is-critical' : '');
+
+  var badgeHTML = isCritical
+    ? '<span class="card-badge critical">kluczowe</span>'
+    : '<span class="card-badge extra">dodatkowe</span>';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div>' + badgeHTML + '</div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedź</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrócić do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+buildTopicBar();
+buildPriorityRow();
+renderCard();
+</script>
+</body>
+</html>
