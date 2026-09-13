@@ -46,7 +46,9 @@
   .front-period{font-size:.65rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:600;position:absolute;top:24px;left:22px}
   .front-z{font-size:1.1rem;color:#8a9aaa;font-weight:600;margin-bottom:8px}
   .front-symbol{font-family:'DM Serif Display',serif;font-size:4.5rem;line-height:1;color:var(--text-dark);margin-bottom:12px}
-  .front-prompt{font-size:.88rem;color:#8a9aaa;margin-top:8px}
+  /* element name on the front; clamp keeps the longest name (Darmsztadt) on one line
+     down to iPhone SE 2022 (375px), the smallest supported viewport */
+  .front-name{font-family:'DM Serif Display',serif;font-size:clamp(2.6rem,13vw,4.2rem);line-height:1.1;color:var(--text-dark);margin-bottom:12px;text-align:center}
   .front-hint{font-size:.7rem;color:#aab5c0;position:absolute;bottom:22px}
   .back-z{font-size:1rem;color:var(--text-muted);font-weight:600;margin-bottom:4px}
   .back-symbol{font-family:'DM Serif Display',serif;font-size:2.8rem;color:var(--accent);line-height:1;margin-bottom:10px}
@@ -226,7 +228,6 @@ function renderCard(){
       '<div class="cat-dot '+catCss+'"></div>'+
       '<div class="front-z">Z = '+Z+'</div>'+
       '<div class="front-symbol">'+sym+'</div>'+
-      '<div class="front-prompt">Jak nazywa si\u0119 ten pierwiastek?</div>'+
       '<div class="front-hint">dotknij, aby odkry\u0107</div>';
     cardBack.innerHTML=
       '<div class="back-z">Z = '+Z+'</div>'+
@@ -239,8 +240,7 @@ function renderCard(){
       '<div class="front-period">Okres '+per+'</div>'+
       '<div class="cat-dot '+catCss+'"></div>'+
       '<div class="front-z">Z = '+Z+'</div>'+
-      '<div class="front-symbol" style="font-size:1.6rem;line-height:1.4">'+name+'</div>'+
-      '<div class="front-prompt">Jaki symbol ma ten pierwiastek?</div>'+
+      '<div class="front-name">'+name+'</div>'+
       '<div class="front-hint">dotknij, aby odkry\u0107</div>';
     cardBack.innerHTML=
       '<div class="back-z">Z = '+Z+'</div>'+
