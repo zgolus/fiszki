@@ -52,7 +52,8 @@
   .front-hint{font-size:.7rem;color:#aab5c0;position:absolute;bottom:22px}
   .back-z{font-size:1rem;color:var(--text-muted);font-weight:600;margin-bottom:4px}
   .back-symbol{font-family:'DM Serif Display',serif;font-size:2.8rem;color:var(--accent);line-height:1;margin-bottom:10px}
-  .back-name{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--accent-light);margin-bottom:14px;text-align:center}
+  .back-name{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--accent-light);margin-bottom:5px;text-align:center}
+  .back-latin{font-style:italic;font-size:1.05rem;color:var(--text-muted);margin-bottom:14px;text-align:center}
   .back-info{font-size:.8rem;color:var(--text-muted);text-align:center;line-height:1.6}
   .back-hint{font-size:.7rem;color:var(--text-muted);position:absolute;bottom:22px}
   /* category color dot on front */
@@ -113,16 +114,16 @@
 // by IUPAC in 2016. The teacher decides the scope; when extending it, also update
 // the title, subtitle, file name and the README link.
 //
-// [Z, symbol, Polish name, category, period]
+// [Z, symbol, Polish name, category, period, Latin name]
 // cat: m=metal, n=nonmetal, p=metalloid, g=noble gas, l=lanthanide, a=actinide (Polish labels in CAT_LABELS)
 var DATA=[
-[1,"H","Wod\u00f3r","n",1],[2,"He","Hel","g",1],
-[3,"Li","Lit","m",2],[4,"Be","Beryl","m",2],[5,"B","Bor","p",2],[6,"C","W\u0119giel","n",2],[7,"N","Azot","n",2],[8,"O","Tlen","n",2],[9,"F","Fluor","n",2],[10,"Ne","Neon","g",2],
-[11,"Na","S\u00f3d","m",3],[12,"Mg","Magnez","m",3],[13,"Al","Glin","m",3],[14,"Si","Krzem","p",3],[15,"P","Fosfor","n",3],[16,"S","Siarka","n",3],[17,"Cl","Chlor","n",3],[18,"Ar","Argon","g",3],
-[19,"K","Potas","m",4],[20,"Ca","Wap\u0144","m",4],[21,"Sc","Skand","m",4],[22,"Ti","Tytan","m",4],[23,"V","Wanad","m",4],[24,"Cr","Chrom","m",4],[25,"Mn","Mangan","m",4],[26,"Fe","\u017belazo","m",4],[27,"Co","Kobalt","m",4],[28,"Ni","Nikiel","m",4],[29,"Cu","Mied\u017a","m",4],[30,"Zn","Cynk","m",4],[31,"Ga","Gal","m",4],[32,"Ge","German","p",4],[33,"As","Arsen","p",4],[34,"Se","Selen","n",4],[35,"Br","Brom","n",4],[36,"Kr","Krypton","g",4],
-[37,"Rb","Rubid","m",5],[38,"Sr","Stront","m",5],[39,"Y","Itr","m",5],[40,"Zr","Cyrkon","m",5],[41,"Nb","Niob","m",5],[42,"Mo","Molibden","m",5],[43,"Tc","Technet","m",5],[44,"Ru","Ruten","m",5],[45,"Rh","Rod","m",5],[46,"Pd","Pallad","m",5],[47,"Ag","Srebro","m",5],[48,"Cd","Kadm","m",5],[49,"In","Ind","m",5],[50,"Sn","Cyna","m",5],[51,"Sb","Antymon","p",5],[52,"Te","Tellur","p",5],[53,"I","Jod","n",5],[54,"Xe","Ksenon","g",5],
-[55,"Cs","Cez","m",6],[56,"Ba","Bar","m",6],[57,"La","Lantan","l",6],[58,"Ce","Cer","l",6],[59,"Pr","Prazeodym","l",6],[60,"Nd","Neodym","l",6],[61,"Pm","Promet","l",6],[62,"Sm","Samar","l",6],[63,"Eu","Europ","l",6],[64,"Gd","Gadolin","l",6],[65,"Tb","Terb","l",6],[66,"Dy","Dysproz","l",6],[67,"Ho","Holm","l",6],[68,"Er","Erb","l",6],[69,"Tm","Tul","l",6],[70,"Yb","Iterb","l",6],[71,"Lu","Lutet","l",6],[72,"Hf","Hafn","m",6],[73,"Ta","Tantal","m",6],[74,"W","Wolfram","m",6],[75,"Re","Ren","m",6],[76,"Os","Osm","m",6],[77,"Ir","Iryd","m",6],[78,"Pt","Platyna","m",6],[79,"Au","Z\u0142oto","m",6],[80,"Hg","Rt\u0119\u0107","m",6],[81,"Tl","Tal","m",6],[82,"Pb","O\u0142\u00f3w","m",6],[83,"Bi","Bizmut","m",6],[84,"Po","Polon","p",6],[85,"At","Astat","p",6],[86,"Rn","Radon","g",6],
-[87,"Fr","Frans","m",7],[88,"Ra","Rad","m",7],[89,"Ac","Aktyn","a",7],[90,"Th","Tor","a",7],[91,"Pa","Protaktyn","a",7],[92,"U","Uran","a",7],[93,"Np","Neptun","a",7],[94,"Pu","Pluton","a",7],[95,"Am","Ameryk","a",7],[96,"Cm","Kiur","a",7],[97,"Bk","Berkel","a",7],[98,"Cf","Kaliforn","a",7],[99,"Es","Einstein","a",7],[100,"Fm","Ferm","a",7],[101,"Md","Mendelew","a",7],[102,"No","Nobel","a",7],[103,"Lr","Lorens","a",7],[104,"Rf","Rutherford","m",7],[105,"Db","Dubn","m",7],[106,"Sg","Seaborg","m",7],[107,"Bh","Bohr","m",7],[108,"Hs","Has","m",7],[109,"Mt","Meitner","m",7],[110,"Ds","Darmsztadt","m",7],[111,"Rg","Roentgen","m",7],[112,"Cn","Kopernik","m",7]
+[1,"H","Wod\u00f3r","n",1,"Hydrogenium"],[2,"He","Hel","g",1,"Helium"],
+[3,"Li","Lit","m",2,"Lithium"],[4,"Be","Beryl","m",2,"Beryllium"],[5,"B","Bor","p",2,"Borum"],[6,"C","W\u0119giel","n",2,"Carboneum"],[7,"N","Azot","n",2,"Nitrogenium"],[8,"O","Tlen","n",2,"Oxygenium"],[9,"F","Fluor","n",2,"Fluorum"],[10,"Ne","Neon","g",2,"Neon"],
+[11,"Na","S\u00f3d","m",3,"Natrium"],[12,"Mg","Magnez","m",3,"Magnesium"],[13,"Al","Glin","m",3,"Aluminium"],[14,"Si","Krzem","p",3,"Silicium"],[15,"P","Fosfor","n",3,"Phosphorus"],[16,"S","Siarka","n",3,"Sulfur"],[17,"Cl","Chlor","n",3,"Chlorum"],[18,"Ar","Argon","g",3,"Argon"],
+[19,"K","Potas","m",4,"Kalium"],[20,"Ca","Wap\u0144","m",4,"Calcium"],[21,"Sc","Skand","m",4,"Scandium"],[22,"Ti","Tytan","m",4,"Titanium"],[23,"V","Wanad","m",4,"Vanadium"],[24,"Cr","Chrom","m",4,"Chromium"],[25,"Mn","Mangan","m",4,"Manganum"],[26,"Fe","\u017belazo","m",4,"Ferrum"],[27,"Co","Kobalt","m",4,"Cobaltum"],[28,"Ni","Nikiel","m",4,"Niccolum"],[29,"Cu","Mied\u017a","m",4,"Cuprum"],[30,"Zn","Cynk","m",4,"Zincum"],[31,"Ga","Gal","m",4,"Gallium"],[32,"Ge","German","p",4,"Germanium"],[33,"As","Arsen","p",4,"Arsenicum"],[34,"Se","Selen","n",4,"Selenium"],[35,"Br","Brom","n",4,"Bromum"],[36,"Kr","Krypton","g",4,"Krypton"],
+[37,"Rb","Rubid","m",5,"Rubidium"],[38,"Sr","Stront","m",5,"Strontium"],[39,"Y","Itr","m",5,"Yttrium"],[40,"Zr","Cyrkon","m",5,"Zirconium"],[41,"Nb","Niob","m",5,"Niobium"],[42,"Mo","Molibden","m",5,"Molybdenum"],[43,"Tc","Technet","m",5,"Technetium"],[44,"Ru","Ruten","m",5,"Ruthenium"],[45,"Rh","Rod","m",5,"Rhodium"],[46,"Pd","Pallad","m",5,"Palladium"],[47,"Ag","Srebro","m",5,"Argentum"],[48,"Cd","Kadm","m",5,"Cadmium"],[49,"In","Ind","m",5,"Indium"],[50,"Sn","Cyna","m",5,"Stannum"],[51,"Sb","Antymon","p",5,"Stibium"],[52,"Te","Tellur","p",5,"Tellurium"],[53,"I","Jod","n",5,"Iodum"],[54,"Xe","Ksenon","g",5,"Xenon"],
+[55,"Cs","Cez","m",6,"Caesium"],[56,"Ba","Bar","m",6,"Barium"],[57,"La","Lantan","l",6,"Lanthanum"],[58,"Ce","Cer","l",6,"Cerium"],[59,"Pr","Prazeodym","l",6,"Praseodymium"],[60,"Nd","Neodym","l",6,"Neodymium"],[61,"Pm","Promet","l",6,"Promethium"],[62,"Sm","Samar","l",6,"Samarium"],[63,"Eu","Europ","l",6,"Europium"],[64,"Gd","Gadolin","l",6,"Gadolinium"],[65,"Tb","Terb","l",6,"Terbium"],[66,"Dy","Dysproz","l",6,"Dysprosium"],[67,"Ho","Holm","l",6,"Holmium"],[68,"Er","Erb","l",6,"Erbium"],[69,"Tm","Tul","l",6,"Thulium"],[70,"Yb","Iterb","l",6,"Ytterbium"],[71,"Lu","Lutet","l",6,"Lutetium"],[72,"Hf","Hafn","m",6,"Hafnium"],[73,"Ta","Tantal","m",6,"Tantalum"],[74,"W","Wolfram","m",6,"Wolframium"],[75,"Re","Ren","m",6,"Rhenium"],[76,"Os","Osm","m",6,"Osmium"],[77,"Ir","Iryd","m",6,"Iridium"],[78,"Pt","Platyna","m",6,"Platinum"],[79,"Au","Z\u0142oto","m",6,"Aurum"],[80,"Hg","Rt\u0119\u0107","m",6,"Hydrargyrum"],[81,"Tl","Tal","m",6,"Thallium"],[82,"Pb","O\u0142\u00f3w","m",6,"Plumbum"],[83,"Bi","Bizmut","m",6,"Bismuthum"],[84,"Po","Polon","p",6,"Polonium"],[85,"At","Astat","p",6,"Astatium"],[86,"Rn","Radon","g",6,"Radon"],
+[87,"Fr","Frans","m",7,"Francium"],[88,"Ra","Rad","m",7,"Radium"],[89,"Ac","Aktyn","a",7,"Actinium"],[90,"Th","Tor","a",7,"Thorium"],[91,"Pa","Protaktyn","a",7,"Protactinium"],[92,"U","Uran","a",7,"Uranium"],[93,"Np","Neptun","a",7,"Neptunium"],[94,"Pu","Pluton","a",7,"Plutonium"],[95,"Am","Ameryk","a",7,"Americium"],[96,"Cm","Kiur","a",7,"Curium"],[97,"Bk","Berkel","a",7,"Berkelium"],[98,"Cf","Kaliforn","a",7,"Californium"],[99,"Es","Einstein","a",7,"Einsteinium"],[100,"Fm","Ferm","a",7,"Fermium"],[101,"Md","Mendelew","a",7,"Mendelevium"],[102,"No","Nobel","a",7,"Nobelium"],[103,"Lr","Lorens","a",7,"Lawrencium"],[104,"Rf","Rutherford","m",7,"Rutherfordium"],[105,"Db","Dubn","m",7,"Dubnium"],[106,"Sg","Seaborg","m",7,"Seaborgium"],[107,"Bh","Bohr","m",7,"Bohrium"],[108,"Hs","Has","m",7,"Hassium"],[109,"Mt","Meitner","m",7,"Meitnerium"],[110,"Ds","Darmsztadt","m",7,"Darmstadtium"],[111,"Rg","Roentgen","m",7,"Roentgenium"],[112,"Cn","Kopernik","m",7,"Copernicium"]
 ];
 
 var CAT_LABELS={"m":"metal","n":"niemetal","p":"p\u00f3\u0142metal","g":"gaz szlachetny","l":"lantanowiec","a":"aktynowiec"};
@@ -218,7 +219,7 @@ function renderCard(){
     prevBtn.disabled=true;nextBtn.disabled=true;return;
   }
   var el=filteredData[currentIndex];
-  var Z=el[0],sym=el[1],name=el[2],cat=el[3],per=el[4];
+  var Z=el[0],sym=el[1],name=el[2],cat=el[3],per=el[4],lat=el[5];
   var catLabel=CAT_LABELS[cat];
   var catCss=CAT_CSS[cat];
 
@@ -233,6 +234,7 @@ function renderCard(){
       '<div class="back-z">Z = '+Z+'</div>'+
       '<div class="back-symbol">'+sym+'</div>'+
       '<div class="back-name">'+name+'</div>'+
+      '<div class="back-latin">'+lat+'</div>'+
       '<div class="back-info">'+catLabel+' \u00b7 okres '+per+'</div>'+
       '<div class="back-hint">dotknij, aby wr\u00f3ci\u0107</div>';
   } else {
@@ -246,6 +248,7 @@ function renderCard(){
       '<div class="back-z">Z = '+Z+'</div>'+
       '<div class="back-symbol" style="font-size:4rem">'+sym+'</div>'+
       '<div class="back-name" style="font-size:1.3rem">'+name+'</div>'+
+      '<div class="back-latin" style="font-size:.9rem">'+lat+'</div>'+
       '<div class="back-info">'+catLabel+' \u00b7 okres '+per+'</div>'+
       '<div class="back-hint">dotknij, aby wr\u00f3ci\u0107</div>';
   }
