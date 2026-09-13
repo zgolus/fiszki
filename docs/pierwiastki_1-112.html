@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pierwiastki 1–112 — Fiszki</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #121820;
+    --card-front: #eaf0f5;
+    --card-back: #1c2530;
+    --accent: #5b9bd5;
+    --accent-light: #a8cce8;
+    --text-dark: #1c2530;
+    --text-light: #eaf0f5;
+    --text-muted: #7a8ea0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-light);min-height:100dvh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;user-select:none}
+  .header{width:100%;max-width:480px;padding:28px 24px 8px;text-align:center}
+  .header h1{font-family:'DM Serif Display',serif;font-size:1.45rem;color:var(--accent-light);letter-spacing:.02em}
+  .header .subtitle{font-size:.78rem;color:var(--text-muted);margin-top:6px;text-transform:uppercase;letter-spacing:.12em}
+  .filters{width:100%;max-width:480px;display:flex;flex-direction:column;gap:8px;padding:14px 20px 6px}
+  .topic-bar{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  .topic-bar::-webkit-scrollbar{display:none}
+  .topic-pill{flex-shrink:0;padding:6px 13px;border-radius:20px;border:1px solid #2a3545;background:transparent;color:var(--text-muted);font-size:.72rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .25s;white-space:nowrap}
+  .topic-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .mode-row{display:flex;gap:8px}
+  .mode-pill{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1px solid #2a3545;background:transparent;color:var(--text-muted);font-size:.68rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .25s;white-space:nowrap}
+  .mode-pill.active{border-color:var(--accent);color:var(--accent-light)}
+  .progress-area{width:100%;max-width:480px;padding:10px 24px 4px;display:flex;align-items:center;gap:12px}
+  .progress-track{flex:1;height:3px;background:#2a3545;border-radius:2px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+  .progress-label{font-size:.75rem;color:var(--text-muted);font-weight:500;min-width:56px;text-align:right}
+  .card-container{width:100%;max-width:480px;flex:1;display:flex;align-items:center;justify-content:center;padding:16px 24px;perspective:1000px}
+  .card{width:100%;aspect-ratio:3/4;max-height:420px;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+  .card.flipped{transform:rotateY(180deg)}
+  .card.slide-left{animation:slideLeft .35s ease both}
+  .card.slide-right{animation:slideRight .35s ease both}
+  @keyframes slideLeft{0%{opacity:1;transform:translateX(0)}40%{opacity:0;transform:translateX(-60px)}60%{opacity:0;transform:translateX(60px)}100%{opacity:1;transform:translateX(0)}}
+  @keyframes slideRight{0%{opacity:1;transform:translateX(0)}40%{opacity:0;transform:translateX(60px)}60%{opacity:0;transform:translateX(-60px)}100%{opacity:1;transform:translateX(0)}}
+  .card-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 22px;overflow-y:auto}
+  .card-front{background:var(--card-front);color:var(--text-dark);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+  .card-back{background:var(--card-back);color:var(--text-light);transform:rotateY(180deg);box-shadow:0 8px 40px rgba(0,0,0,.5)}
+  .front-period{font-size:.65rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:600;position:absolute;top:24px;left:22px}
+  .front-z{font-size:1.1rem;color:#8a9aaa;font-weight:600;margin-bottom:8px}
+  .front-symbol{font-family:'DM Serif Display',serif;font-size:4.5rem;line-height:1;color:var(--text-dark);margin-bottom:12px}
+  .front-prompt{font-size:.88rem;color:#8a9aaa;margin-top:8px}
+  .front-hint{font-size:.7rem;color:#aab5c0;position:absolute;bottom:22px}
+  .back-z{font-size:1rem;color:var(--text-muted);font-weight:600;margin-bottom:4px}
+  .back-symbol{font-family:'DM Serif Display',serif;font-size:2.8rem;color:var(--accent);line-height:1;margin-bottom:10px}
+  .back-name{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--accent-light);margin-bottom:14px;text-align:center}
+  .back-info{font-size:.8rem;color:var(--text-muted);text-align:center;line-height:1.6}
+  .back-hint{font-size:.7rem;color:var(--text-muted);position:absolute;bottom:22px}
+  /* category color dot on front */
+  .cat-dot{width:10px;height:10px;border-radius:50%;position:absolute;top:26px;right:22px}
+  .cat-metal{background:#5b9bd5}
+  .cat-niemetal{background:#d55b5b}
+  .cat-polmetal{background:#8b6bbf}
+  .cat-gaz{background:#5bbf8b}
+  .cat-lantanowiec{background:#bf8b5b}
+  .cat-aktynowiec{background:#bf5b9b}
+  /* category legend */
+  .legend{display:flex;flex-wrap:wrap;gap:6px 12px;padding:4px 0 0}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:.62rem;color:var(--text-muted);letter-spacing:.03em}
+  .legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .nav-area{width:100%;max-width:480px;padding:6px 24px 34px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .nav-btn{width:54px;height:54px;border-radius:50%;border:1.5px solid #2a3545;background:transparent;color:var(--text-muted);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+  .nav-btn:active{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(.92)}
+  .nav-btn:disabled{opacity:.2;pointer-events:none}
+  .shuffle-btn{padding:11px 22px;border-radius:28px;border:1.5px solid #2a3545;background:transparent;color:var(--text-muted);font-size:.78rem;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;letter-spacing:.08em;transition:all .2s}
+  .shuffle-btn:active{background:var(--accent);border-color:var(--accent);color:#fff}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .header{animation:fadeUp .5s ease both}
+  .filters{animation:fadeUp .5s .05s ease both}
+  .progress-area{animation:fadeUp .5s .1s ease both}
+  .card-container{animation:fadeUp .5s .2s ease both}
+  .nav-area{animation:fadeUp .5s .3s ease both}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Układ okresowy</h1>
+  <div class="subtitle">Pierwiastki 1–112 &middot; liceum &middot; klasa 2</div>
+</div>
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+  <div class="mode-row" id="modeRow"></div>
+  <div class="legend" id="legend"></div>
+</div>
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+<script>
+// SCOPE: elements 1-112.
+// The current periodic table has 118 elements. 113-118 are deliberately omitted
+// (Nh nihon, Fl flerow, Mc moskow, Lv liwermor, Ts tenes, Og oganeson) - named
+// by IUPAC in 2016. The teacher decides the scope; when extending it, also update
+// the title, subtitle, file name and the README link.
+//
+// [Z, symbol, Polish name, category, period]
+// cat: m=metal, n=nonmetal, p=metalloid, g=noble gas, l=lanthanide, a=actinide (Polish labels in CAT_LABELS)
+var DATA=[
+[1,"H","Wod\u00f3r","n",1],[2,"He","Hel","g",1],
+[3,"Li","Lit","m",2],[4,"Be","Beryl","m",2],[5,"B","Bor","p",2],[6,"C","W\u0119giel","n",2],[7,"N","Azot","n",2],[8,"O","Tlen","n",2],[9,"F","Fluor","n",2],[10,"Ne","Neon","g",2],
+[11,"Na","S\u00f3d","m",3],[12,"Mg","Magnez","m",3],[13,"Al","Glin","m",3],[14,"Si","Krzem","p",3],[15,"P","Fosfor","n",3],[16,"S","Siarka","n",3],[17,"Cl","Chlor","n",3],[18,"Ar","Argon","g",3],
+[19,"K","Potas","m",4],[20,"Ca","Wap\u0144","m",4],[21,"Sc","Skand","m",4],[22,"Ti","Tytan","m",4],[23,"V","Wanad","m",4],[24,"Cr","Chrom","m",4],[25,"Mn","Mangan","m",4],[26,"Fe","\u017belazo","m",4],[27,"Co","Kobalt","m",4],[28,"Ni","Nikiel","m",4],[29,"Cu","Mied\u017a","m",4],[30,"Zn","Cynk","m",4],[31,"Ga","Gal","m",4],[32,"Ge","German","p",4],[33,"As","Arsen","p",4],[34,"Se","Selen","n",4],[35,"Br","Brom","n",4],[36,"Kr","Krypton","g",4],
+[37,"Rb","Rubid","m",5],[38,"Sr","Stront","m",5],[39,"Y","Itr","m",5],[40,"Zr","Cyrkon","m",5],[41,"Nb","Niob","m",5],[42,"Mo","Molibden","m",5],[43,"Tc","Technet","m",5],[44,"Ru","Ruten","m",5],[45,"Rh","Rod","m",5],[46,"Pd","Pallad","m",5],[47,"Ag","Srebro","m",5],[48,"Cd","Kadm","m",5],[49,"In","Ind","m",5],[50,"Sn","Cyna","m",5],[51,"Sb","Antymon","p",5],[52,"Te","Tellur","p",5],[53,"I","Jod","n",5],[54,"Xe","Ksenon","g",5],
+[55,"Cs","Cez","m",6],[56,"Ba","Bar","m",6],[57,"La","Lantan","l",6],[58,"Ce","Cer","l",6],[59,"Pr","Prazeodym","l",6],[60,"Nd","Neodym","l",6],[61,"Pm","Promet","l",6],[62,"Sm","Samar","l",6],[63,"Eu","Europ","l",6],[64,"Gd","Gadolin","l",6],[65,"Tb","Terb","l",6],[66,"Dy","Dysproz","l",6],[67,"Ho","Holm","l",6],[68,"Er","Erb","l",6],[69,"Tm","Tul","l",6],[70,"Yb","Iterb","l",6],[71,"Lu","Lutet","l",6],[72,"Hf","Hafn","m",6],[73,"Ta","Tantal","m",6],[74,"W","Wolfram","m",6],[75,"Re","Ren","m",6],[76,"Os","Osm","m",6],[77,"Ir","Iryd","m",6],[78,"Pt","Platyna","m",6],[79,"Au","Z\u0142oto","m",6],[80,"Hg","Rt\u0119\u0107","m",6],[81,"Tl","Tal","m",6],[82,"Pb","O\u0142\u00f3w","m",6],[83,"Bi","Bizmut","m",6],[84,"Po","Polon","p",6],[85,"At","Astat","p",6],[86,"Rn","Radon","g",6],
+[87,"Fr","Frans","m",7],[88,"Ra","Rad","m",7],[89,"Ac","Aktyn","a",7],[90,"Th","Tor","a",7],[91,"Pa","Protaktyn","a",7],[92,"U","Uran","a",7],[93,"Np","Neptun","a",7],[94,"Pu","Pluton","a",7],[95,"Am","Ameryk","a",7],[96,"Cm","Kiur","a",7],[97,"Bk","Berkel","a",7],[98,"Cf","Kaliforn","a",7],[99,"Es","Einstein","a",7],[100,"Fm","Ferm","a",7],[101,"Md","Mendelew","a",7],[102,"No","Nobel","a",7],[103,"Lr","Lorens","a",7],[104,"Rf","Rutherford","m",7],[105,"Db","Dubn","m",7],[106,"Sg","Seaborg","m",7],[107,"Bh","Bohr","m",7],[108,"Hs","Has","m",7],[109,"Mt","Meitner","m",7],[110,"Ds","Darmsztadt","m",7],[111,"Rg","Roentgen","m",7],[112,"Cn","Kopernik","m",7]
+];
+
+var CAT_LABELS={"m":"metal","n":"niemetal","p":"p\u00f3\u0142metal","g":"gaz szlachetny","l":"lantanowiec","a":"aktynowiec"};
+var CAT_CSS={"m":"cat-metal","n":"cat-niemetal","p":"cat-polmetal","g":"cat-gaz","l":"cat-lantanowiec","a":"cat-aktynowiec"};
+
+// Quiz modes
+var MODE="symbol"; // "symbol" = show symbol ask name; "name" = show name ask symbol
+
+var TOPICS=["Wszystkie","Okres 1\u20133","Okres 4","Okres 5","Okres 6","Okres 7"];
+
+function periodFilter(p,topic){
+  if(topic==="Wszystkie") return true;
+  if(topic==="Okres 1\u20133") return p<=3;
+  if(topic==="Okres 4") return p===4;
+  if(topic==="Okres 5") return p===5;
+  if(topic==="Okres 6") return p===6;
+  if(topic==="Okres 7") return p===7;
+  return true;
+}
+
+var activeTopic="Wszystkie";
+var filteredData=DATA.slice();
+var currentIndex=0;
+var isFlipped=false;
+var isAnimating=false;
+
+var card=document.getElementById('card');
+var cardFront=document.getElementById('cardFront');
+var cardBack=document.getElementById('cardBack');
+var progressFill=document.getElementById('progressFill');
+var progressLabel=document.getElementById('progressLabel');
+var prevBtn=document.getElementById('prevBtn');
+var nextBtn=document.getElementById('nextBtn');
+var topicBar=document.getElementById('topicBar');
+var modeRow=document.getElementById('modeRow');
+var legend=document.getElementById('legend');
+
+function applyFilters(){
+  filteredData=[];
+  for(var i=0;i<DATA.length;i++){
+    if(periodFilter(DATA[i][4],activeTopic)) filteredData.push(DATA[i]);
+  }
+  currentIndex=0;isFlipped=false;card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar(){
+  topicBar.innerHTML='';
+  for(var i=0;i<TOPICS.length;i++){
+    var t=TOPICS[i];
+    var pill=document.createElement('button');
+    pill.className='topic-pill'+(t===activeTopic?' active':'');
+    pill.textContent=t;
+    pill.setAttribute('data-t',t);
+    pill.onclick=function(){activeTopic=this.getAttribute('data-t');buildTopicBar();applyFilters();};
+    topicBar.appendChild(pill);
+  }
+}
+
+function buildModeRow(){
+  var opts=[{key:"symbol",label:"Symbol \u2192 nazwa"},{key:"name",label:"Nazwa \u2192 symbol"}];
+  modeRow.innerHTML='';
+  for(var i=0;i<opts.length;i++){
+    var o=opts[i];
+    var pill=document.createElement('button');
+    pill.className='mode-pill'+(MODE===o.key?' active':'');
+    pill.textContent=o.label;
+    pill.setAttribute('data-k',o.key);
+    pill.onclick=function(){MODE=this.getAttribute('data-k');buildModeRow();isFlipped=false;card.classList.remove('flipped');renderCard();};
+    modeRow.appendChild(pill);
+  }
+}
+
+function buildLegend(){
+  legend.innerHTML='';
+  for(var k in CAT_LABELS){
+    var item=document.createElement('div');
+    item.className='legend-item';
+    var dot=document.createElement('span');
+    dot.className='legend-dot '+CAT_CSS[k];
+    var txt=document.createElement('span');
+    txt.textContent=CAT_LABELS[k];
+    item.appendChild(dot);item.appendChild(txt);
+    legend.appendChild(item);
+  }
+}
+
+function renderCard(){
+  if(filteredData.length===0){
+    cardFront.innerHTML='<div style="font-size:1rem;color:#8a9aaa">Brak pierwiastk\u00f3w</div>';
+    cardBack.innerHTML='';
+    progressFill.style.width='0%';progressLabel.textContent='0 / 0';
+    prevBtn.disabled=true;nextBtn.disabled=true;return;
+  }
+  var el=filteredData[currentIndex];
+  var Z=el[0],sym=el[1],name=el[2],cat=el[3],per=el[4];
+  var catLabel=CAT_LABELS[cat];
+  var catCss=CAT_CSS[cat];
+
+  if(MODE==="symbol"){
+    cardFront.innerHTML=
+      '<div class="front-period">Okres '+per+'</div>'+
+      '<div class="cat-dot '+catCss+'"></div>'+
+      '<div class="front-z">Z = '+Z+'</div>'+
+      '<div class="front-symbol">'+sym+'</div>'+
+      '<div class="front-prompt">Jak nazywa si\u0119 ten pierwiastek?</div>'+
+      '<div class="front-hint">dotknij, aby odkry\u0107</div>';
+    cardBack.innerHTML=
+      '<div class="back-z">Z = '+Z+'</div>'+
+      '<div class="back-symbol">'+sym+'</div>'+
+      '<div class="back-name">'+name+'</div>'+
+      '<div class="back-info">'+catLabel+' \u00b7 okres '+per+'</div>'+
+      '<div class="back-hint">dotknij, aby wr\u00f3ci\u0107</div>';
+  } else {
+    cardFront.innerHTML=
+      '<div class="front-period">Okres '+per+'</div>'+
+      '<div class="cat-dot '+catCss+'"></div>'+
+      '<div class="front-z">Z = '+Z+'</div>'+
+      '<div class="front-symbol" style="font-size:1.6rem;line-height:1.4">'+name+'</div>'+
+      '<div class="front-prompt">Jaki symbol ma ten pierwiastek?</div>'+
+      '<div class="front-hint">dotknij, aby odkry\u0107</div>';
+    cardBack.innerHTML=
+      '<div class="back-z">Z = '+Z+'</div>'+
+      '<div class="back-symbol" style="font-size:4rem">'+sym+'</div>'+
+      '<div class="back-name" style="font-size:1.3rem">'+name+'</div>'+
+      '<div class="back-info">'+catLabel+' \u00b7 okres '+per+'</div>'+
+      '<div class="back-hint">dotknij, aby wr\u00f3ci\u0107</div>';
+  }
+
+  var progress=((currentIndex+1)/filteredData.length)*100;
+  progressFill.style.width=progress+'%';
+  progressLabel.textContent=(currentIndex+1)+' / '+filteredData.length;
+  prevBtn.disabled=currentIndex===0;
+  nextBtn.disabled=currentIndex===filteredData.length-1;
+}
+
+function flipCard(){if(isAnimating)return;isFlipped=!isFlipped;card.classList.toggle('flipped',isFlipped);}
+function navigateTo(ni,dir){
+  if(isAnimating||ni<0||ni>=filteredData.length)return;
+  isAnimating=true;isFlipped=false;card.classList.remove('flipped');
+  var ac=dir==='left'?'slide-left':'slide-right';card.classList.add(ac);
+  setTimeout(function(){currentIndex=ni;renderCard();},140);
+  setTimeout(function(){card.classList.remove(ac);isAnimating=false;},350);
+}
+function prevCard(){navigateTo(currentIndex-1,'right');}
+function nextCard(){navigateTo(currentIndex+1,'left');}
+function shuffleDeck(){
+  if(isAnimating)return;
+  for(var i=filteredData.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=filteredData[i];filteredData[i]=filteredData[j];filteredData[j]=tmp;}
+  isFlipped=false;card.classList.remove('flipped');navigateTo(0,'left');
+}
+card.addEventListener('click',flipCard);
+var touchStartX=0;
+var cardContainer=document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart',function(e){touchStartX=e.changedTouches[0].screenX;},{passive:true});
+cardContainer.addEventListener('touchend',function(e){var diff=touchStartX-e.changedTouches[0].screenX;if(Math.abs(diff)>60){if(diff>0)nextCard();else prevCard();}});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')prevCard();else if(e.key==='ArrowRight')nextCard();else if(e.key===' '){e.preventDefault();flipCard();}});
+buildTopicBar();buildModeRow();buildLegend();renderCard();
+</script>
+</body>
+</html>
