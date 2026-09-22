@@ -1,6 +1,9 @@
 # Rodney - browser session data (Chrome profile, cache)
 .rodney/
 
+# Source material for flashcards (not published)
+data/
+
 # Claude Code local settings
 .claude/settings.local.json
 
