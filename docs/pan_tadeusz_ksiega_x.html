@@ -87,40 +87,6 @@
     color: #16241a;
   }
 
-  .priority-row {
-    display: flex;
-    gap: 8px;
-  }
-  .priority-pill {
-    flex-shrink: 0;
-    padding: 5px 12px;
-    border-radius: 20px;
-    border: 1px solid #2c3d2f;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 0.68rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.25s;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .priority-pill.active {
-    border-color: var(--accent);
-    color: var(--accent-light);
-  }
-  .priority-pill .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .priority-pill .dot.critical { background: #a8791f; }
-  .priority-pill .dot.extra { background: #7f9a6b; }
-
   .progress-area {
     width: 100%;
     max-width: 480px;
@@ -216,23 +182,6 @@
     color: var(--accent);
     font-weight: 600;
   }
-  .card-front .card-badge {
-    font-size: 0.58rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 10px;
-  }
-  .card-front .card-badge.critical {
-    background: #a8791f;
-    color: #16241a;
-  }
-  .card-front .card-badge.extra {
-    background: transparent;
-    border: 1px solid #a9ae9c;
-    color: #6f7a63;
-  }
   .card-front .card-question {
     font-family: 'DM Serif Display', serif;
     font-size: 1.1rem;
@@ -247,10 +196,6 @@
     margin-top: auto;
     padding-top: 14px;
   }
-  .card-front.is-critical {
-    border-top: 3px solid #a8791f;
-  }
-
   .card-back {
     background: var(--card-back);
     color: var(--text-light);
@@ -375,7 +320,6 @@
 
 <div class="filters">
   <div class="topic-bar" id="topicBar"></div>
-  <div class="priority-row" id="priorityRow"></div>
 </div>
 
 <div class="progress-area">
@@ -397,101 +341,100 @@
 </div>
 
 <script>
-// p: "c" = kluczowe (z podsumowania podręcznika), "e" = dodatkowe
 var ALL_FLASHCARDS = [
   // =============================================
   // 1. BURZA I NARADA
   // =============================================
 
-  { topic: "Burza i narada", p: "e", q: "Jakie zjawisko pogodowe nastąpiło bezpośrednio po walce szlachty z Moskalami?", a: ["Gwałtowna burza z piorunami i ulewą — nawałnica zbierająca się od rana", "Wichry rwały trawy i zboża, a jeden wzbił się jak ruchoma piramida i trąbą otrębował burzę", "Pioruny, ulewa „jak z wiader” i ciemność gruba, gęsta, prawie dotykalna", "Noc „z burzą od nocy czarniejszą” zapadła nad placem boju"] },
-  { topic: "Burza i narada", p: "c", q: "W jaki sposób nawałnica „pomogła” szlachcie po starciu z wojskiem ruskim?", a: ["Okryła mrokiem plac boju, więc nikt z zewnątrz nie zobaczył, co się stało", "Zalała drogi i zerwała mosty na rzece — folwark Soplicy stał się niedostępną fortecą", "Wieść o bitwie nie mogła rozejść się po okolicy", "A właśnie od zachowania tajemnicy zależał los całej szlachty"] },
-  { topic: "Burza i narada", p: "e", q: "Z kim przez godzinę naradzał się leżący w łóżku, ranny ks. Robak?", a: ["Z Sędzią, który ściśle wypełniał wszystkie jego rozkazy", "Z Podkomorzym i z Klucznikiem Gerwazym", "Oraz z przyprowadzonym kapitanem Rykowem", "Drzwi zamknięto — „godzinę całą trwały tajemne rozmowy”"] },
+  { topic: "Burza i narada", q: "Jakie zjawisko pogodowe nastąpiło bezpośrednio po walce szlachty z Moskalami?", a: ["Gwałtowna burza z piorunami i ulewą — nawałnica zbierająca się od rana", "Wichry rwały trawy i zboża, a jeden wzbił się jak ruchoma piramida i trąbą otrębował burzę", "Pioruny, ulewa „jak z wiader” i ciemność gruba, gęsta, prawie dotykalna", "Noc „z burzą od nocy czarniejszą” zapadła nad placem boju"] },
+  { topic: "Burza i narada", q: "W jaki sposób nawałnica „pomogła” szlachcie po starciu z wojskiem ruskim?", a: ["Okryła mrokiem plac boju, więc nikt z zewnątrz nie zobaczył, co się stało", "Zalała drogi i zerwała mosty na rzece — folwark Soplicy stał się niedostępną fortecą", "Wieść o bitwie nie mogła rozejść się po okolicy", "A właśnie od zachowania tajemnicy zależał los całej szlachty"] },
+  { topic: "Burza i narada", q: "Z kim przez godzinę naradzał się leżący w łóżku, ranny ks. Robak?", a: ["Z Sędzią, który ściśle wypełniał wszystkie jego rozkazy", "Z Podkomorzym i z Klucznikiem Gerwazym", "Oraz z przyprowadzonym kapitanem Rykowem", "Drzwi zamknięto — „godzinę całą trwały tajemne rozmowy”"] },
 
   // =============================================
   // 2. UKŁADY Z RYKOWEM
   // =============================================
 
-  { topic: "Układy z Rykowem", p: "c", q: "Za jakiego człowieka szlachta uważa kapitana Rykowa? Nazwij przypisywaną mu cechę charakteru.", a: ["Za człowieka poczciwego — „Żeś człek poczciwy, wiedzą tu wszyscy ziemianie”", "Przypisywana mu cecha to uczciwość i honor: dotrzymuje danego słowa", "Znali go od lat, bo stawał u ziemian na kwaterach", "Jest pozytywnym przeciwieństwem chciwego i podłego Płuta"] },
-  { topic: "Układy z Rykowem", p: "c", q: "Dlaczego szlachta polska chce wręczyć Rykowowi pieniądze?", a: ["Jako zadośćuczynienie — stracił całą rotę, a szlachta nie chciała go skrzywdzić", "Wiedzieli, że jest niebogaty: „te dukaty śmieliśmy złożyć wiedząc, żeś człek niebogaty”", "Liczyli też na jego przychylne świadectwo w przyszłym śledztwie", "Kiesa ciężka dukatami leżała na stole w izbie Sędziego"] },
-  { topic: "Układy z Rykowem", p: "c", q: "Czy kapitan Ryków oskarża Polaków o wybicie jego roty?", a: ["Nie — traktuje klęskę jako zwykłą kolej wojennego losu", "Cytuje ruskie przysłowie: kto dziś na wozie, jutro bywa pod wozem; „dziś bijesz, jutro ciebie biją”", "Bez urazy wspomina własne porażki (Racławice, Zurych) i zwycięstwa (Maciejowice)", "Całą winę składa na Płuta, nie na szlachtę"] },
-  { topic: "Układy z Rykowem", p: "c", q: "Czy kapitan Ryków bierze pieniądze oferowane mu przez szlachtę? Jak to uzasadnia?", a: ["Nie bierze — rzuca kiesę z dukatami z powrotem na stół", "Ma swój żołd kapitański, a wystarczy mu „na ponczyk i lulkę tabaki”", "Lubi Polaków, bo to ludzie weseli, „dobrzy do wypitki i dobrzy do wybitki”", "Za wybicie roty przed carem odpowie Płut, a nie szlachta"] },
-  { topic: "Układy z Rykowem", p: "e", q: "Czym jest żołd?", a: ["Stałe wynagrodzenie pieniężne żołnierza za służbę wojskową", "Wypłacane regularnie przez władcę lub państwo utrzymujące wojsko", "Ryków mówi, że jego żołd kapitański jest „lada jaki”, ale mu na życie starcza"] },
-  { topic: "Układy z Rykowem", p: "c", q: "Komu Ryków przypisuje winę za rozpoczęcie walki?", a: ["Majorowi Płutowi — „Moja rota! a wszystko z winy tego Płuta!”", "To Płut był pierwszym komendantem i to on zakomenderował ognia", "„On za to przed carem odpowie” — odpowiedzialność spada na dowódcę"] },
-  { topic: "Układy z Rykowem", p: "c", q: "Co Ryków obiecuje Polakom?", a: ["Że ich obroni i da za nimi świadectwo, gdy zacznie się śledztwo — daje na to „słowo uczciwe”", "Zezna, że Moskale przyszli z wizytą, pili, tańczyli i sobie podchmielili", "A Płut przypadkiem kazał dać ognia i tak się „batalijon jakoś zmarnował”"] },
-  { topic: "Układy z Rykowem", p: "c", q: "Co Ryków radzi Polakom, aby śledztwo w sprawie wybicia moskiewskiej roty zakończyło się dla nich pomyślnie?", a: ["Żeby „śledztwo pomazywać złotem” — przekupić prowadzących je urzędników, a wtedy „będzie kręcić się”", "Żeby Płutowi „zatkać gębę bankowym papierem”, czyli przekupić go banknotami", "Ostrzega, że Płut został żywy i jako „chytra sztuczka” może im „zagiąć kruczka”"] },
+  { topic: "Układy z Rykowem", q: "Za jakiego człowieka szlachta uważa kapitana Rykowa? Nazwij przypisywaną mu cechę charakteru.", a: ["Za człowieka poczciwego — „Żeś człek poczciwy, wiedzą tu wszyscy ziemianie”", "Przypisywana mu cecha to uczciwość i honor: dotrzymuje danego słowa", "Znali go od lat, bo stawał u ziemian na kwaterach", "Jest pozytywnym przeciwieństwem chciwego i podłego Płuta"] },
+  { topic: "Układy z Rykowem", q: "Dlaczego szlachta polska chce wręczyć Rykowowi pieniądze?", a: ["Jako zadośćuczynienie — stracił całą rotę, a szlachta nie chciała go skrzywdzić", "Wiedzieli, że jest niebogaty: „te dukaty śmieliśmy złożyć wiedząc, żeś człek niebogaty”", "Liczyli też na jego przychylne świadectwo w przyszłym śledztwie", "Kiesa ciężka dukatami leżała na stole w izbie Sędziego"] },
+  { topic: "Układy z Rykowem", q: "Czy kapitan Ryków oskarża Polaków o wybicie jego roty?", a: ["Nie — traktuje klęskę jako zwykłą kolej wojennego losu", "Cytuje ruskie przysłowie: kto dziś na wozie, jutro bywa pod wozem; „dziś bijesz, jutro ciebie biją”", "Bez urazy wspomina własne porażki (Racławice, Zurych) i zwycięstwa (Maciejowice)", "Całą winę składa na Płuta, nie na szlachtę"] },
+  { topic: "Układy z Rykowem", q: "Czy kapitan Ryków bierze pieniądze oferowane mu przez szlachtę? Jak to uzasadnia?", a: ["Nie bierze — rzuca kiesę z dukatami z powrotem na stół", "Ma swój żołd kapitański, a wystarczy mu „na ponczyk i lulkę tabaki”", "Lubi Polaków, bo to ludzie weseli, „dobrzy do wypitki i dobrzy do wybitki”", "Za wybicie roty przed carem odpowie Płut, a nie szlachta"] },
+  { topic: "Układy z Rykowem", q: "Czym jest żołd?", a: ["Stałe wynagrodzenie pieniężne żołnierza za służbę wojskową", "Wypłacane regularnie przez władcę lub państwo utrzymujące wojsko", "Ryków mówi, że jego żołd kapitański jest „lada jaki”, ale mu na życie starcza"] },
+  { topic: "Układy z Rykowem", q: "Komu Ryków przypisuje winę za rozpoczęcie walki?", a: ["Majorowi Płutowi — „Moja rota! a wszystko z winy tego Płuta!”", "To Płut był pierwszym komendantem i to on zakomenderował ognia", "„On za to przed carem odpowie” — odpowiedzialność spada na dowódcę"] },
+  { topic: "Układy z Rykowem", q: "Co Ryków obiecuje Polakom?", a: ["Że ich obroni i da za nimi świadectwo, gdy zacznie się śledztwo — daje na to „słowo uczciwe”", "Zezna, że Moskale przyszli z wizytą, pili, tańczyli i sobie podchmielili", "A Płut przypadkiem kazał dać ognia i tak się „batalijon jakoś zmarnował”"] },
+  { topic: "Układy z Rykowem", q: "Co Ryków radzi Polakom, aby śledztwo w sprawie wybicia moskiewskiej roty zakończyło się dla nich pomyślnie?", a: ["Żeby „śledztwo pomazywać złotem” — przekupić prowadzących je urzędników, a wtedy „będzie kręcić się”", "Żeby Płutowi „zatkać gębę bankowym papierem”, czyli przekupić go banknotami", "Ostrzega, że Płut został żywy i jako „chytra sztuczka” może im „zagiąć kruczka”"] },
 
   // =============================================
   // 3. ZNIKNIĘCIE PŁUTA
   // =============================================
 
-  { topic: "Zniknięcie Płuta", p: "c", q: "Co się stało z Płutem?", a: ["Potajemnie zabił go Gerwazy: „Klnę się Scyzorykiem, że Płut nie wyda! gadać już nie będzie z nikim!”", "Nazajutrz daremnie szukano go we dworze i wyznaczono nagrodę za trupa", "„Major zginął bez śladu, jak gdyby wpadł w wodę” — nikt na pewno nie wiedział, co się stało", "Ryków skwitował to przysłowiem: „Nosił wilk, ponieśli i wilka!”"] },
-  { topic: "Zniknięcie Płuta", p: "e", q: "Co oznaczają słowa „Pro publico bono”?", a: ["Po łacinie: „dla dobra publicznego”, dla dobra ogółu", "Robak mówi, że to jedyna restrykcyja (okoliczność łagodząca) zabójstwa: jeśli popełniono je nie z głupiej zemsty, ale pro publico bono", "Gerwazy powtarzał te słowa jako jedyne wyjaśnienie zniknięcia Płuta", "Tymi samymi słowami odmówi potem podania ręki Jackowi"] },
-  { topic: "Zniknięcie Płuta", p: "e", q: "Kto znał tajemnicę Klucznika dotyczącą zniknięcia Płuta, lecz honorowo dotrzymując słowa, milczał?", a: ["Wojski Hreczecha", "„Wojski był w tajemnicy, lecz słowem ujęty honorowym, staruszek milczał jak zaklęty”"] },
+  { topic: "Zniknięcie Płuta", q: "Co się stało z Płutem?", a: ["Potajemnie zabił go Gerwazy: „Klnę się Scyzorykiem, że Płut nie wyda! gadać już nie będzie z nikim!”", "Nazajutrz daremnie szukano go we dworze i wyznaczono nagrodę za trupa", "„Major zginął bez śladu, jak gdyby wpadł w wodę” — nikt na pewno nie wiedział, co się stało", "Ryków skwitował to przysłowiem: „Nosił wilk, ponieśli i wilka!”"] },
+  { topic: "Zniknięcie Płuta", q: "Co oznaczają słowa „Pro publico bono”?", a: ["Po łacinie: „dla dobra publicznego”, dla dobra ogółu", "Robak mówi, że to jedyna restrykcyja (okoliczność łagodząca) zabójstwa: jeśli popełniono je nie z głupiej zemsty, ale pro publico bono", "Gerwazy powtarzał te słowa jako jedyne wyjaśnienie zniknięcia Płuta", "Tymi samymi słowami odmówi potem podania ręki Jackowi"] },
+  { topic: "Zniknięcie Płuta", q: "Kto znał tajemnicę Klucznika dotyczącą zniknięcia Płuta, lecz honorowo dotrzymując słowa, milczał?", a: ["Wojski Hreczecha", "„Wojski był w tajemnicy, lecz słowem ujęty honorowym, staruszek milczał jak zaklęty”"] },
 
   // =============================================
   // 4. EMIGRACJA
   // =============================================
 
-  { topic: "Emigracja", p: "c", q: "Podaj dwa powody, które według Podkomorzego doprowadziły do zbyt wczesnego rozpoczęcia walki z Moskalami.", a: ["Ksiądz Robak zbyt czynnie rozszerzał nowiny o zbliżającym się powstaniu", "Klucznik i szlachta pojęli te nowiny opacznie — zrozumieli je źle i chwycili za broń przedwcześnie", "„Zbłądziliśmy i nikt tu z nas nie jest bez winy”", "Wojna z Rosją miała się zacząć dopiero za jakiś czas"] },
-  { topic: "Emigracja", p: "c", q: "Dokąd musieli się udać szlachcice najczynniej zaangażowani w bitwę z Moskalami?", a: ["Za Niemen, do Księstwa Warszawskiego, gdzie czekał na nich „zastęp narodowy”", "Uciekać musieli m.in. Maciej Chrzciciel, Tadeusz, Konew i Brzytew", "Na nieobecnych i na Płuta zwalono by całą winę, żeby ocalić resztę szlachty", "Kto raz zwadził się z carem, musi „albo bić się, albo gnić w Sybirze”"] },
+  { topic: "Emigracja", q: "Podaj dwa powody, które według Podkomorzego doprowadziły do zbyt wczesnego rozpoczęcia walki z Moskalami.", a: ["Ksiądz Robak zbyt czynnie rozszerzał nowiny o zbliżającym się powstaniu", "Klucznik i szlachta pojęli te nowiny opacznie — zrozumieli je źle i chwycili za broń przedwcześnie", "„Zbłądziliśmy i nikt tu z nas nie jest bez winy”", "Wojna z Rosją miała się zacząć dopiero za jakiś czas"] },
+  { topic: "Emigracja", q: "Dokąd musieli się udać szlachcice najczynniej zaangażowani w bitwę z Moskalami?", a: ["Za Niemen, do Księstwa Warszawskiego, gdzie czekał na nich „zastęp narodowy”", "Uciekać musieli m.in. Maciej Chrzciciel, Tadeusz, Konew i Brzytew", "Na nieobecnych i na Płuta zwalono by całą winę, żeby ocalić resztę szlachty", "Kto raz zwadził się z carem, musi „albo bić się, albo gnić w Sybirze”"] },
 
   // =============================================
   // 5. POŻEGNANIA
   // =============================================
 
-  { topic: "Pożegnania", p: "c", q: "Jaki plan w obliczu przyspieszonego wyjazdu Tadeusza ma wobec niego Sędzia?", a: ["Chce, by Tadeusz przed odjazdem poprosił Zosię o rękę", "Skoro ślub jest niemożliwy, niech przynajmniej odbędą się zaręczyny", "Telimena już nie przeszkadza, a Zosia zgadza się z wolą opiekunów", "Sędzia wierzy, że „wielką siłę ma ślubna obrączka” — ostudzi pokusy w podróży"] },
-  { topic: "Pożegnania", p: "e", q: "W kim w młodości zakochał się Sędzia i po kim pozostał wdowcem, mimo że do ślubu nie doszło?", a: ["W pannie Marcie — Wojszczance, córce przyjaciela, Wojskiego Hreczechy", "Byli zaręczeni, ale Bóg nie pobłogosławił związkowi i wziął ją do swojej chwały", "Sędzia dochował jej wiary: „nie bywszy małżonkiem, jestem wdowiec stary”", "Pamiątką został ślubny złoty pierścień, na który patrzy ze łzami"] },
-  { topic: "Pożegnania", p: "c", q: "Dlaczego Tadeusz nie chce przyspieszonych zaręczyn z Zosią?", a: ["Nie chce więzić jej woli, skoro wyjeżdża może na bardzo długo", "Uważa, że nie zasłużył na wzajemność — prosić o nią „byłaby nikczemność”", "Chce wrócić lepszy i godniejszy, zdobyć ją stałością i „troszeczką sławy” ozdobić swoje imię", "Dopiero wtedy na klęczkach poprosi o rękę, jeśli Zosia będzie wolna"] },
-  { topic: "Pożegnania", p: "e", q: "Co ofiaruje Zosia Tadeuszowi na drogę?", a: ["Obrazek ze świętą Genowefą", "Relikwiarzyk z cząstką sukni świętego Józefa — patrona zaręczonej młodzi", "Wyjęła je z domowego ołtarzyka", "Dodała przestrogę, by zawsze nosił je przy sobie i pamiętał o Zosi"] },
-  { topic: "Pożegnania", p: "c", q: "Hrabia wyjaśnia Tadeuszowi, że pojedynkował się z nim, bo uważał go za rywala. Kim w rzeczywistości był zainteresowany?", a: ["Telimeną — „ja zaś tej pięknej nimfie oddałem me serce”", "Tadeusz tymczasem wzdychał do „pasterki”, czyli do Zosi", "Ta pomyłka była jedną z przyczyn ich smutnej zwady i pojedynku", "Hrabia proponuje, by odtąd ścigali się nie szpadą, lecz stałością uczuć i męstwem wobec wroga"] },
-  { topic: "Pożegnania", p: "c", q: "Dlaczego Hrabia nie chce wykupić się od więzienia, tylko decyduje się uciekać z innymi?", a: ["Sędzia radził mu zostać: jest dość bogaty, wykupi się od więzień połową intraty", "Hrabia odpowiada, że to „niezgodna z moim charakterem”", "„Nie mogę być kochankiem: będę bohaterem” — pociągają go sława i czyny nadzwyczajne", "„Gdy jestem nędzarz sercem, będę ręką wielki”; Robak radzi mu wziąć pieniądze i wystawić rotę"] },
-  { topic: "Pożegnania", p: "e", q: "Czym jest kolor, który ofiaruje Telimena Hrabiemu?", a: ["Kolor to barwa damy serca — znak, który rycerz nosi, idąc na wojnę", "Telimena oderwała wstążkę od sukni, zrobiła z niej kokardę i przypięła Hrabiemu na piersiach", "Ma go wieść „na działa ogniste” i przypominać, czyja ręka ten kolor przyszpiliła", "To nawiązanie do dawnego obyczaju rycerskiego"] },
+  { topic: "Pożegnania", q: "Jaki plan w obliczu przyspieszonego wyjazdu Tadeusza ma wobec niego Sędzia?", a: ["Chce, by Tadeusz przed odjazdem poprosił Zosię o rękę", "Skoro ślub jest niemożliwy, niech przynajmniej odbędą się zaręczyny", "Telimena już nie przeszkadza, a Zosia zgadza się z wolą opiekunów", "Sędzia wierzy, że „wielką siłę ma ślubna obrączka” — ostudzi pokusy w podróży"] },
+  { topic: "Pożegnania", q: "W kim w młodości zakochał się Sędzia i po kim pozostał wdowcem, mimo że do ślubu nie doszło?", a: ["W pannie Marcie — Wojszczance, córce przyjaciela, Wojskiego Hreczechy", "Byli zaręczeni, ale Bóg nie pobłogosławił związkowi i wziął ją do swojej chwały", "Sędzia dochował jej wiary: „nie bywszy małżonkiem, jestem wdowiec stary”", "Pamiątką został ślubny złoty pierścień, na który patrzy ze łzami"] },
+  { topic: "Pożegnania", q: "Dlaczego Tadeusz nie chce przyspieszonych zaręczyn z Zosią?", a: ["Nie chce więzić jej woli, skoro wyjeżdża może na bardzo długo", "Uważa, że nie zasłużył na wzajemność — prosić o nią „byłaby nikczemność”", "Chce wrócić lepszy i godniejszy, zdobyć ją stałością i „troszeczką sławy” ozdobić swoje imię", "Dopiero wtedy na klęczkach poprosi o rękę, jeśli Zosia będzie wolna"] },
+  { topic: "Pożegnania", q: "Co ofiaruje Zosia Tadeuszowi na drogę?", a: ["Obrazek ze świętą Genowefą", "Relikwiarzyk z cząstką sukni świętego Józefa — patrona zaręczonej młodzi", "Wyjęła je z domowego ołtarzyka", "Dodała przestrogę, by zawsze nosił je przy sobie i pamiętał o Zosi"] },
+  { topic: "Pożegnania", q: "Hrabia wyjaśnia Tadeuszowi, że pojedynkował się z nim, bo uważał go za rywala. Kim w rzeczywistości był zainteresowany?", a: ["Telimeną — „ja zaś tej pięknej nimfie oddałem me serce”", "Tadeusz tymczasem wzdychał do „pasterki”, czyli do Zosi", "Ta pomyłka była jedną z przyczyn ich smutnej zwady i pojedynku", "Hrabia proponuje, by odtąd ścigali się nie szpadą, lecz stałością uczuć i męstwem wobec wroga"] },
+  { topic: "Pożegnania", q: "Dlaczego Hrabia nie chce wykupić się od więzienia, tylko decyduje się uciekać z innymi?", a: ["Sędzia radził mu zostać: jest dość bogaty, wykupi się od więzień połową intraty", "Hrabia odpowiada, że to „niezgodna z moim charakterem”", "„Nie mogę być kochankiem: będę bohaterem” — pociągają go sława i czyny nadzwyczajne", "„Gdy jestem nędzarz sercem, będę ręką wielki”; Robak radzi mu wziąć pieniądze i wystawić rotę"] },
+  { topic: "Pożegnania", q: "Czym jest kolor, który ofiaruje Telimena Hrabiemu?", a: ["Kolor to barwa damy serca — znak, który rycerz nosi, idąc na wojnę", "Telimena oderwała wstążkę od sukni, zrobiła z niej kokardę i przypięła Hrabiemu na piersiach", "Ma go wieść „na działa ogniste” i przypominać, czyja ręka ten kolor przyszpiliła", "To nawiązanie do dawnego obyczaju rycerskiego"] },
 
   // =============================================
   // 6. SPOWIEDŹ JACKA
   // =============================================
 
-  { topic: "Spowiedź Jacka", p: "e", q: "Czym jest wijatyk, z którym do ks. Robaka przychodzi pleban?", a: ["Wiatyk (łac. viaticum — „zaopatrzenie na drogę”) to Komunia święta udzielana umierającemu", "Ostatni sakrament na drogę do wieczności", "Robak sam prosi Sędziego, by jak najrychlej posłać po plebana z wijatykiem", "Przyjazd księdza oznajmia dzwonek — „znak, że przyjechał pleban z Panem Bogiem”"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Jakie były pierwsze słowa ks. Robaka, gdy umierający pozostał z Klucznikiem i Sędzią?", a: ["„Jam jest Jacek Soplica…” — wyznał swoją prawdziwą tożsamość", "Wcześniej długo wpatrywał się w Gerwazego, a potem zasłonił oczy ręką jak chirurg przed cięciem", "Klucznik pobladł, chwycił za rapier i zamarł „jak głaz lecący z góry zatrzymany w drodze”", "Był podobny do rannego rysia gotowego skoczyć myśliwemu do oczu"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "W jakim celu ks. Robak „spowiada się” Gerwazemu?", a: ["Dla ulgi sumienia — chce uzyskać przebaczenie, a przynajmniej o nie prosić przed śmiercią", "Chce wyjawić prawdziwe powody zabójstwa Stolnika i oczyścić się z zarzutu zdrady", "„Posłuchaj mej spowiedzi; potem zrobisz sobie ze mną, co zechcesz”", "Gerwazy jako wierny sługa Horeszków jest jedynym, kto może mu przebaczyć w imieniu rodu"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Jak Jacek Soplica odbierał przychylność Stolnika Horeszki?", a: ["Brał ją za szczerą i wielką przyjaźń", "Stolnik zapraszał go na biesiady, wznosił jego zdrowie, ściskał przy ludziach", "Krzyczał, że „nie miał przyjaciela nad Jacka Soplicę”", "Wszyscy myśleli, że Stolnik „duszą się z nim podzieli”"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Jakie były prawdziwe intencje Stolnika Horeszki wobec Jacka Soplicy?", a: ["Traktował go instrumentalnie — Jacek był mu po prostu potrzebny", "Cenił jego poważanie u szlachty, jego szablę i kreskę (głos) na sejmikach", "Chytrze udawał, że nie dostrzega jego miłości do Ewy i że taki związek nie przyszedł mu nawet do głowy", "Gdy Jacek był bliski wyznania, starzec wrzucał obojętne słowo o procesach, sejmikach, łowach"] },
-  { topic: "Spowiedź Jacka", p: "e", q: "Czym jest rekuza?", a: ["Odmowa ręki panny — odrzucenie oświadczyn, czyli konkurów", "Z łacińskiego recusare — odmawiać, nie przyjmować", "Jacek żałuje, że Stolnik nie zrekuzował go otwarcie", "Bał się też, że ludzie powiedzą, iż mści się z powodu rekuzy"] },
-  { topic: "Spowiedź Jacka", p: "e", q: "Jak miała na imię córka Stolnika Horeszki?", a: ["Ewa — Ewa Horeszkówna", "Jacek wspomina ją jako łagodnego gołąbka o uprzejmym, anielskim wzroku", "Wydana za Wojewodę, została matką Zosi"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Dlaczego Jacek otwarcie nie poprosił Horeszki o rękę jego córki?", a: ["Z pychy — żeby nie ubliżyć imieniowi Sopliców i nie zniżyć się przed panem próżną prośbą", "Bał się odmowy i tego, co mówiłaby szlachta: „Soplicy Horeszkowie odmówili dziewkę!”", "Gdy spotykał zimne jak lód spojrzenie Stolnika, wstyd mu było własnego wzruszenia", "Zamiast prosić — udawał, że drwi z magnatów i ich córek"] },
-  { topic: "Spowiedź Jacka", p: "e", q: "Czym była czarna polewka? Co oznaczało jej podanie?", a: ["Czarnina — zupa gotowana na krwi kaczki lub gęsi, z octem i przyprawami", "Podana konkurentowi w domu panny oznaczała odmowę: grzeczną, ale jednoznaczną rekuzę", "„Że mnie, Jackowi, czarną podano polewkę!” — dla dumnego Soplicy była to hańba"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "W jaki sposób Jacek chciał sobie poradzić z rozpaczą z powodu nieszczęśliwej miłości?", a: ["Postanowił zgromadzić ze szlachty mały pułk i opuścić na zawsze powiat i ojczyznę", "Chciał wynieść się „gdzie na Moskwę lub na Tatarszczyznę” i zacząć wojnę", "Później ożenił się z pierwszą napotkaną ubogą dziewczyną, żeby wykorzenić miłość z serca", "Gdy i to nie pomogło — zaczął pić"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Po co Jacek pojechał do Stolnika przed opuszczeniem kraju?", a: ["Żeby się z nim pożegnać przed wyprawą", "Liczył, że na widok wiernego stronnika i dawnego przyjaciela starzec wreszcie się poruszy", "Że pokaże „trochę ludzkiej duszy, jak ślimak rogów”, bo przy pożegnaniu odzywa się nawet iskierka uczucia", "W głębi serca miał nadzieję, że Stolnik odda mu Ewę"] },
-  { topic: "Spowiedź Jacka", p: "e", q: "Jaki temat poruszył Stolnik, kiedy Jacek przyjechał, aby się pożegnać przed wyprawą?", a: ["Temat zamążpójścia córki — właśnie przyjechał do niego swat kasztelanica", "Zimny „jako słup soli”, grzeczny i obojętny, pytał Jacka jako przyjaciela o radę", "Chwalił się, że ma córkę piękną i bogatą", "Zastanawiał się, czy kasztelan witebski to dość — „w senacie niskie, drążkowe krzesło”"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Jak zareagował Jacek, kiedy Stolnik chciał jego rady w sprawie zamążpójścia córki?", a: ["Nie pamięta, co odpowiedział — „podobno nic”", "Wsiadł na konia i uciekł", "Chwilę wcześniej Ewa na wieść o jego odjeździe zbladła i o mało trupem nie padła, a on pierwszy raz w życiu zalał się łzami", "Chciał paść Stolnikowi do nóg i zawołać: „Ojcze drogi, weź za syna lub zabij!”"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Dlaczego Jacek nie zdecydował się siłą zabrać Ewy od ojca?", a: ["Mógł to zrobić — miał za sobą Dobrzyn i cztery zaścianki, rozbiłby zamek „w puch”", "Ale Ewa była słaba i lękliwa, wypieszczona przez rodziców — „robaczek motyli, wiosenna gąsiennica”", "Nie zniosłaby ucieczki, pogoni ani szczęku broni", "„Dotknąć ją zbrojną ręką, byłoby ją zabić; nie mogłem, nie”"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Co zrobił Jacek po odrzuceniu jego konkurów?", a: ["„Szatan dumy” podsunął mu plan: zemścić się krwawo, ale powód zemsty ukryć", "Przestał bywać w zamku i próbował wykorzenić miłość z serca, puścić Ewę w niepamięć", "Ożenił się z pierwszą napotkaną ubogą dziewczyną — matką Tadeusza — której nie kochał", "Czekał, aż znajdzie jakąś zaczepkę, żeby się pomścić"] },
-  { topic: "Spowiedź Jacka", p: "c", q: "Do czego doprowadziła Jacka jego urażona duma i nałóg?", a: ["Zaczął pić, był zły i opryskliwy, nie umiał zająć się gospodarstwem ani interesem", "Żona umarła z żalu, zostawiając małego Tadeusza", "Szedł „z grzechów w nowe grzechy” aż do zabójstwa Stolnika", "Skutkiem były hańba zdrajcy, utrata dawnej pozycji i wieloletnia tułaczka"] },
+  { topic: "Spowiedź Jacka", q: "Czym jest wijatyk, z którym do ks. Robaka przychodzi pleban?", a: ["Wiatyk (łac. viaticum — „zaopatrzenie na drogę”) to Komunia święta udzielana umierającemu", "Ostatni sakrament na drogę do wieczności", "Robak sam prosi Sędziego, by jak najrychlej posłać po plebana z wijatykiem", "Przyjazd księdza oznajmia dzwonek — „znak, że przyjechał pleban z Panem Bogiem”"] },
+  { topic: "Spowiedź Jacka", q: "Jakie były pierwsze słowa ks. Robaka, gdy umierający pozostał z Klucznikiem i Sędzią?", a: ["„Jam jest Jacek Soplica…” — wyznał swoją prawdziwą tożsamość", "Wcześniej długo wpatrywał się w Gerwazego, a potem zasłonił oczy ręką jak chirurg przed cięciem", "Klucznik pobladł, chwycił za rapier i zamarł „jak głaz lecący z góry zatrzymany w drodze”", "Był podobny do rannego rysia gotowego skoczyć myśliwemu do oczu"] },
+  { topic: "Spowiedź Jacka", q: "W jakim celu ks. Robak „spowiada się” Gerwazemu?", a: ["Dla ulgi sumienia — chce uzyskać przebaczenie, a przynajmniej o nie prosić przed śmiercią", "Chce wyjawić prawdziwe powody zabójstwa Stolnika i oczyścić się z zarzutu zdrady", "„Posłuchaj mej spowiedzi; potem zrobisz sobie ze mną, co zechcesz”", "Gerwazy jako wierny sługa Horeszków jest jedynym, kto może mu przebaczyć w imieniu rodu"] },
+  { topic: "Spowiedź Jacka", q: "Jak Jacek Soplica odbierał przychylność Stolnika Horeszki?", a: ["Brał ją za szczerą i wielką przyjaźń", "Stolnik zapraszał go na biesiady, wznosił jego zdrowie, ściskał przy ludziach", "Krzyczał, że „nie miał przyjaciela nad Jacka Soplicę”", "Wszyscy myśleli, że Stolnik „duszą się z nim podzieli”"] },
+  { topic: "Spowiedź Jacka", q: "Jakie były prawdziwe intencje Stolnika Horeszki wobec Jacka Soplicy?", a: ["Traktował go instrumentalnie — Jacek był mu po prostu potrzebny", "Cenił jego poważanie u szlachty, jego szablę i kreskę (głos) na sejmikach", "Chytrze udawał, że nie dostrzega jego miłości do Ewy i że taki związek nie przyszedł mu nawet do głowy", "Gdy Jacek był bliski wyznania, starzec wrzucał obojętne słowo o procesach, sejmikach, łowach"] },
+  { topic: "Spowiedź Jacka", q: "Czym jest rekuza?", a: ["Odmowa ręki panny — odrzucenie oświadczyn, czyli konkurów", "Z łacińskiego recusare — odmawiać, nie przyjmować", "Jacek żałuje, że Stolnik nie zrekuzował go otwarcie", "Bał się też, że ludzie powiedzą, iż mści się z powodu rekuzy"] },
+  { topic: "Spowiedź Jacka", q: "Jak miała na imię córka Stolnika Horeszki?", a: ["Ewa — Ewa Horeszkówna", "Jacek wspomina ją jako łagodnego gołąbka o uprzejmym, anielskim wzroku", "Wydana za Wojewodę, została matką Zosi"] },
+  { topic: "Spowiedź Jacka", q: "Dlaczego Jacek otwarcie nie poprosił Horeszki o rękę jego córki?", a: ["Z pychy — żeby nie ubliżyć imieniowi Sopliców i nie zniżyć się przed panem próżną prośbą", "Bał się odmowy i tego, co mówiłaby szlachta: „Soplicy Horeszkowie odmówili dziewkę!”", "Gdy spotykał zimne jak lód spojrzenie Stolnika, wstyd mu było własnego wzruszenia", "Zamiast prosić — udawał, że drwi z magnatów i ich córek"] },
+  { topic: "Spowiedź Jacka", q: "Czym była czarna polewka? Co oznaczało jej podanie?", a: ["Czarnina — zupa gotowana na krwi kaczki lub gęsi, z octem i przyprawami", "Podana konkurentowi w domu panny oznaczała odmowę: grzeczną, ale jednoznaczną rekuzę", "„Że mnie, Jackowi, czarną podano polewkę!” — dla dumnego Soplicy była to hańba"] },
+  { topic: "Spowiedź Jacka", q: "W jaki sposób Jacek chciał sobie poradzić z rozpaczą z powodu nieszczęśliwej miłości?", a: ["Postanowił zgromadzić ze szlachty mały pułk i opuścić na zawsze powiat i ojczyznę", "Chciał wynieść się „gdzie na Moskwę lub na Tatarszczyznę” i zacząć wojnę", "Później ożenił się z pierwszą napotkaną ubogą dziewczyną, żeby wykorzenić miłość z serca", "Gdy i to nie pomogło — zaczął pić"] },
+  { topic: "Spowiedź Jacka", q: "Po co Jacek pojechał do Stolnika przed opuszczeniem kraju?", a: ["Żeby się z nim pożegnać przed wyprawą", "Liczył, że na widok wiernego stronnika i dawnego przyjaciela starzec wreszcie się poruszy", "Że pokaże „trochę ludzkiej duszy, jak ślimak rogów”, bo przy pożegnaniu odzywa się nawet iskierka uczucia", "W głębi serca miał nadzieję, że Stolnik odda mu Ewę"] },
+  { topic: "Spowiedź Jacka", q: "Jaki temat poruszył Stolnik, kiedy Jacek przyjechał, aby się pożegnać przed wyprawą?", a: ["Temat zamążpójścia córki — właśnie przyjechał do niego swat kasztelanica", "Zimny „jako słup soli”, grzeczny i obojętny, pytał Jacka jako przyjaciela o radę", "Chwalił się, że ma córkę piękną i bogatą", "Zastanawiał się, czy kasztelan witebski to dość — „w senacie niskie, drążkowe krzesło”"] },
+  { topic: "Spowiedź Jacka", q: "Jak zareagował Jacek, kiedy Stolnik chciał jego rady w sprawie zamążpójścia córki?", a: ["Nie pamięta, co odpowiedział — „podobno nic”", "Wsiadł na konia i uciekł", "Chwilę wcześniej Ewa na wieść o jego odjeździe zbladła i o mało trupem nie padła, a on pierwszy raz w życiu zalał się łzami", "Chciał paść Stolnikowi do nóg i zawołać: „Ojcze drogi, weź za syna lub zabij!”"] },
+  { topic: "Spowiedź Jacka", q: "Dlaczego Jacek nie zdecydował się siłą zabrać Ewy od ojca?", a: ["Mógł to zrobić — miał za sobą Dobrzyn i cztery zaścianki, rozbiłby zamek „w puch”", "Ale Ewa była słaba i lękliwa, wypieszczona przez rodziców — „robaczek motyli, wiosenna gąsiennica”", "Nie zniosłaby ucieczki, pogoni ani szczęku broni", "„Dotknąć ją zbrojną ręką, byłoby ją zabić; nie mogłem, nie”"] },
+  { topic: "Spowiedź Jacka", q: "Co zrobił Jacek po odrzuceniu jego konkurów?", a: ["„Szatan dumy” podsunął mu plan: zemścić się krwawo, ale powód zemsty ukryć", "Przestał bywać w zamku i próbował wykorzenić miłość z serca, puścić Ewę w niepamięć", "Ożenił się z pierwszą napotkaną ubogą dziewczyną — matką Tadeusza — której nie kochał", "Czekał, aż znajdzie jakąś zaczepkę, żeby się pomścić"] },
+  { topic: "Spowiedź Jacka", q: "Do czego doprowadziła Jacka jego urażona duma i nałóg?", a: ["Zaczął pić, był zły i opryskliwy, nie umiał zająć się gospodarstwem ani interesem", "Żona umarła z żalu, zostawiając małego Tadeusza", "Szedł „z grzechów w nowe grzechy” aż do zabójstwa Stolnika", "Skutkiem były hańba zdrajcy, utrata dawnej pozycji i wieloletnia tułaczka"] },
 
   // =============================================
   // 7. ZABÓJSTWO STOLNIKA
   // =============================================
 
-  { topic: "Zabójstwo Stolnika", p: "c", q: "Jakiej potwarzy zdecydowanie przeciwstawia się ks. Robak, kiedy opowiada, jak znalazł się pod zamkiem Stolnika w momencie ataku Moskali?", a: ["Zarzutowi zdrady — że działał w zmowie z Moskalami", "„Bo fałsz, żebym był w jakiej z Moskalami zmowie”, „Nie byłem w zmowie”", "Pod zamek przyjechał sam, bo „szatan go tam wabił”, a Moskale nadciągnęli niezależnie od niego", "To dla niego najcięższy zarzut — przez całe życie pokutuje za miano zdrajcy"] },
-  { topic: "Zabójstwo Stolnika", p: "c", q: "O czym pomyślał Jacek, kiedy zobaczył zwycięskiego Stolnika na ganku podczas ataku Moskali?", a: ["Ogarnęła go złość: „Ten Stolnik zwycięski! I także mu na świecie wszystko się powodzi?”", "Stolnik migotał brylantową szpinką, dumnie kręcił wąsa i miotał dumne spojrzenia", "Jackowi zdało się, że go poznał, wyciąga ku niemu rękę, szydzi i grozi", "Chwycił więc karabin Moskala i prawie nie mierząc — wypalił"] },
-  { topic: "Zabójstwo Stolnika", p: "e", q: "Czy Jacek Soplica próbował uniknąć strzału Gerwazego, gdy ten mierzył do niego z broni?", a: ["Nie — nie uciekał: „Utkwiłem oczy we dwie twojej broni rury”", "Przybiła go do ziemi rozpacz i dziwny żal", "Żałuje nawet, że Gerwazy chybił: „Czemuś wtenczas chybił? Łaskę byś zrobił!”"] },
-  { topic: "Zabójstwo Stolnika", p: "e", q: "Dlaczego Gerwazy nie zabił Jacka?", a: ["Po prostu chybił — „Bóg widzi, szczerze trafić chciałem”", "Jacek widzi w tym wyrok Boży: musiał żyć „za pokutę grzechu”"] },
-  { topic: "Zabójstwo Stolnika", p: "c", q: "Dlaczego Gerwazy odstępuje od zemsty na Jacku – ks. Robaku?", a: ["Bo Jacek jest księdzem zakonnikiem: „sukienka broni cię przed Scyzorykiem”", "Bo Jacek ocalił dwóch ostatnich Horeszków — zasłonił Hrabiego przed jegrami i rzucił Gerwazego o ziemię, gdy Moskal do niego palił", "Bo grzechem jest smucić umierającego", "„Bądź zdrów… z nami kwita — zostawmy resztę Panu Bogu”"] },
-  { topic: "Zabójstwo Stolnika", p: "c", q: "Dlaczego Klucznik nie chce podać ręki i wybaczyć zemsty Jacka na Stolniku?", a: ["Bo nie może „bez mego szlachectwa obrazy” dotknąć ręki skrwawionej takim morderstwem", "Zabójstwa dokonano „z prywatnej zemsty, nie zaś pro publico bono”", "Odstępuje więc od zemsty, ale ręki Jackowi nie podaje"] },
-  { topic: "Zabójstwo Stolnika", p: "c", q: "Co najbardziej doskwierało Jackowi po zabiciu Stolnika?", a: ["Miano zdrajcy — „imię zdrajcy przylgnęło do mnie jako dżuma”", "Obywatele odwracali od niego twarz, dawni przyjaciele uciekali, lada chłop czy Żyd przebijał go szyderskim uśmiechem", "Wyraz „zdrajca” brzmiał mu w uszach od rana do zmroku, „jako plama w chorym oku”", "A przecież zdrajcą kraju nie był: odrzucił urząd od targowiczan i nie dał się „przemoskwicić”"] },
+  { topic: "Zabójstwo Stolnika", q: "Jakiej potwarzy zdecydowanie przeciwstawia się ks. Robak, kiedy opowiada, jak znalazł się pod zamkiem Stolnika w momencie ataku Moskali?", a: ["Zarzutowi zdrady — że działał w zmowie z Moskalami", "„Bo fałsz, żebym był w jakiej z Moskalami zmowie”, „Nie byłem w zmowie”", "Pod zamek przyjechał sam, bo „szatan go tam wabił”, a Moskale nadciągnęli niezależnie od niego", "To dla niego najcięższy zarzut — przez całe życie pokutuje za miano zdrajcy"] },
+  { topic: "Zabójstwo Stolnika", q: "O czym pomyślał Jacek, kiedy zobaczył zwycięskiego Stolnika na ganku podczas ataku Moskali?", a: ["Ogarnęła go złość: „Ten Stolnik zwycięski! I także mu na świecie wszystko się powodzi?”", "Stolnik migotał brylantową szpinką, dumnie kręcił wąsa i miotał dumne spojrzenia", "Jackowi zdało się, że go poznał, wyciąga ku niemu rękę, szydzi i grozi", "Chwycił więc karabin Moskala i prawie nie mierząc — wypalił"] },
+  { topic: "Zabójstwo Stolnika", q: "Czy Jacek Soplica próbował uniknąć strzału Gerwazego, gdy ten mierzył do niego z broni?", a: ["Nie — nie uciekał: „Utkwiłem oczy we dwie twojej broni rury”", "Przybiła go do ziemi rozpacz i dziwny żal", "Żałuje nawet, że Gerwazy chybił: „Czemuś wtenczas chybił? Łaskę byś zrobił!”"] },
+  { topic: "Zabójstwo Stolnika", q: "Dlaczego Gerwazy nie zabił Jacka?", a: ["Po prostu chybił — „Bóg widzi, szczerze trafić chciałem”", "Jacek widzi w tym wyrok Boży: musiał żyć „za pokutę grzechu”"] },
+  { topic: "Zabójstwo Stolnika", q: "Dlaczego Gerwazy odstępuje od zemsty na Jacku – ks. Robaku?", a: ["Bo Jacek jest księdzem zakonnikiem: „sukienka broni cię przed Scyzorykiem”", "Bo Jacek ocalił dwóch ostatnich Horeszków — zasłonił Hrabiego przed jegrami i rzucił Gerwazego o ziemię, gdy Moskal do niego palił", "Bo grzechem jest smucić umierającego", "„Bądź zdrów… z nami kwita — zostawmy resztę Panu Bogu”"] },
+  { topic: "Zabójstwo Stolnika", q: "Dlaczego Klucznik nie chce podać ręki i wybaczyć zemsty Jacka na Stolniku?", a: ["Bo nie może „bez mego szlachectwa obrazy” dotknąć ręki skrwawionej takim morderstwem", "Zabójstwa dokonano „z prywatnej zemsty, nie zaś pro publico bono”", "Odstępuje więc od zemsty, ale ręki Jackowi nie podaje"] },
+  { topic: "Zabójstwo Stolnika", q: "Co najbardziej doskwierało Jackowi po zabiciu Stolnika?", a: ["Miano zdrajcy — „imię zdrajcy przylgnęło do mnie jako dżuma”", "Obywatele odwracali od niego twarz, dawni przyjaciele uciekali, lada chłop czy Żyd przebijał go szyderskim uśmiechem", "Wyraz „zdrajca” brzmiał mu w uszach od rana do zmroku, „jako plama w chorym oku”", "A przecież zdrajcą kraju nie był: odrzucił urząd od targowiczan i nie dał się „przemoskwicić”"] },
 
   // =============================================
   // 8. POKUTA I ŚMIERĆ
   // =============================================
 
-  { topic: "Pokuta i śmierć", p: "c", q: "Co stało się z Ewą?", a: ["Wydano ją za Wojewodę — biorąc obrączkę mdlała, wpadła w gorączkę, miała początki suchot", "Z mężem została wywieziona gdzieś na Sybir i tam umarła młodo", "Zostawiła w kraju córkę — małą Zosię", "Jacek kazał Zosię „hodować”, czyli potajemnie wychowywać na swój koszt"] },
-  { topic: "Pokuta i śmierć", p: "c", q: "Dlaczego Jacek wstąpił do zakonu i przybrał imię Robaka?", a: ["Bo zabił „bardziej niźli z miłości, może z głupiej pychy” — lekarstwem na pychę miała być pokora", "Dumny z rodu junak spuścił głowę i został ubogim kwestarzem", "Przybrał imię Robak, „że jako robak w prochu” — najniższe stworzenie pełzające w pyle", "Nowe imię jest znakiem pokuty i wyrzeczenia się dawnej dumy"] },
-  { topic: "Pokuta i śmierć", p: "c", q: "W jaki sposób chciał zadośćuczynić za „zły przykład dla ojczyzny, zachętę do zdrady”?", a: ["Trzeba to było okupić „dobrymi przykłady, krwią, poświęceniem się”", "Bił się za kraj, ale nie dla ziemskiej chwały — milej wspomina czyny ciche i użyteczne", "Jako emisariusz przedzierał się do kraju, nosił rozkazy wodzów, zbierał wiadomości, układał zmowy", "Cierpiał: rok przy taczkach w pruskiej fortecy, kije Moskali, droga na Sybir, lochy Szpilbergu (carcer durum)"] },
-  { topic: "Pokuta i śmierć", p: "c", q: "Dlaczego zbyt skwapliwie zaczął działać na rzecz powstania? — „Możem nad rozkaz wodzów powstanie przyśpieszył!”", a: ["Znowu odezwała się duma rodowa — chciał zmyć hańbę z nazwiska Sopliców", "Pragnął, „że dom Sopliców pierwszy się uzbroi, że pierwszą Pogoń w Litwie zatkną krewni moi”", "Sam na łożu śmierci nie jest pewien swoich pobudek: „Ta myśl… zdaje się czysta…”", "Boi się, że i tym razem mógł zgrzeszyć pychą"] },
-  { topic: "Pokuta i śmierć", p: "c", q: "Kto udaremnił / skomplikował plany powstańcze ks. Robaka?", a: ["Gerwazy — Klucznik, który podburzył szlachtę dobrzyńską i doprowadził do zajazdu na Soplicowo", "Zajazd wywołał przedwczesną bitwę z Moskalami i zniszczył lata przygotowań", "„Tyś wątek spisku tyle lat snowany splątał!”", "Jacek widzi w nim narzędzie kary Bożej — i przebacza mu"] },
-  { topic: "Pokuta i śmierć", p: "c", q: "Jaką tajemnicę umierającemu Jackowi wyjawił Gerwazy?", a: ["Że Stolnik przed śmiercią przebaczył swojemu zabójcy", "Ranny Pan wstrząsnął głową, wyciągnął rękę w stronę bramy, gdzie stał Jacek, i naznaczył w powietrzu krzyż", "Mówić nie mógł, ale „dał znak, że zbójcy przebaczył”", "Gerwazy tak się wtedy wściekł z gniewu, że o tym krzyżu nigdy słowa nie rzekł"] },
-  { topic: "Pokuta i śmierć", p: "e", q: "Jaka informacja znalazła się w liście od Fiszera?", a: ["Fiszer był szefem sztabu armii polskiej pod księciem Józefem Poniatowskim", "Donosił, że w cesarskim tajnym gabinecie „stanęła wojna” — cesarz ogłasza ją już po całym świecie", "Do Warszawy zwołano sejm walny", "Skonfederowane stany mazowieckie uroczyście wyrzekną przyłączenie Litwy"] },
-  { topic: "Pokuta i śmierć", p: "e", q: "O jakiej porze umiera ks. Robak?", a: ["O świcie — noc właśnie schodziła, a po mlecznym, różowym niebie biegły pierwsze promyki słoneczne", "Wpadły przez szyby „jako strzały brylantowe” i oświetliły głowę umierającego", "Błyszczał wtedy „jako święty w ognistej koronie”", "Zdążył usłyszeć list Fiszera i przyjąć wiatyk: „Teraz, Panie, sługę twego puść z pokojem!”"] },
+  { topic: "Pokuta i śmierć", q: "Co stało się z Ewą?", a: ["Wydano ją za Wojewodę — biorąc obrączkę mdlała, wpadła w gorączkę, miała początki suchot", "Z mężem została wywieziona gdzieś na Sybir i tam umarła młodo", "Zostawiła w kraju córkę — małą Zosię", "Jacek kazał Zosię „hodować”, czyli potajemnie wychowywać na swój koszt"] },
+  { topic: "Pokuta i śmierć", q: "Dlaczego Jacek wstąpił do zakonu i przybrał imię Robaka?", a: ["Bo zabił „bardziej niźli z miłości, może z głupiej pychy” — lekarstwem na pychę miała być pokora", "Dumny z rodu junak spuścił głowę i został ubogim kwestarzem", "Przybrał imię Robak, „że jako robak w prochu” — najniższe stworzenie pełzające w pyle", "Nowe imię jest znakiem pokuty i wyrzeczenia się dawnej dumy"] },
+  { topic: "Pokuta i śmierć", q: "W jaki sposób chciał zadośćuczynić za „zły przykład dla ojczyzny, zachętę do zdrady”?", a: ["Trzeba to było okupić „dobrymi przykłady, krwią, poświęceniem się”", "Bił się za kraj, ale nie dla ziemskiej chwały — milej wspomina czyny ciche i użyteczne", "Jako emisariusz przedzierał się do kraju, nosił rozkazy wodzów, zbierał wiadomości, układał zmowy", "Cierpiał: rok przy taczkach w pruskiej fortecy, kije Moskali, droga na Sybir, lochy Szpilbergu (carcer durum)"] },
+  { topic: "Pokuta i śmierć", q: "Dlaczego zbyt skwapliwie zaczął działać na rzecz powstania? — „Możem nad rozkaz wodzów powstanie przyśpieszył!”", a: ["Znowu odezwała się duma rodowa — chciał zmyć hańbę z nazwiska Sopliców", "Pragnął, „że dom Sopliców pierwszy się uzbroi, że pierwszą Pogoń w Litwie zatkną krewni moi”", "Sam na łożu śmierci nie jest pewien swoich pobudek: „Ta myśl… zdaje się czysta…”", "Boi się, że i tym razem mógł zgrzeszyć pychą"] },
+  { topic: "Pokuta i śmierć", q: "Kto udaremnił / skomplikował plany powstańcze ks. Robaka?", a: ["Gerwazy — Klucznik, który podburzył szlachtę dobrzyńską i doprowadził do zajazdu na Soplicowo", "Zajazd wywołał przedwczesną bitwę z Moskalami i zniszczył lata przygotowań", "„Tyś wątek spisku tyle lat snowany splątał!”", "Jacek widzi w nim narzędzie kary Bożej — i przebacza mu"] },
+  { topic: "Pokuta i śmierć", q: "Jaką tajemnicę umierającemu Jackowi wyjawił Gerwazy?", a: ["Że Stolnik przed śmiercią przebaczył swojemu zabójcy", "Ranny Pan wstrząsnął głową, wyciągnął rękę w stronę bramy, gdzie stał Jacek, i naznaczył w powietrzu krzyż", "Mówić nie mógł, ale „dał znak, że zbójcy przebaczył”", "Gerwazy tak się wtedy wściekł z gniewu, że o tym krzyżu nigdy słowa nie rzekł"] },
+  { topic: "Pokuta i śmierć", q: "Jaka informacja znalazła się w liście od Fiszera?", a: ["Fiszer był szefem sztabu armii polskiej pod księciem Józefem Poniatowskim", "Donosił, że w cesarskim tajnym gabinecie „stanęła wojna” — cesarz ogłasza ją już po całym świecie", "Do Warszawy zwołano sejm walny", "Skonfederowane stany mazowieckie uroczyście wyrzekną przyłączenie Litwy"] },
+  { topic: "Pokuta i śmierć", q: "O jakiej porze umiera ks. Robak?", a: ["O świcie — noc właśnie schodziła, a po mlecznym, różowym niebie biegły pierwsze promyki słoneczne", "Wpadły przez szyby „jako strzały brylantowe” i oświetliły głowę umierającego", "Błyszczał wtedy „jako święty w ognistej koronie”", "Zdążył usłyszeć list Fiszera i przyjąć wiatyk: „Teraz, Panie, sługę twego puść z pokojem!”"] },
 ];
 
 // --- Engine ---
@@ -503,7 +446,6 @@ for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
 }
 
 var activeTopic = "Wszystkie";
-var activeFilter = "all";
 var filteredCards = ALL_FLASHCARDS.slice();
 var currentIndex = 0;
 var isFlipped = false;
@@ -517,15 +459,12 @@ var progressLabel = document.getElementById('progressLabel');
 var prevBtn = document.getElementById('prevBtn');
 var nextBtn = document.getElementById('nextBtn');
 var topicBar = document.getElementById('topicBar');
-var priorityRow = document.getElementById('priorityRow');
 
 function applyFilters() {
   var cards = [];
   for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
     var f = ALL_FLASHCARDS[i];
     if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
-    if (activeFilter === "c" && f.p !== "c") continue;
-    if (activeFilter === "e" && f.p !== "e") continue;
     cards.push(f);
   }
   filteredCards = cards;
@@ -552,28 +491,6 @@ function buildTopicBar() {
   }
 }
 
-function buildPriorityRow() {
-  var opts = [
-    { key: "all", label: "Wszystkie", dotClass: "" },
-    { key: "c",   label: "Kluczowe",  dotClass: "critical" },
-    { key: "e",   label: "Dodatkowe", dotClass: "extra" }
-  ];
-  priorityRow.innerHTML = '';
-  for (var i = 0; i < opts.length; i++) {
-    var o = opts[i];
-    var pill = document.createElement('button');
-    pill.className = 'priority-pill' + (activeFilter === o.key ? ' active' : '');
-    pill.innerHTML = (o.dotClass ? '<span class="dot ' + o.dotClass + '"></span>' : '') + o.label;
-    pill.setAttribute('data-key', o.key);
-    pill.onclick = function() {
-      activeFilter = this.getAttribute('data-key');
-      buildPriorityRow();
-      applyFilters();
-    };
-    priorityRow.appendChild(pill);
-  }
-}
-
 function renderCard() {
   if (filteredCards.length === 0) {
     cardFront.innerHTML = '<div class="card-question">Brak fiszek dla tego filtra</div>';
@@ -585,16 +502,11 @@ function renderCard() {
     return;
   }
   var fc = filteredCards[currentIndex];
-  var isCritical = fc.p === "c";
 
-  cardFront.className = 'card-face card-front' + (isCritical ? ' is-critical' : '');
-
-  var badgeHTML = isCritical
-    ? '<span class="card-badge critical">kluczowe</span>'
-    : '<span class="card-badge extra">dodatkowe</span>';
+  cardFront.className = 'card-face card-front';
 
   cardFront.innerHTML =
-    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div>' + badgeHTML + '</div>' +
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div></div>' +
     '<div class="card-question">' + fc.q + '</div>' +
     '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
 
@@ -669,7 +581,6 @@ document.addEventListener('keydown', function(e) {
 });
 
 buildTopicBar();
-buildPriorityRow();
 renderCard();
 </script>
 </body>
