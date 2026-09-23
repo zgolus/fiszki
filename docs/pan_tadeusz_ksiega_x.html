@@ -251,6 +251,41 @@
     padding-top: 12px;
   }
 
+  .topic-pill.known-pill {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .topic-pill.known-pill.active {
+    background: var(--accent);
+    border-style: solid;
+    color: #16241a;
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 480px;
+    padding: 4px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
   .nav-area {
     width: 100%;
     max-width: 480px;
@@ -299,6 +334,32 @@
     border-color: var(--accent);
     color: #16241a;
   }
+  .mark-btn {
+    padding: 11px 18px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mark-btn:active {
+    background: var(--accent);
+    color: #16241a;
+    transform: scale(0.95);
+  }
+  .mark-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+  @media (max-width: 400px) {
+    .nav-area { gap: 8px; padding: 6px 14px 30px; }
+    .nav-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+    .shuffle-btn, .mark-btn { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.03em; }
+  }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -308,6 +369,7 @@
   .filters { animation: fadeUp 0.5s 0.05s ease both; }
   .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
   .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .stats-row { animation: fadeUp 0.5s 0.15s ease both; }
   .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
 </style>
 </head>
@@ -327,6 +389,8 @@
   <div class="progress-label" id="progressLabel"></div>
 </div>
 
+<div class="stats-row" id="statsRow"></div>
+
 <div class="card-container">
   <div class="card" id="card">
     <div class="card-face card-front" id="cardFront"></div>
@@ -336,6 +400,7 @@
 
 <div class="nav-area">
   <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="mark-btn" id="markBtn" onclick="toggleKnown()">&#10003; Umiem</button>
   <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
   <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
 </div>
@@ -445,8 +510,13 @@ for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
   if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
 }
 
+var DECK_ID = 'pan_tadeusz_ksiega_x';
+var STORE_KEY = 'fiszki:' + DECK_ID + ':opanowane';
+var KNOWN_VIEW = "__odlozone__";
+
 var activeTopic = "Wszystkie";
-var filteredCards = ALL_FLASHCARDS.slice();
+var known = loadKnown();
+var filteredCards = [];
 var currentIndex = 0;
 var isFlipped = false;
 var isAnimating = false;
@@ -459,12 +529,20 @@ var progressLabel = document.getElementById('progressLabel');
 var prevBtn = document.getElementById('prevBtn');
 var nextBtn = document.getElementById('nextBtn');
 var topicBar = document.getElementById('topicBar');
+var markBtn = document.getElementById('markBtn');
+var statsRow = document.getElementById('statsRow');
 
 function applyFilters() {
   var cards = [];
   for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
     var f = ALL_FLASHCARDS[i];
-    if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    var isKnown = !!known[cardId(f)];
+    if (isKnownView()) {
+      if (!isKnown) continue;
+    } else {
+      if (isKnown) continue;
+      if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    }
     cards.push(f);
   }
   filteredCards = cards;
@@ -488,19 +566,131 @@ function buildTopicBar() {
       applyFilters();
     };
     topicBar.appendChild(pill);
+    if (i === 0) appendKnownPill();
   }
 }
 
+function appendKnownPill() {
+  var kn = knownCount();
+  if (kn === 0) return;
+  var knownPill = document.createElement('button');
+  knownPill.className = 'topic-pill known-pill' + (isKnownView() ? ' active' : '');
+  knownPill.innerHTML = '&#10003; Odłożone (' + kn + ')';
+  knownPill.setAttribute('data-topic', KNOWN_VIEW);
+  knownPill.onclick = function() {
+    activeTopic = this.getAttribute('data-topic');
+    buildTopicBar();
+    applyFilters();
+  };
+  topicBar.appendChild(knownPill);
+}
+
+// --- odkładanie opanowanych fiszek ---
+function cardId(f) { return f.q; }
+function isKnownView() { return activeTopic === KNOWN_VIEW; }
+
+function loadKnown() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    var arr = JSON.parse(raw);
+    var map = {};
+    for (var i = 0; i < arr.length; i++) map[arr[i]] = true;
+    return map;
+  } catch (e) { return {}; }
+}
+
+function saveKnown() {
+  try {
+    var arr = [];
+    for (var k in known) { if (known[k]) arr.push(k); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function knownCount() {
+  var n = 0;
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    if (known[cardId(ALL_FLASHCARDS[i])]) n++;
+  }
+  return n;
+}
+
+function plural(n, one, few, many) {
+  var n10 = n % 10, n100 = n % 100;
+  if (n === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+  return many;
+}
+
+function updateStats() {
+  var n = knownCount();
+  if (n === 0) { statsRow.innerHTML = ''; return; }
+  statsRow.innerHTML =
+    '<span>' + n + ' ' + plural(n, 'fiszka odłożona', 'fiszki odłożone', 'fiszek odłożonych') + '</span>' +
+    '<button class="link-btn" onclick="restoreAll()">Przywróć wszystkie</button>';
+}
+
+function toggleKnown() {
+  if (isAnimating || filteredCards.length === 0) return;
+  var id = cardId(filteredCards[currentIndex]);
+  if (known[id]) { delete known[id]; } else { known[id] = true; }
+  saveKnown();
+
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  card.classList.add('slide-left');
+  setTimeout(function() {
+    filteredCards.splice(currentIndex, 1);
+    if (currentIndex > filteredCards.length - 1) {
+      currentIndex = Math.max(0, filteredCards.length - 1);
+    }
+    if (isKnownView() && knownCount() === 0) {
+      activeTopic = "Wszystkie";
+      buildTopicBar();
+      updateStats();
+      applyFilters();
+    } else {
+      buildTopicBar();
+      updateStats();
+      renderCard();
+    }
+  }, 140);
+  setTimeout(function() { card.classList.remove('slide-left'); isAnimating = false; }, 350);
+}
+
+function restoreAll() {
+  known = {};
+  saveKnown();
+  if (isKnownView()) activeTopic = "Wszystkie";
+  buildTopicBar();
+  updateStats();
+  applyFilters();
+}
+
 function renderCard() {
+  markBtn.innerHTML = isKnownView() ? '&#8617; Przywróć' : '&#10003; Umiem';
+
   if (filteredCards.length === 0) {
-    cardFront.innerHTML = '<div class="card-question">Brak fiszek dla tego filtra</div>';
+    var msg = isKnownView()
+      ? 'Nie ma jeszcze odłożonych fiszek'
+      : (knownCount() > 0
+          ? (activeTopic === "Wszystkie"
+              ? 'Wszystko opanowane! Aby wrócić do nauki, użyj „Przywróć wszystkie” nad kartą.'
+              : 'Cały dział opanowany! Wybierz inny dział albo użyj „Przywróć wszystkie” nad kartą.')
+          : 'Brak fiszek dla tego filtra');
+    cardFront.className = 'card-face card-front';
+    cardFront.innerHTML = '<div class="card-question">' + msg + '</div>';
     cardBack.innerHTML = '';
     progressFill.style.width = '0%';
     progressLabel.textContent = '0 / 0';
     prevBtn.disabled = true;
     nextBtn.disabled = true;
+    markBtn.disabled = true;
     return;
   }
+  markBtn.disabled = false;
   var fc = filteredCards[currentIndex];
 
   cardFront.className = 'card-face card-front';
@@ -578,10 +768,12 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowLeft') prevCard();
   else if (e.key === 'ArrowRight') nextCard();
   else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); toggleKnown(); }
 });
 
 buildTopicBar();
-renderCard();
+updateStats();
+applyFilters();
 </script>
 </body>
 </html>
