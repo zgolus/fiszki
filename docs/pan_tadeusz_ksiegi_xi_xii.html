@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pan Tadeusz — Księgi XI i XII</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1712;
+    --card-front: #f4efe0;
+    --card-back: #16241a;
+    --accent: #a8791f;
+    --accent-light: #ecd49c;
+    --text-dark: #1c2a1e;
+    --text-light: #f4efe0;
+    --text-muted: #93a08e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #2c3d2f;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #16241a;
+  }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #2c3d2f;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #8b917f;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .topic-pill.known-pill {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .topic-pill.known-pill.active {
+    background: var(--accent);
+    border-style: solid;
+    color: #16241a;
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 480px;
+    padding: 4px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #2c3d2f;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #16241a;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #2c3d2f;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #16241a;
+  }
+  .mark-btn {
+    padding: 11px 18px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mark-btn:active {
+    background: var(--accent);
+    color: #16241a;
+    transform: scale(0.95);
+  }
+  .mark-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+  @media (max-width: 400px) {
+    .nav-area { gap: 8px; padding: 6px 14px 30px; }
+    .nav-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+    .shuffle-btn, .mark-btn { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.03em; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .stats-row { animation: fadeUp 0.5s 0.15s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Pan Tadeusz &middot; Księgi XI i XII</h1>
+  <div class="subtitle">Rok 1812 &middot; Kochajmy się &middot; 33 pytania</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="mark-btn" id="markBtn" onclick="toggleKnown()">&#10003; Umiem</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+var ALL_FLASHCARDS = [
+  // =============================================
+  // KSIĘGA XI — Rok 1812
+  // =============================================
+
+  { topic: "XI. Rok 1812", q: "Do kogo/czego skierowana jest apostrofa rozpoczynająca Księgę XI?", a: ["Do roku 1812 — „O roku ów! kto ciebie widział w naszym kraju!”", "Lud nazywał go rokiem urodzaju, a żołnierz rokiem wojny", "To rok wkroczenia wojsk Napoleona na Litwę i nadziei na niepodległość"] },
+  { topic: "XI. Rok 1812", q: "Kto, oprócz wiosennego ptactwa, pojawił się na litewskich wzgórkach i błoniach?", a: ["Wojsko — pułki jazdy, piechoty i artylerii idące na Moskwę", "Poeta porównuje żołnierzy do stad ptaków wracających z wyraju", "Najpierw widać barwne kity i chorągiewki konnicy, potem kolumny piechoty"] },
+  { topic: "XI. Rok 1812", q: "Podaj liczebność obozu wojskowego, który stanął w Soplicowie.", a: ["Czterdzieści tysięcy żołnierzy", "Główny sztab księcia Józefa Poniatowskiego stanął w pobliskim miasteczku"] },
+  { topic: "XI. Rok 1812", q: "Wymień 3 nazwiska polskich dowódców.", a: ["Dąbrowski, Kniaziewicz, Małachowski", "W Soplicowie stanęli też Giedrojć i Grabowski", "Wojskami dowodzili książę Józef Poniatowski i król westfalski Hieronim"] },
+
+  { topic: "XI. Przed ucztą", q: "Dlaczego Wojski nie może zasnąć?", a: ["Musi przygotować na następny dzień wielką biesiadę", "Uczta ma uświetnić zaręczyny trzech par i wsławić dom Sopliców na wieki", "Generał Dąbrowski zażyczył sobie prawdziwie polskiego obiadu"] },
+  { topic: "XI. Przed ucztą", q: "Czym są „zrękowiny”?", a: ["Dawna nazwa zaręczyn", "Uroczyste przyrzeczenie małżeństwa połączone z wymianą pierścionków", "W Soplicowie odbywają się zrękowiny trzech par naraz"] },
+  { topic: "XI. Przed ucztą", q: "Z jakiej książki korzysta Wojski, przygotowując na życzenie gen. Dąbrowskiego polski obiad? Podaj tytuł.", a: ["„Kucharz doskonały”", "Spisano w niej wszystkie potrawy stołów staropolskich", "Wojski podarował tę księgę generałowi Dąbrowskiemu"] },
+  { topic: "XI. Przed ucztą", q: "W jakim świątecznym dniu odbywała się biesiada?", a: ["W święto Najświętszej Panny Kwietnej", "To ludowa nazwa Zwiastowania Najświętszej Maryi Panny", "Wieśniaczki przyniosły tego dnia na ołtarz pierwsze snopki wiosennej zieleni"] },
+
+  { topic: "XI. Rehabilitacja Jacka", q: "W jakim porannym obrzędzie uczestniczyła cała okolica oraz dowódcy wojskowi?", a: ["We mszy świętej przy dworskiej kaplicy", "Kaplica była za mała, więc lud klęczał dookoła na trawie", "Ludzie przyszli też z ciekawości — chcieli zobaczyć sławnych generałów"] },
+  { topic: "XI. Rehabilitacja Jacka", q: "Jakim odznaczeniem przez Napoleona został uhonorowany za zasługi na rzecz wolności zmarły Jacek Soplica – ks. Robak?", a: ["Krzyżem kawalerskim Legii Honorowej", "Order przyznano mu już po śmierci", "Podkomorzy zawiesił go na krzyżu nad grobem Jacka"] },
+  { topic: "XI. Rehabilitacja Jacka", q: "Podkomorzy ogłasza publicznie rehabilitację Jacka Soplicy. Co to znaczy, że „wierną służbą (…) zniósł infamiji plamę, powraca do części”?", a: ["Infamia to kara pozbawienia czci i praw obywatelskich, która spotykała zdrajcę", "Jacek zmył z siebie tę hańbę wierną służbą ojczyźnie", "Odzyskuje dobre imię i wraca do grona uczciwych patriotów", "Od tej pory nikomu nie wolno wypominać jego dawnej winy"] },
+
+  { topic: "XI. Zaręczyny", q: "W jakim stroju wystąpiła Zosia podczas zaręczyn z Tadeuszem?", a: ["W prostym stroju litewskiej wieśniaczki, którego uparła się mimo sprzeciwu Telimeny", "Biała spódnica, zielona suknia i gorset wiązany różowymi wstążkami", "Kolczyki z pestek wiśni, sznurki bursztynu i wianek z rozmarynu", "Nad czołem błyszczący sierp żniwiarki — wodzów wzruszył ten narodowy ubiór"] },
+  { topic: "XI. Zaręczyny", q: "Jak rozstrzygnął się spór o psy?", a: ["Remisem — Kusy i Sokół dopadły zająca w tej samej chwili z dwóch stron", "Wojski jako sędzia ogłosił, że obaj wygrali, i zwrócił zakłady", "Podobno sam podrzucił oswojonego zająca, żeby pogodzić myśliwych"] },
+  { topic: "XI. Zaręczyny", q: "Co darują sobie wzajemnie Rejent i Asesor na znak zgody?", a: ["Rejent oddał Asesorowi bogaty turecki rząd na konia", "Asesor dał Rejentowi obroże wykładane złotem i jedwabną smycz", "Pierścień z krwawnikiem dostał Wojski jako zapłata za rozsądzenie sporu"] },
+  { topic: "XI. Zaręczyny", q: "Wypisz imiona/nazwiska osób tworzących trzy pary zaręczonych.", a: ["Tadeusz Soplica i Zofia Horeszkówna (Zosia)", "Asesor i Tekla Hreczeszanka, córka Wojskiego", "Rejent Bolesta i Telimena"] },
+
+  // =============================================
+  // KSIĘGA XII — Kochajmy się
+  // =============================================
+
+  { topic: "XII. Uczta i serwis", q: "Kto zasiadł do stołu biesiadnego obok Podkomorzego we wnętrzu dworu?", a: ["Po prawej stronie generał Dąbrowski", "Po lewej Kniaziewicz, Pac i Małachowski", "Dalej Podkomorzyna, inne panie, oficerowie i szlachta — parami"] },
+  { topic: "XII. Uczta i serwis", q: "Kto obsługiwał włościan, którzy ucztowali przy stole ustawionym na dziedzińcu?", a: ["Tadeusz i Zosia — roznosili jedzenie i jedli na stojąco", "Taki był dawny zwyczaj: nowi dziedzice na pierwszej uczcie sami służyli ludowi", "Przy stole z chłopami zasiedli Sędzia i pleban"] },
+  { topic: "XII. Uczta i serwis", q: "Co przedstawiał serwis ze słodyczami, który postawiono na stole?", a: ["Najpierw krajobraz zimowy: cukrowy śnieg, las z konfitur, wsie i zaścianki", "Porcelanowe figurki w polskich strojach odgrywały scenę sejmiku: narady, głosowanie, kłótnie i okrzyk veto", "Gdy cukier topniał od ciepła, obrazek zmieniał się w wiosnę, lato i jesień"] },
+
+  { topic: "XII. Gerwazy i Scyzoryk", q: "Gerwazy nie uciekł z Soplicowa po bitwie z Moskalami. Gdzie się ukrywał, bojąc się śledztwa, przez całą zimę?", a: ["Tułał się po lasach przez całą zimę", "Kraju jednak nie opuścił, w przeciwieństwie do innej szlachty", "Wyszedł z ukrycia dopiero po wkroczeniu wojsk polskich"] },
+  { topic: "XII. Gerwazy i Scyzoryk", q: "W czyje ręce Gerwazy przekazuje swój Scyzoryk i dlaczego?", a: ["Generałowi Kniaziewiczowi", "Tylko on uniósł ciężki rapier lekko i pięknie nim fechtował", "Gerwazy bał się, że po jego śmierci szabla zardzewieje — szukał dla niej dziedzica", "Mówił, że Scyzoryk był mu żoną i dzieckiem"] },
+
+  { topic: "XII. Spory przy stole", q: "Dlaczego Maciek nie cieszył się z innymi z przybycia żołnierzy polskich w towarzystwie wojska Napoleona?", a: ["Nie ufał Napoleonowi — uważał, że Polsce potrzebny jest własny, polski bohater", "Raziły go obce nazwy stopni w polskim wojsku", "Widział żołnierzy rabujących kościoły i napastujących kobiety", "Mówił, że cesarz idzie na Moskwę bez Boga, obłożony klątwą biskupów"] },
+  { topic: "XII. Spory przy stole", q: "W jakim stroju Rejent wkroczył z Telimeną do sali i dlaczego nie miał na sobie staropolskiego kontusza?", a: ["We francuskim fraku", "Telimena zażądała tego w intercyzie, czyli umowie przedślubnej", "Rejent zgodził się rad nierad i czuł się w nowym stroju okropnie", "Szedł sztywno jak żuraw i nie wiedział, co zrobić z rękami"] },
+  { topic: "XII. Spory przy stole", q: "Co to znaczy, że Rejent, czując się nieswojo w nowym stroju, spiekł raka?", a: ["Zaczerwienił się ze wstydu i zmieszania", "Powiedzenie pochodzi stąd, że rak po ugotowaniu robi się czerwony", "Rejent odruchowo sięgnął do pasa, którego przy fraku nie było"] },
+  { topic: "XII. Spory przy stole", q: "Jak na widok Rejenta w nowym stroju zareagował Maciek Dobrzyński?", a: ["Spojrzał tak ostro, że Rejent zbladł i zaczął zapinać frak", "Dwa razy powiedział głośno: „Głupi!”", "Oburzony wstał od stołu i bez pożegnania odjechał do zaścianka", "A przedtem żyli z Rejentem w wielkiej przyjaźni"] },
+  { topic: "XII. Spory przy stole", q: "Jak zareagował Hrabia na widok Telimeny i Rejenta?", a: ["Zbladł, zerwał się od stołu i zaczął szukać szpady", "Nazwał Telimenę niewierną i zagroził, że rywal pójdzie do ołtarza po jego trupie", "Na złość jej zaczął potem adorować Podkomorzankę"] },
+  { topic: "XII. Spory przy stole", q: "Kto i w jaki sposób nie dopuścił do rozlewu krwi?", a: ["Telimena — wzięła Hrabiego na stronę i zapytała wprost, czy ożeni się z nią dziś", "Hrabia wycofał się, zasłaniając się wzniosłymi frazesami o miłości na odległość", "Zagroziła mu, że jeśli zerwie jej ślub, rzuci się na niego z pazurami", "Wcześniej rywali próbował godzić Podkomorzy"] },
+
+  { topic: "XII. Wolność i dary", q: "Jaką decyzję wobec swoich poddanych włościan podejmują Tadeusz i Zosia?", a: ["Postanawiają uwłaszczyć chłopów — dać im wolność i ziemię na własność", "Tadeusz woli oddać los wieśniaków pod opiekę prawa niż zostawiać go kaprysom dziedzica", "Zosia zgadza się, choć wiedzą, że zubożeją i będą żyć skromniej", "Tadeusz wznosi toast za wolnych i równych współobywateli Polaków"] },
+  { topic: "XII. Wolność i dary", q: "Jakiego herbu byli Soplicowie?", a: ["Leliwa", "Horeszkowie pieczętowali się Półkozicem", "Gerwazy proponował, żeby oba herby nadać uwłaszczonym chłopom"] },
+  { topic: "XII. Wolność i dary", q: "Jakim prezentem obdarzył młodą parę Gerwazy?", a: ["Ukrytym w zamku skarbcem Stolnika: srebrami stołowymi, klejnotami i szablami", "Dorzucił własny worek talarów uzbieranych przez lata służby", "Dzięki temu młodzi nie zubożeją po oddaniu ziemi chłopom"] },
+  { topic: "XII. Wolność i dary", q: "Czego oczekiwał Gerwazy za przekazanie swojego majątku młodym dziedzicom?", a: ["Chce dożyć swoich dni u nich na łaskawym chlebie", "Marzy, żeby kołysać ich dzieci i uczyć syna władać szablą"] },
+
+  { topic: "XII. Polonez i finał", q: "Kto tańczy poloneza w pierwszej parze?", a: ["Podkomorzy z Zosią", "Prowadzi taniec jako najwyższy urzędnik w powiecie", "Zosię szybko odbijają mu kolejni tancerze, między innymi Dąbrowski"] },
+  { topic: "XII. Polonez i finał", q: "Jaka pora dnia kończy utwór?", a: ["Wieczór — ciepły i cichy, tuż po zachodzie słońca", "Poeta opisuje, jak słońce chowa głowę za obłok i zasypia", "Szlachta wznosi wtedy ostatnie toasty"] },
+  { topic: "XII. Polonez i finał", q: "Zacytuj ostatni dwuwers „Pana Tadeusza”.", a: ["„I ja tam z gośćmi byłem, miód i wino piłem,<br>A com wiedział i słyszał, w księgi umieściłem.”", "To nawiązanie do baśniowej formuły kończącej opowieść"] },
+];
+
+// --- Engine ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var DECK_ID = 'pan_tadeusz_ksiegi_xi_xii';
+var STORE_KEY = 'fiszki:' + DECK_ID + ':opanowane';
+var KNOWN_VIEW = "__odlozone__";
+
+var activeTopic = "Wszystkie";
+var known = loadKnown();
+var filteredCards = [];
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var markBtn = document.getElementById('markBtn');
+var statsRow = document.getElementById('statsRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    var isKnown = !!known[cardId(f)];
+    if (isKnownView()) {
+      if (!isKnown) continue;
+    } else {
+      if (isKnown) continue;
+      if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    }
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+    if (i === 0) appendKnownPill();
+  }
+}
+
+function appendKnownPill() {
+  var kn = knownCount();
+  if (kn === 0) return;
+  var knownPill = document.createElement('button');
+  knownPill.className = 'topic-pill known-pill' + (isKnownView() ? ' active' : '');
+  knownPill.innerHTML = '&#10003; Odłożone (' + kn + ')';
+  knownPill.setAttribute('data-topic', KNOWN_VIEW);
+  knownPill.onclick = function() {
+    activeTopic = this.getAttribute('data-topic');
+    buildTopicBar();
+    applyFilters();
+  };
+  topicBar.appendChild(knownPill);
+}
+
+// --- odkładanie opanowanych fiszek ---
+function cardId(f) { return f.q; }
+function isKnownView() { return activeTopic === KNOWN_VIEW; }
+
+function loadKnown() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    var arr = JSON.parse(raw);
+    var map = {};
+    for (var i = 0; i < arr.length; i++) map[arr[i]] = true;
+    return map;
+  } catch (e) { return {}; }
+}
+
+function saveKnown() {
+  try {
+    var arr = [];
+    for (var k in known) { if (known[k]) arr.push(k); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function knownCount() {
+  var n = 0;
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    if (known[cardId(ALL_FLASHCARDS[i])]) n++;
+  }
+  return n;
+}
+
+function plural(n, one, few, many) {
+  var n10 = n % 10, n100 = n % 100;
+  if (n === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+  return many;
+}
+
+function updateStats() {
+  var n = knownCount();
+  if (n === 0) { statsRow.innerHTML = ''; return; }
+  statsRow.innerHTML =
+    '<span>' + n + ' ' + plural(n, 'fiszka odłożona', 'fiszki odłożone', 'fiszek odłożonych') + '</span>' +
+    '<button class="link-btn" onclick="restoreAll()">Przywróć wszystkie</button>';
+}
+
+function toggleKnown() {
+  if (isAnimating || filteredCards.length === 0) return;
+  var id = cardId(filteredCards[currentIndex]);
+  if (known[id]) { delete known[id]; } else { known[id] = true; }
+  saveKnown();
+
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  card.classList.add('slide-left');
+  setTimeout(function() {
+    filteredCards.splice(currentIndex, 1);
+    if (currentIndex > filteredCards.length - 1) {
+      currentIndex = Math.max(0, filteredCards.length - 1);
+    }
+    if (isKnownView() && knownCount() === 0) {
+      activeTopic = "Wszystkie";
+      buildTopicBar();
+      updateStats();
+      applyFilters();
+    } else {
+      buildTopicBar();
+      updateStats();
+      renderCard();
+    }
+  }, 140);
+  setTimeout(function() { card.classList.remove('slide-left'); isAnimating = false; }, 350);
+}
+
+function restoreAll() {
+  known = {};
+  saveKnown();
+  if (isKnownView()) activeTopic = "Wszystkie";
+  buildTopicBar();
+  updateStats();
+  applyFilters();
+}
+
+function renderCard() {
+  markBtn.innerHTML = isKnownView() ? '&#8617; Przywróć' : '&#10003; Umiem';
+
+  if (filteredCards.length === 0) {
+    var msg = isKnownView()
+      ? 'Nie ma jeszcze odłożonych fiszek'
+      : (knownCount() > 0
+          ? (activeTopic === "Wszystkie"
+              ? 'Wszystko opanowane! Aby wrócić do nauki, użyj „Przywróć wszystkie” nad kartą.'
+              : 'Cały dział opanowany! Wybierz inny dział albo użyj „Przywróć wszystkie” nad kartą.')
+          : 'Brak fiszek dla tego filtra');
+    cardFront.className = 'card-face card-front';
+    cardFront.innerHTML = '<div class="card-question">' + msg + '</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    markBtn.disabled = true;
+    return;
+  }
+  markBtn.disabled = false;
+  var fc = filteredCards[currentIndex];
+
+  cardFront.className = 'card-face card-front';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div></div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedź</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrócić do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); toggleKnown(); }
+});
+
+buildTopicBar();
+updateStats();
+applyFilters();
+</script>
+</body>
+</html>
