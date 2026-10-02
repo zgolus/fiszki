@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Chemia 8: Kwasy</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #121820;
+    --card-front: #eaf0f5;
+    --card-back: #1c2530;
+    --accent: #5b9bd5;
+    --accent-light: #a8cce8;
+    --text-dark: #1c2530;
+    --text-light: #eaf0f5;
+    --text-muted: #7a8ea0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #2a3545;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #121820;
+  }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #2a3545;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #7a8ea0;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .eq { white-space: nowrap; }
+
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .topic-pill.known-pill {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .topic-pill.known-pill.active {
+    background: var(--accent);
+    border-style: solid;
+    color: #121820;
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 480px;
+    padding: 4px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #2a3545;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #121820;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #2a3545;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #121820;
+  }
+  .mark-btn {
+    padding: 11px 18px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mark-btn:active {
+    background: var(--accent);
+    color: #121820;
+    transform: scale(0.95);
+  }
+  .mark-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+  @media (max-width: 400px) {
+    .nav-area { gap: 8px; padding: 6px 14px 30px; }
+    .nav-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+    .shuffle-btn, .mark-btn { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.03em; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .stats-row { animation: fadeUp 0.5s 0.15s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Chemia &middot; Kwasy</h1>
+  <div class="subtitle">Kwasy tlenowe i beztlenowe &middot; 45 pytań</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="mark-btn" id="markBtn" onclick="toggleKnown()">&#10003; Umiem</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+var ALL_FLASHCARDS = [
+  // =============================================
+  // 7.3. KWASY
+  // =============================================
+
+  { topic: "Kwasy wokół nas", q: "Wymień 4 kwasy, które spotykamy w domowych produktach spożywczych.", a: ["Kwas cytrynowy — w owocach cytrusowych", "Kwas octowy — ocet to jego 6- lub 10-procentowy roztwór wodny", "Kwas mlekowy — w zsiadłym mleku (kefir, jogurt)", "Kwas winowy — w winogronach"] },
+  { topic: "Kwasy wokół nas", q: "Jakie są wspólne cechy wszystkich kwasów?", a: ["Kwaśny smak (ale w laboratorium nie wolno smakować odczynników!)", "Barwienie lakmusu i wskaźnika uniwersalnego na czerwono", "Uleganie charakterystycznym reakcjom chemicznym", "Za te cechy odpowiadają atomy wodoru w cząsteczkach kwasów"] },
+  { topic: "Kwasy wokół nas", q: "Czy każdy związek chemiczny zawierający wodór jest kwasem?", a: ["Nie — każdy kwas zawiera wodór, ale nie każdy związek zawierający wodór jest kwasem", "Np. woda H<sub>2</sub>O zawiera wodór, a nie jest kwasem"] },
+
+  // =============================================
+  // WSKAŹNIKI
+  // =============================================
+
+  { topic: "Wskaźniki", q: "Co to jest wskaźnik (indykator)?", a: ["Substancja lub mieszanina substancji, która zmienia barwę pod wpływem określonych związków chemicznych", "Typowy przykład: lakmus, który w obecności kwasów przybiera barwę czerwoną"] },
+  { topic: "Wskaźniki", q: "Co to jest papierek wskaźnikowy?", a: ["Pasek bibuły nasycony wskaźnikiem", "Papierek lakmusowy — nasączony lakmusem, jednym z najstarszych wskaźników", "Papierek uniwersalny — nasycony mieszaniną kilku wskaźników; najczęściej używany w laboratorium"] },
+  { topic: "Wskaźniki", q: "Na jaki kolor kwasy barwią papierek lakmusowy i uniwersalny?", a: ["Na czerwono", "Woda destylowana i roztwór soli kuchennej nie zmieniają barwy papierków — nie są kwasami"] },
+
+  // =============================================
+  // BUDOWA I NAZWY
+  // =============================================
+
+  { topic: "Budowa i nazwy", q: "Co to jest kwas tlenowy?", a: ["Związek zawierający tlen, co najmniej jeden inny pierwiastek (E) oraz co najmniej jeden atom wodoru związany z tlenem"] },
+  { topic: "Budowa i nazwy", q: "Podaj wzór ogólny kwasów tlenowych i wyjaśnij jego oznaczenia.", a: ["H<sub>n</sub>E<sub>m</sub>O<sub>z</sub>", "E — symbol pierwiastka (najczęściej niemetalu)", "n, m, z — indeksy stechiometryczne"] },
+  { topic: "Budowa i nazwy", q: "Z jakich wyrazów składa się nazwa kwasu tlenowego?", a: ["Z wyrazu „kwas” i przymiotnika określającego pierwiastek E, np. kwas siarkowy, kwas azotowy", "Jeśli pierwiastek E tworzy kilka kwasów, w nazwie podaje się jego wartościowość, np. kwas siarkowy(VI) — siarka jest w nim sześciowartościowa"] },
+  { topic: "Budowa i nazwy", q: "Co to jest atom centralny?", a: ["Atom niemetalu (lub czasem metalu), który łączy się bezpośrednio z atomami tlenu w cząsteczkach kwasów tlenowych", "Atomy wodoru łączą się z tlenem, a nie bezpośrednio z atomem centralnym: E–O–H"] },
+  { topic: "Budowa i nazwy", q: "Jaki wzór sumaryczny ma kwas siarkowy(VI)?", a: ["H<sub>2</sub>SO<sub>4</sub>", "Wzór strukturalny: dwie grupy –O–H i dwa atomy tlenu połączone wiązaniem podwójnym (S=O) z atomem siarki"] },
+  { topic: "Budowa i nazwy", q: "Jaki wzór sumaryczny ma kwas siarkowy(IV)?", a: ["H<sub>2</sub>SO<sub>3</sub>", "Wzór strukturalny: dwie grupy –O–H i jeden atom tlenu połączony wiązaniem podwójnym (S=O) z atomem siarki"] },
+  { topic: "Budowa i nazwy", q: "Jaki wzór sumaryczny ma kwas azotowy(V)?", a: ["HNO<sub>3</sub>", "Wzór strukturalny: H–O–N, a azot łączy się jeszcze z dwoma atomami tlenu"] },
+  { topic: "Budowa i nazwy", q: "Jaki wzór sumaryczny ma kwas fosforowy(V)?", a: ["H<sub>3</sub>PO<sub>4</sub>", "Wzór strukturalny: trzy grupy –O–H i jeden atom tlenu połączony wiązaniem podwójnym (P=O) z atomem fosforu"] },
+  { topic: "Budowa i nazwy", q: "Jaki wzór sumaryczny ma kwas węglowy?", a: ["H<sub>2</sub>CO<sub>3</sub>", "Wzór strukturalny: dwie grupy –O–H i jeden atom tlenu połączony wiązaniem podwójnym (C=O) z atomem węgla"] },
+  { topic: "Budowa i nazwy", q: "Podaj nazwę kwasu o wzorze H<sub>2</sub>SO<sub>4</sub>.", a: ["Kwas siarkowy(VI)"] },
+  { topic: "Budowa i nazwy", q: "Podaj nazwę kwasu o wzorze H<sub>2</sub>SO<sub>3</sub>.", a: ["Kwas siarkowy(IV)"] },
+  { topic: "Budowa i nazwy", q: "Podaj nazwę kwasu o wzorze HNO<sub>3</sub>.", a: ["Kwas azotowy(V)"] },
+  { topic: "Budowa i nazwy", q: "Podaj nazwę kwasu o wzorze H<sub>3</sub>PO<sub>4</sub>.", a: ["Kwas fosforowy(V)", "Inaczej: kwas ortofosforowy(V)"] },
+  { topic: "Budowa i nazwy", q: "Podaj nazwę kwasu o wzorze H<sub>2</sub>CO<sub>3</sub>.", a: ["Kwas węglowy", "Bez wartościowości w nazwie — węgiel tworzy tylko ten jeden kwas tlenowy"] },
+  { topic: "Budowa i nazwy", q: "Jaką ogólną reakcją otrzymuje się kwasy tlenowe?", a: ["<span class='eq'>tlenek niemetalu + woda → kwas</span>", "Np.<br><span class='eq'>SO<sub>3</sub> + H<sub>2</sub>O → H<sub>2</sub>SO<sub>4</sub></span>"] },
+
+  // =============================================
+  // BEZPIECZEŃSTWO
+  // =============================================
+
+  { topic: "Bezpieczeństwo", q: "Jak należy rozcieńczać stężony kwas?", a: ["Stężony kwas wlewa się do wody, a nie odwrotnie!", "Wlewa się go powoli, mieszając bagietką"] },
+  { topic: "Bezpieczeństwo", q: "Co się może stać, jeśli wlejemy wodę do stężonego kwasu? Dlaczego?", a: ["Ciecz może zostać wyrzucona z naczynia i oblać kwasem otoczenie", "Woda ma mniejszą gęstość, więc zostaje na powierzchni kwasu", "Mieszanie jest procesem egzotermicznym — na powierzchni następuje silny wzrost temperatury, wrzenie i wzrost ciśnienia"] },
+
+  // =============================================
+  // KWAS SIARKOWY(VI)
+  // =============================================
+
+  { topic: "H₂SO₄", q: "Jak otrzymuje się kwas siarkowy(VI)? Zapisz równanie reakcji.", a: ["W reakcji tlenku siarki(VI) z wodą", "<span class='eq'>SO<sub>3</sub> + H<sub>2</sub>O → H<sub>2</sub>SO<sub>4</sub></span>", "Uwaga: stężony kwas siarkowy(VI) jest żrący — doświadczenia z nim wykonuje tylko nauczyciel"] },
+  { topic: "H₂SO₄", q: "Opisz wygląd i gęstość stężonego kwasu siarkowego(VI).", a: ["Oleista, bezbarwna ciecz", "Gęstość niemal dwukrotnie większa od gęstości wody — butelka z kwasem jest wyraźnie cięższa od takiej samej butelki z wodą"] },
+  { topic: "H₂SO₄", q: "Jak stężony kwas siarkowy(VI) działa na cukier, drewno, papier i tkaninę bawełnianą?", a: ["Powoduje ich zwęglenie (niszczenie, zżeranie)", "Za każdym razem zachodzą inne, skomplikowane reakcje chemiczne"] },
+  { topic: "H₂SO₄", q: "Co to znaczy, że stężony kwas siarkowy(VI) jest higroskopijny?", a: ["Że pochłania parę wodną z powietrza (higroskopijność — zdolność pochłaniania pary wodnej i wody)", "Pozostawiony w otwartym naczyniu w wilgotnym pomieszczeniu osusza w nim powietrze"] },
+
+  // =============================================
+  // KWAS AZOTOWY(V)
+  // =============================================
+
+  { topic: "HNO₃", q: "Jak otrzymuje się kwas azotowy(V)? Zapisz równanie reakcji.", a: ["W reakcji tlenku azotu(V) z wodą", "<span class='eq'>N<sub>2</sub>O<sub>5</sub> + H<sub>2</sub>O → 2 HNO<sub>3</sub></span>"] },
+  { topic: "HNO₃", q: "Skąd pochodzi określenie „dymiący kwas azotowy”?", a: ["Po otwarciu butelki ze stężonym kwasem azotowym(V) wydobywają się z niej obłoki brunatnej mgły"] },
+  { topic: "HNO₃", q: "Jak stężony kwas azotowy(V) działa na białko (np. białko jaja, biały ser, jedwab, pióro)?", a: ["Reaguje z białkiem — powstają produkty o charakterystycznym żółtym zabarwieniu", "Żółknie białko jaja, biały ser, jedwab, ptasie pióro, a także skóra człowieka"] },
+
+  // =============================================
+  // KWAS FOSFOROWY(V)
+  // =============================================
+
+  { topic: "H₃PO₄", q: "Jak otrzymuje się kwas fosforowy(V)? Zapisz równania reakcji.", a: ["1) Spalanie fosforu w tlenie:<br><span class='eq'>4 P + 5 O<sub>2</sub> → P<sub>4</sub>O<sub>10</sub></span>", "2) Reakcja tlenku fosforu(V) z wodą:<br><span class='eq'>P<sub>4</sub>O<sub>10</sub> + 6 H<sub>2</sub>O → 4 H<sub>3</sub>PO<sub>4</sub></span>", "Tlenek fosforu(V) zapisujemy jako P<sub>4</sub>O<sub>10</sub>, bo cząsteczki P<sub>2</sub>O<sub>5</sub> łączą się w dimer"] },
+
+
+  // =============================================
+  // H2CO3 I H2SO3
+  // =============================================
+
+  { topic: "H₂CO₃ i H₂SO₃", q: "Jak powstaje kwas węglowy? Zapisz równanie reakcji.", a: ["W reakcji tlenku węgla(IV) z wodą", "<span class='eq'>CO<sub>2</sub> + H<sub>2</sub>O → H<sub>2</sub>CO<sub>3</sub></span>"] },
+  { topic: "H₂CO₃ i H₂SO₃", q: "Dlaczego nie można otrzymać stężonego roztworu kwasu węglowego?", a: ["Bo jest nietrwały — gdy jego stężenie przekracza ok. 0,002%, część cząsteczek się rozkłada:<br><span class='eq'>H<sub>2</sub>CO<sub>3</sub> → CO<sub>2</sub>↑ + H<sub>2</sub>O</span>", "Istnieje tylko w bardzo rozcieńczonych roztworach, np. w wodach gazowanych", "Nie jest kwasem żrącym"] },
+  { topic: "H₂CO₃ i H₂SO₃", q: "Jak otrzymuje się kwas siarkowy(IV)? Zapisz równanie reakcji.", a: ["W reakcji tlenku siarki(IV) z wodą", "<span class='eq'>SO<sub>2</sub> + H<sub>2</sub>O → H<sub>2</sub>SO<sub>3</sub></span>"] },
+  { topic: "H₂CO₃ i H₂SO₃", q: "Czy kwas siarkowy(IV) jest trwały? Zapisz równanie jego rozkładu.", a: ["Nie — jest nietrwały i rozkłada się, np. podczas ogrzewania", "<span class='eq'>H<sub>2</sub>SO<sub>3</sub> → SO<sub>2</sub>↑ + H<sub>2</sub>O</span>"] },
+  { topic: "H₂CO₃ i H₂SO₃", q: "Podaj właściwości kwasu siarkowego(IV).", a: ["Silnie drażniący i trujący", "Łatwo niszczy roślinność", "Ma właściwości bakterio- i grzybobójcze", "Nie znajduje licznych zastosowań"] },
+
+  // =============================================
+  // 7.5. KWASY BEZTLENOWE
+  // =============================================
+
+  { topic: "Kwasy beztlenowe", q: "Podaj wzór ogólny kwasów i wyjaśnij, czym jest reszta kwasowa.", a: ["H<sub>n</sub>R", "R — reszta kwasowa: grupa atomów, która zostaje po „odjęciu” wodorów", "W kwasach tlenowych reszta zawiera tlen (E<sub>m</sub>O<sub>z</sub>), w beztlenowych — nie"] },
+  { topic: "Kwasy beztlenowe", q: "Co to jest kwas beztlenowy?", a: ["Kwas, który nie zawiera w reszcie kwasowej atomów tlenu, np. HCl<sub>(aq)</sub>, H<sub>2</sub>S<sub>(aq)</sub>", "Otrzymuje się go przez rozpuszczenie w wodzie odpowiedniego wodorku niemetalu"] },
+  { topic: "Kwasy beztlenowe", q: "Pierwiastki których grup układu okresowego tworzą wodorki o właściwościach kwasowych?", a: ["17. grupy (fluor, chlor, brom, jod)", "16. grupy, np. siarka"] },
+  { topic: "Kwasy beztlenowe", q: "Co oznaczają indeksy (g) i (aq) w zapisach HCl<sub>(g)</sub> i HCl<sub>(aq)</sub>?", a: ["(g) — gaz: HCl<sub>(g)</sub> to gazowy chlorowodór (wodorek)", "(aq) — roztwór wodny: HCl<sub>(aq)</sub> to kwas solny", "Wodorek i jego roztwór mają ten sam wzór sumaryczny, stąd potrzeba indeksów"] },
+  { topic: "Kwasy beztlenowe", q: "Jaka jest druga nazwa kwasu solnego i jaki ma wzór?", a: ["Kwas chlorowodorowy", "HCl<sub>(aq)</sub>; wzór strukturalny: H–Cl", "Występuje w soku żołądkowym człowieka (w niewielkim stężeniu)"] },
+  { topic: "Kwasy beztlenowe", q: "Jak otrzymuje się kwas solny? Zapisz równania reakcji.", a: ["1) Bezpośrednie łączenie wodoru z chlorem:<br><span class='eq'>H<sub>2</sub> + Cl<sub>2</sub> → 2 HCl<sub>(g)</sub></span>", "2) Rozpuszczenie chlorowodoru w wodzie:<br><span class='eq'>HCl<sub>(g)</sub> —H<sub>2</sub>O→ HCl<sub>(aq)</sub></span>"] },
+  { topic: "Kwasy beztlenowe", q: "Podaj właściwości kwasu solnego.", a: ["Bezbarwna, dymiąca ciecz o nieprzyjemnym zapachu chlorowodoru", "Maksymalne stężenie (dostępne w handlu): ok. 36%", "Ma właściwości żrące, ale nie zwęgla cukru, drewna ani tkanin — niszczy je w inny sposób"] },
+  { topic: "Kwasy beztlenowe", q: "Jak otrzymuje się kwas siarkowodorowy? Zapisz równania reakcji.", a: ["1) Łączenie wodoru z siarką:<br><span class='eq'>H<sub>2</sub> + S → H<sub>2</sub>S<sub>(g)</sub></span>", "2) Rozpuszczenie siarkowodoru w wodzie:<br><span class='eq'>H<sub>2</sub>S<sub>(g)</sub> —H<sub>2</sub>O→ H<sub>2</sub>S<sub>(aq)</sub></span>"] },
+  { topic: "Kwasy beztlenowe", q: "Podaj właściwości siarkowodoru i kwasu siarkowodorowego.", a: ["Siarkowodór H<sub>2</sub>S to gaz o nieprzyjemnym zapachu zgniłych jaj", "Słabo rozpuszcza się w wodzie — stężenie roztworu to zaledwie ok. 0,4%, dlatego bywa nazywany „wodą siarkowodorową”", "Roztwór barwi lakmus na czerwono"] },
+];
+
+// --- Engine ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var DECK_ID = 'chemia_kwasy';
+var STORE_KEY = 'fiszki:' + DECK_ID + ':opanowane';
+var KNOWN_VIEW = "__odlozone__";
+
+var activeTopic = "Wszystkie";
+var known = loadKnown();
+var filteredCards = [];
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var markBtn = document.getElementById('markBtn');
+var statsRow = document.getElementById('statsRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    var isKnown = !!known[cardId(f)];
+    if (isKnownView()) {
+      if (!isKnown) continue;
+    } else {
+      if (isKnown) continue;
+      if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    }
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+    if (i === 0) appendKnownPill();
+  }
+}
+
+function appendKnownPill() {
+  var kn = knownCount();
+  if (kn === 0) return;
+  var knownPill = document.createElement('button');
+  knownPill.className = 'topic-pill known-pill' + (isKnownView() ? ' active' : '');
+  knownPill.innerHTML = '&#10003; Odłożone (' + kn + ')';
+  knownPill.setAttribute('data-topic', KNOWN_VIEW);
+  knownPill.onclick = function() {
+    activeTopic = this.getAttribute('data-topic');
+    buildTopicBar();
+    applyFilters();
+  };
+  topicBar.appendChild(knownPill);
+}
+
+// --- odkładanie opanowanych fiszek ---
+function cardId(f) { return f.q; }
+function isKnownView() { return activeTopic === KNOWN_VIEW; }
+
+function loadKnown() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    var arr = JSON.parse(raw);
+    var map = {};
+    for (var i = 0; i < arr.length; i++) map[arr[i]] = true;
+    return map;
+  } catch (e) { return {}; }
+}
+
+function saveKnown() {
+  try {
+    var arr = [];
+    for (var k in known) { if (known[k]) arr.push(k); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function knownCount() {
+  var n = 0;
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    if (known[cardId(ALL_FLASHCARDS[i])]) n++;
+  }
+  return n;
+}
+
+function plural(n, one, few, many) {
+  var n10 = n % 10, n100 = n % 100;
+  if (n === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+  return many;
+}
+
+function updateStats() {
+  var n = knownCount();
+  if (n === 0) { statsRow.innerHTML = ''; return; }
+  statsRow.innerHTML =
+    '<span>' + n + ' ' + plural(n, 'fiszka odłożona', 'fiszki odłożone', 'fiszek odłożonych') + '</span>' +
+    '<button class="link-btn" onclick="restoreAll()">Przywróć wszystkie</button>';
+}
+
+function toggleKnown() {
+  if (isAnimating || filteredCards.length === 0) return;
+  var id = cardId(filteredCards[currentIndex]);
+  if (known[id]) { delete known[id]; } else { known[id] = true; }
+  saveKnown();
+
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  card.classList.add('slide-left');
+  setTimeout(function() {
+    filteredCards.splice(currentIndex, 1);
+    if (currentIndex > filteredCards.length - 1) {
+      currentIndex = Math.max(0, filteredCards.length - 1);
+    }
+    if (isKnownView() && knownCount() === 0) {
+      activeTopic = "Wszystkie";
+      buildTopicBar();
+      updateStats();
+      applyFilters();
+    } else {
+      buildTopicBar();
+      updateStats();
+      renderCard();
+    }
+  }, 140);
+  setTimeout(function() { card.classList.remove('slide-left'); isAnimating = false; }, 350);
+}
+
+function restoreAll() {
+  known = {};
+  saveKnown();
+  if (isKnownView()) activeTopic = "Wszystkie";
+  buildTopicBar();
+  updateStats();
+  applyFilters();
+}
+
+function renderCard() {
+  markBtn.innerHTML = isKnownView() ? '&#8617; Przywróć' : '&#10003; Umiem';
+
+  if (filteredCards.length === 0) {
+    var msg = isKnownView()
+      ? 'Nie ma jeszcze odłożonych fiszek'
+      : (knownCount() > 0
+          ? (activeTopic === "Wszystkie"
+              ? 'Wszystko opanowane! Aby wrócić do nauki, użyj „Przywróć wszystkie” nad kartą.'
+              : 'Cały dział opanowany! Wybierz inny dział albo użyj „Przywróć wszystkie” nad kartą.')
+          : 'Brak fiszek dla tego filtra');
+    cardFront.className = 'card-face card-front';
+    cardFront.innerHTML = '<div class="card-question">' + msg + '</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    markBtn.disabled = true;
+    return;
+  }
+  markBtn.disabled = false;
+  var fc = filteredCards[currentIndex];
+
+  cardFront.className = 'card-face card-front';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div></div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedź</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrócić do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); toggleKnown(); }
+});
+
+buildTopicBar();
+updateStats();
+applyFilters();
+</script>
+</body>
+</html>
