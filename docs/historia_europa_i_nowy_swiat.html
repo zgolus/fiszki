@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Historia LO 2 — Europa i Nowy Świat</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c131a;
+    --card-front: #f1f4f6;
+    --card-back: #13212e;
+    --accent: #2b7bb5;
+    --accent-light: #a8d0ec;
+    --text-dark: #13212e;
+    --text-light: #f1f4f6;
+    --text-muted: #8a9aa8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #263949;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #263949;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #7d8b97;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .topic-pill.known-pill {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .topic-pill.known-pill.active {
+    background: var(--accent);
+    border-style: solid;
+    color: #ffffff;
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 480px;
+    padding: 4px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #263949;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #263949;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+  .mark-btn {
+    padding: 11px 18px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mark-btn:active {
+    background: var(--accent);
+    color: #ffffff;
+    transform: scale(0.95);
+  }
+  .mark-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+  @media (max-width: 400px) {
+    .nav-area { gap: 8px; padding: 6px 14px 30px; }
+    .nav-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+    .shuffle-btn, .mark-btn { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.03em; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .stats-row { animation: fadeUp 0.5s 0.15s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Europa i Nowy Świat</h1>
+  <div class="subtitle">Historia &middot; rozdział I &middot; 35 pytań</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="mark-btn" id="markBtn" onclick="toggleKnown()">&#10003; Umiem</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+var ALL_FLASHCARDS = [
+  // =============================================
+  // 1. WIELKIE ODKRYCIA GEOGRAFICZNE
+  // =============================================
+
+  { topic: "Odkrycia geograficzne", q: "Dlaczego Europejczycy podjęli wyprawy oceaniczne?", a: [
+    "Kryzys gospodarczy w XV w.: brak kruszców (srebra i złota) — wywożono je masowo w handlu ze Wschodem, a złoża w Europie się wyczerpywały",
+    "Po zdobyciu Konstantynopola przez Turków (1453) utrudniony handel ze Wschodem — szukano nowej drogi do Indii (przyprawy, towary luksusowe)",
+    "Przeludnienie i brak nowych pól pod uprawę",
+    "Młodsi synowie szlacheccy nie dziedziczyli ziemi — podbój nowych terenów dawał szansę na łupy, karierę i awans społeczny",
+    "Zapał ewangelizacyjny duchowieństwa — chęć schrystianizowania nowych ludów",
+    "Ciekawość świata rozbudzona przez humanizm, wzrost zainteresowania teorią o kulistości Ziemi"
+  ] },
+  { topic: "Odkrycia geograficzne", q: "Jakie wynalazki umożliwiły prowadzenie podróży dalekomorskich?", a: [
+    "Nowe typy statków żaglowych — karawele i karaki (uniwersalne ożaglowanie na 3 masztach pozwalało płynąć nawet pod wiatr)",
+    "Busola (kompas) — wskazywała północ, pozwalała wytyczyć kierunek żeglugi",
+    "Astrolabium — mierzyło wysokość ciał niebieskich nad horyzontem → szerokość geograficzna",
+    "Kwadrant — wyznaczał pozycję statku względem gwiazd",
+    "Laska św. Jakuba — mierzyła kąt między powierzchnią oceanu a gwiazdami",
+    "Rozwój kartografii — dokładniejsze mapy (np. mapy Toscanellego)"
+  ] },
+  { topic: "Odkrycia geograficzne", q: "Czego dokonali Bartolomeu Dias i Vasco da Gama?", a: [
+    "Bartolomeu Dias (Portugalczyk) w 1488 r. opłynął południowy kraniec Afryki — Przylądek Dobrej Nadziei",
+    "Vasco da Gama w latach 1497–1498 opłynął Afrykę i jako pierwszy Europejczyk dopłynął morzem do Indii (Kalikat) — odkrycie morskiej drogi do Indii",
+    "W 1499 r. flota da Gamy wróciła do Lizbony z ogromnym ładunkiem przypraw",
+    "Da Gama w latach 1502–1503 zdobył Kalikat; otrzymał tytuł admirała mórz indyjskich, a potem wicekróla Indii"
+  ] },
+  { topic: "Odkrycia geograficzne", q: "W jakim celu Krzysztof Kolumb rozpoczął swoją wyprawę?", a: [
+    "Chciał dotrzeć do Indii drogą zachodnią — płynąc przez Ocean Atlantycki",
+    "Opierał się na teorii o kulistości Ziemi i mapach Paola Toscanellego; nie wiedział, że po drodze leży Ameryka",
+    "Wyprawę sfinansowali władcy Hiszpanii — Izabela Kastylijska i Ferdynand Aragoński (rywalizacja z Portugalią o drogę do Indii)",
+    "3 sierpnia 1492 r. wypłynął z Palos (statki: Santa María, Niña, Pinta), 12 października 1492 r. dotarł do wyspy San Salvador (Bahamy)",
+    "Do końca życia uważał, że dotarł do Indii"
+  ] },
+  { topic: "Odkrycia geograficzne", q: "W jaki sposób ostatecznie udowodniono tezę o kulistości Ziemi?", a: [
+    "Pierwszą podróżą dookoła świata (1519–1522)",
+    "Wyprawę 5 statków poprowadził Portugalczyk w służbie hiszpańskiej Ferdynand Magellan — opłynął Amerykę Płd. (Cieśnina Magellana) i przepłynął Ocean Spokojny",
+    "Magellan zginął na Filipinach w walce z tubylcami",
+    "Do Hiszpanii (Kadyks) w 1522 r. dotarł tylko statek Victoria pod dowództwem Juana Sebastiána Elcano — z 270 uczestników wróciło 18"
+  ] },
+  { topic: "Odkrycia geograficzne", q: "Czego dotyczył traktat zawarty w Tordesillas w 1494 r.?", a: [
+    "Podziału świata na strefy wpływów między Hiszpanię i Portugalię (rozgraniczenie zaproponował papież Aleksander VI)",
+    "Linia graniczna biegła wzdłuż południka ok. 2 tys. km na zachód od Wysp Zielonego Przylądka",
+    "Ziemie na zachód od linii → Hiszpania (Ameryka), na wschód → Portugalia (Afryka, Azja)",
+    "Dzięki temu do Portugalii przypadła też Brazylia (odkryta w 1500 r. przez Pedra Cabrala)"
+  ] },
+  { topic: "Odkrycia geograficzne", q: "Na jakich obszarach istniały państwa Majów, Azteków i Inków?", a: [
+    "Majowie — Meksyk (płw. Jukatan) i Gwatemala; ok. 250 r. n.e.–1697 r.; kalendarz, astronomia, matematyka, piramidy schodkowe (Tikal)",
+    "Aztekowie — środkowy Meksyk (stolica Tenochtitlán), Gwatemala; ok. 1200–1525 r.; najsilniejsze militarnie państwo",
+    "Inkowie — Andy w Ameryce Płd.: Peru, Ekwador, Boliwia, Chile (stolica Cuzco); ok. 1150–1572 r.; drogi górskie, wiszące mosty, pismo węzełkowe kipu, tarasy"
+  ] },
+
+  // =============================================
+  // 2. PODBOJE KOLONIALNE I ICH SKUTKI
+  // =============================================
+
+  { topic: "Podboje kolonialne", q: "Co oznaczają określenia „konkwista” i „konkwistador”?", a: [
+    "Konkwista (hiszp. conquista — podbój) — hiszpański podbój Ameryki w XVI w.",
+    "Konkwistador — hiszpański zdobywca, dowódca zbrojnej wyprawy podboju",
+    "Wyprawy organizowali przedsiębiorcy, którzy zawierali umowę z królem hiszpańskim na prowadzenie w jego imieniu odkryć i podbojów",
+    "Najsłynniejsi konkwistadorzy: Hernán Cortés i Francisco Pizarro"
+  ] },
+  { topic: "Podboje kolonialne", q: "Kto podbił imperium Inków, a kto — Azteków?", a: [
+    "Aztekowie: Hernán Cortés (1519–1521) — uwięził króla Montezumę II; w 1521 r. z pomocą indiańskich sojuszników zdobył stolicę Tenochtitlán",
+    "Inkowie: Francisco Pizarro (1530–1533) — podstępem uwięził władcę Atahualpę, wziął okup w złocie i go zamordował; w 1533 r. zajął stolicę Cuzco",
+    "Przyczyny sukcesu: przewaga uzbrojenia (broń palna), konie, lepsza organizacja, wykorzystanie podziałów między Indianami (sojusznicy), epidemie",
+    "Ostatni władca Inków — Tupac Amaru — stanął na czele buntu przeciw Hiszpanom"
+  ] },
+  { topic: "Podboje kolonialne", q: "Na jakich kontynentach założyli swoje kolonie Portugalczycy?", a: [
+    "W Afryce — najstarsze (nad Zatoką Gwinejską, Angola, Mozambik): złoto, kość słoniowa, niewolnicy",
+    "W Azji — faktorie w Indiach, Chinach i Japonii, Moluki (Wyspy Korzenne) w Indonezji: przyprawy, głównie pieprz",
+    "W Ameryce Południowej — Brazylia (odkryta w 1500 r. przez Pedra Cabrala): plantacje trzciny cukrowej"
+  ] },
+  { topic: "Podboje kolonialne", q: "Jakie były skutki europejskich podbojów dla Indian?", a: [
+    "Katastrofalne wyludnienie — wyniszczająca niewolnicza praca w kopalniach i na plantacjach; w niektórych regionach zmarło nawet 90% ludności",
+    "Epidemie chorób przywiezionych z Europy: ospa (zmarło ponad 70% Azteków i 90% Inków), dżuma, tyfus, cholera",
+    "Zniszczenie dużej części kultur i wierzeń; utrata niepodległości i ziemi",
+    "Przymusowa chrystianizacja i narzucenie europejskich wzorców kulturowych oraz języków (hiszpański, portugalski)",
+    "W Ameryce Płn. — wypędzanie z ziem, a nawet wytępienie plemion (rezerwaty)"
+  ] },
+  { topic: "Podboje kolonialne", q: "Skąd pochodzi określenie „Ameryka Łacińska”?", a: [
+    "To wspólnota kulturowa obejmująca Amerykę Środkową i Południową",
+    "Nazwa pochodzi od języków zdobywców — hiszpańskiego i portugalskiego — które wywodzą się z łaciny (języki romańskie)",
+    "Stały się one w koloniach językami urzędowymi"
+  ] },
+  { topic: "Podboje kolonialne", q: "Na czym polegał handel trójkątny?", a: [
+    "Model handlu w XVI w. (tzw. złoty trójkąt) — kątami były Europa, Afryka i Ameryka",
+    "Europa → Afryka: wyroby rzemieślnicze (broń, narzędzia, odzież, rum) wymieniane na niewolników",
+    "Afryka → Ameryka: czarnoskórzy niewolnicy sprzedawani z ogromnym zyskiem do pracy na plantacjach i w kopalniach",
+    "Ameryka → Europa: towary kolonialne — cukier, tytoń, bawełna, złoto, srebro",
+    "Handel niewolnikami był opłacalny mimo wysokiej śmiertelności w transporcie"
+  ] },
+  { topic: "Podboje kolonialne", q: "Jaką rzekę uznaje się za granicę stref ekonomicznych w nowożytnej Europie?", a: [
+    "Łabę (w Niemczech) — tzw. dualizm gospodarczy",
+    "Na zachód od Łaby: gospodarka czynszowa, wczesny kapitalizm, manufaktury, rozwój miast i handlu; chłopi osobiście wolni, płacą czynsz w pieniądzu",
+    "Na wschód od Łaby (w tym Polska): gospodarka folwarczno-pańszczyźniana; szlachta eksportuje zboże, chłopi odrabiają pańszczyznę i są przywiązani do ziemi; mieszczaństwo słabe"
+  ] },
+  { topic: "Podboje kolonialne", q: "Na czym polega rolnictwo intensywne?", a: [
+    "Na zwiększaniu wydajności z tej samej powierzchni ziemi (dominowało w Europie Zachodniej)",
+    "Wprowadzano nowe narzędzia rolne, ściśle łączono uprawę z hodowlą zwierząt (nawożenie)",
+    "Zamiast trójpolówki — płodozmian: cykliczna zmiana upraw, dzięki której ziemia nie traciła żyzności",
+    "Przeciwieństwo: rolnictwo ekstensywne (Europa Wsch.) — wzrost zysków przez powiększanie areału i obniżanie kosztów pracy (pańszczyzna)"
+  ] },
+
+  // =============================================
+  // 3. KULTURA I SZTUKA RENESANSU
+  // =============================================
+
+  { topic: "Renesans", q: "Dlaczego epokę następującą po średniowieczu określono mianem renesansu?", a: [
+    "Renesans (franc.) = odrodzenie — chodziło o odrodzenie kultury antycznej (greckiej i rzymskiej), która w średniowieczu popadła w zapomnienie",
+    "Twórcy nawiązywali do dokonań autorów starożytnych, wracano do tekstów pisanych łaciną klasyczną, poznawano filozofię Platona i Arystotelesa",
+    "Epoka rozpoczęła się we Włoszech w połowie XV w.; zainteresowanie antykiem wzrosło po 1453 r., gdy uczeni bizantyjscy uciekli z Konstantynopola do Włoch"
+  ] },
+  { topic: "Renesans", q: "Kim był Erazm z Rotterdamu?", a: [
+    "Holenderski humanista (1467–1536) — filolog, filozof i teolog; najwybitniejszy uczony renesansu",
+    "Opracował greckie wydanie Nowego Testamentu i krytyczne edycje dzieł pisarzy antycznych",
+    "Autor „Pochwały głupoty” — krytykował obłudę panujących, korupcję i nadużycia w Kościele (np. handel relikwiami)",
+    "Łączył tradycję antyku z chrześcijańską etyką; domagał się reform w Kościele, ale nie przyłączył się do reformacji",
+    "Wykładał głównie w Szwajcarii i Niemczech, utrzymywał kontakty z humanistami w całej Europie"
+  ] },
+  { topic: "Renesans", q: "Co zmienił wynalazek Jana Gutenberga?", a: [
+    "Ok. 1450–1455 r. Gutenberg (Moguncja) wynalazł druk z ruchomej czcionki metalowej — pierwsza książka: Biblia Gutenberga",
+    "Książki można było drukować masowo i szybko — były znacznie tańsze niż rękopisy",
+    "Upowszechnienie wiedzy i szybka wymiana idei i myśli w całej Europie",
+    "Umożliwił rozprzestrzenianie się humanizmu, a później idei reformacji (druki ulotne, Biblia w językach narodowych)",
+    "Pierwsze drukowane książki (do 1500 r.) to inkunabuły"
+  ] },
+  { topic: "Renesans", q: "Kiedy i gdzie tworzył William Szekspir?", a: [
+    "W Anglii, w drugiej połowie XVI w. i na początku XVII w. — na przełomie renesansu i baroku",
+    "Najwybitniejszy nowożytny dramaturg — rozkwit angielskiego teatru",
+    "Autor ponadczasowych tragedii, m.in. „Hamlet” (1599–1602) i „Makbet”"
+  ] },
+  { topic: "Renesans", q: "Na czym polegała rewolucja zapoczątkowana przez Mikołaja Kopernika?", a: [
+    "W 1543 r. ukazało się dzieło „O obrotach sfer niebieskich” (Kopernik — uczony z Torunia)",
+    "Teoria heliocentryczna: Ziemia wraz z innymi planetami krąży wokół Słońca (wcześniej — na podstawie Biblii — sądzono odwrotnie: geocentryzm)",
+    "Zapoczątkowała rewolucję naukową: obserwacje, eksperymenty i rozumowanie zamiast powoływania się wyłącznie na autorytety",
+    "Kopernik uważał orbity za okręgi; później Kepler ustalił, że są eliptyczne"
+  ] },
+  { topic: "Renesans", q: "Co oznacza określenie „człowiek renesansu”?", a: [
+    "Osobę wszechstronną — o szerokich horyzontach i wielu zdolnościach w różnych dziedzinach sztuki i nauki",
+    "Wzór: Leonardo da Vinci — malarz („Mona Lisa”, „Ostatnia wieczerza”), wynalazca (projekty helikoptera, łodzi podwodnej, roweru), przyrodnik",
+    "Inny przykład: Michał Anioł — rzeźbiarz, malarz, architekt i poeta",
+    "Wynika z idei humanizmu: człowiek jako najwyższa wartość, podkreślanie możliwości jego rozumu"
+  ] },
+
+  // =============================================
+  // 4. REFORMACJA W EUROPIE
+  // =============================================
+
+  { topic: "Reformacja", q: "Jakie wydarzenia uznaje się za początek reformacji?", a: [
+    "31 października 1517 r. Marcin Luter ogłosił w Wittenberdze 95 tez przeciwko sprzedaży odpustów (wg legendy przybił je na drzwiach kościoła)",
+    "Bezpośrednia przyczyna: masowy handel odpustami na budowę bazyliki św. Piotra w Rzymie",
+    "Papież wezwał Lutra do odwołania poglądów — Luter spalił bullę papieską i został obłożony klątwą",
+    "Protekcję zapewnił mu elektor saski Fryderyk Mądry",
+    "Tło: kryzys Kościoła — symonia, nepotyzm, łamanie celibatu, bogactwo duchownych"
+  ] },
+  { topic: "Reformacja", q: "Czym różnił się luteranizm od katolicyzmu?", a: [
+    "Jedynym źródłem wiary jest Pismo Święte — odrzucono tradycję katolicką",
+    "Zbawienie wyłącznie dzięki wierze i łasce Bożej, a nie dobrym uczynkom (odrzucenie odpustów)",
+    "Tylko 2 sakramenty: chrzest i Eucharystia (komunia pod dwiema postaciami — chleba i wina)",
+    "Zniesiono celibat, sakrament kapłaństwa i klasztory; odrzucono kult Maryi, świętych i relikwii",
+    "Nabożeństwa w językach narodowych, bez ozdobnych szat liturgicznych",
+    "Odrzucono zwierzchnictwo papieża — Kościoły podporządkowane władzy świeckiej",
+    "Zasady spisał Filip Melanchton w Konfesji augsburskiej (1530) → Kościół ewangelicko-augsburski"
+  ] },
+  { topic: "Reformacja", q: "Jaką zasadę i na jakim obszarze wprowadził pokój augsburski z 1555 r.?", a: [
+    "Zasadę „Czyja władza, tego wyznanie” (łac. cuius regio, eius religio)",
+    "Obszar: Rzesza Niemiecka",
+    "Poddani musieli przyjąć wyznanie swojego władcy (króla, księcia lub biskupa)",
+    "Zakończył wojny religijne między cesarzem Karolem V a protestanckim Związkiem Szmalkaldzkim — cesarz musiał zgodzić się na współistnienie katolicyzmu i luteranizmu"
+  ] },
+  { topic: "Reformacja", q: "Na czym polegała sekularyzacja Prus Książęcych?", a: [
+    "Sekularyzacja = przekształcenie państwa zakonnego w świeckie",
+    "W 1525 r. wielki mistrz zakonu krzyżackiego Albrecht Hohenzollern przyjął luteranizm i przekształcił państwo krzyżackie w świeckie Prusy Książęce",
+    "Prusy stały się lennem zależnym od Polski (hołd pruski) i pierwszym protestanckim państwem na świecie"
+  ] },
+  { topic: "Reformacja", q: "Kto głosił zasadę predestynacji i na czym ona polegała?", a: [
+    "Jan Kalwin — reformator z Francji, działający w Genewie (Szwajcaria); twórca Kościoła ewangelicko-reformowanego",
+    "Predestynacja: Bóg z góry przeznacza poszczególnych ludzi do zbawienia lub potępienia",
+    "Oznaką wybrania (zbawienia) miało być błogosławieństwo Boże — powodzenie w życiu, a także cnotliwe i pobożne życie",
+    "Etyka protestancka (pracowitość, skromność, oszczędność) sprzyjała rozwojowi kapitalizmu"
+  ] },
+  { topic: "Reformacja", q: "Kogo określano mianem hugenotów?", a: [
+    "Francuskich kalwinistów",
+    "Stanowili silną i wpływową grupę; na ich czele stali Burbonowie (m.in. Henryk Burbon)",
+    "Konflikt z katolikami doprowadził we Francji do wojen religijnych (m.in. noc św. Bartłomieja 1572)",
+    "Edykt nantejski (1598) zagwarantował im wolność religijną"
+  ] },
+  { topic: "Reformacja", q: "Jakie zmiany w Anglii wprowadził Akt supremacji?", a: [
+    "Ogłoszony w 1534 r. przez Henryka VIII",
+    "Król został głową Kościoła anglikańskiego — Kościół wyłączono spod władzy papieża (kościół narodowy)",
+    "Przyczyna: papież nie zgodził się na unieważnienie małżeństwa króla z Katarzyną Aragońską (brak męskiego potomka) — dzięki aktowi król uzyskał rozwód",
+    "Zlikwidowano daniny dla papieża i zakony, a ich majątek sprzedano",
+    "Kościół zachował początkowo katolicką liturgię i strukturę; zwierzchnik duchowny — arcybiskup Canterbury"
+  ] },
+
+  // =============================================
+  // 5. REFORMA KATOLICKA
+  // =============================================
+
+  { topic: "Reforma katolicka", q: "Jakie działania określa się mianem reformy katolickiej?", a: [
+    "Działania Kościoła mające na celu odnowę życia religijnego i usunięcie nadużyć duchowieństwa — odpowiedź na reformację",
+    "Obrady soboru trydenckiego (1545–1563) i jego postanowienia",
+    "Nowe zakony, zwłaszcza jezuici (1534) — edukacja i misje",
+    "Zwalczanie protestantyzmu (kontrreformacja): inkwizycja papieska (1542), indeks ksiąg zakazanych (1559), cenzura",
+    "Rozbudowa liturgii, procesje, pielgrzymki, kult maryjny, bogaty wystrój świątyń"
+  ] },
+  { topic: "Reforma katolicka", q: "Kiedy obradował sobór trydencki?", a: [
+    "W latach 1545–1563 w Trydencie (północne Włochy)",
+    "Postanowienia: potwierdzono przywódczą rolę papieża; źródłem objawienia jest Biblia i tradycja",
+    "Doktrynę spisano w katechizmie trydenckim; ujednolicono księgi biblijne i przepisy liturgiczne; łacina pozostała językiem liturgii",
+    "Dyscyplina duchownych, seminaria duchowne, obowiązek przebywania biskupów i proboszczów w swoich placówkach, wizytacje i synody, księgi metrykalne"
+  ] },
+  { topic: "Reforma katolicka", q: "Do czego doszło w tzw. noc św. Bartłomieja?", a: [
+    "Do rzezi hugenotów w Paryżu w nocy z 23 na 24 sierpnia 1572 r. — katolicy zamordowali niemal 3 tys. protestantów",
+    "Hugenoci przybyli do Paryża na ślub katoliczki Małgorzaty Walezjuszki z ich przywódcą Henrykiem Burbonem (miał przypieczętować pokój)",
+    "Rzeź zorganizowano pod wpływem królowej matki Katarzyny Medycejskiej",
+    "Henryk Burbon ocalał (zmuszony do przyjęcia katolicyzmu), ale wola walki hugenotów nie została złamana"
+  ] },
+  { topic: "Reforma katolicka", q: "Jakie zasady wprowadził Edykt nantejski z 1598 r.?", a: [
+    "Wydał go król Francji Henryk IV Burbon (wcześniej hugenot, przyjął katolicyzm: „Paryż wart jest mszy”)",
+    "Zakończył wojny religijne we Francji",
+    "Hugenotom zagwarantowano wolność religijną",
+    "Katolicyzm zachował rolę wyznania dominującego"
+  ] },
+  { topic: "Reforma katolicka", q: "Kim byli gezowie?", a: [
+    "Protestanccy powstańcy w Niderlandach walczący z hiszpańskim królem Filipem II",
+    "Nazwa z franc. „żebracy” — pogardliwe przezwisko, bo ich delegacja błagała Filipa II o zaprzestanie prześladowań",
+    "Po odrzuceniu próśb prowadzili walkę partyzancką z armią i flotą hiszpańską (wojna od 1566 r.); przywódca: Wilhelm Orański",
+    "Efekt: w 1588 r. proklamowano Republikę Zjednoczonych Prowincji Niderlandów (płn., dzisiejsza Holandia)"
+  ] },
+  { topic: "Reforma katolicka", q: "Kto założył Towarzystwo Jezusowe?", a: [
+    "Ignacy Loyola (Hiszpan, dawny żołnierz) — w 1534 r. w Paryżu",
+    "Zakon jezuitów — pierwszy generał to Loyola; założył też w Rzymie Kolegium Rzymskie",
+    "Cele: walka z reformacją, edukacja (kolegia), polemiki z protestantami, misje na innych kontynentach (np. w Japonii)",
+    "Jezuici byli spowiednikami i kapelanami monarchów, mieli wpływ na elity; polscy męczennicy: Andrzej Bobola"
+  ] },
+  { topic: "Reforma katolicka", q: "Czym były kolegia jezuickie?", a: [
+    "Szkołami średnimi nowego typu prowadzonymi przez jezuitów",
+    "Słynęły z wysokiego poziomu kształcenia",
+    "Uczyli się w nich synowie szlachciców i mieszczan, czasem chłopów — również protestantów",
+    "Pozwalały jezuitom kontrolować dużą część szkolnictwa i wychowywać elity w duchu katolickim"
+  ] },
+];
+
+// --- Engine ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var DECK_ID = 'historia_europa_i_nowy_swiat';
+var STORE_KEY = 'fiszki:' + DECK_ID + ':opanowane';
+var KNOWN_VIEW = "__odlozone__";
+
+var activeTopic = "Wszystkie";
+var known = loadKnown();
+var filteredCards = [];
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var markBtn = document.getElementById('markBtn');
+var statsRow = document.getElementById('statsRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    var isKnown = !!known[cardId(f)];
+    if (isKnownView()) {
+      if (!isKnown) continue;
+    } else {
+      if (isKnown) continue;
+      if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    }
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+    if (i === 0) appendKnownPill();
+  }
+}
+
+function appendKnownPill() {
+  var kn = knownCount();
+  if (kn === 0) return;
+  var knownPill = document.createElement('button');
+  knownPill.className = 'topic-pill known-pill' + (isKnownView() ? ' active' : '');
+  knownPill.innerHTML = '&#10003; Odłożone (' + kn + ')';
+  knownPill.setAttribute('data-topic', KNOWN_VIEW);
+  knownPill.onclick = function() {
+    activeTopic = this.getAttribute('data-topic');
+    buildTopicBar();
+    applyFilters();
+  };
+  topicBar.appendChild(knownPill);
+}
+
+// --- odkładanie opanowanych fiszek ---
+function cardId(f) { return f.q; }
+function isKnownView() { return activeTopic === KNOWN_VIEW; }
+
+function loadKnown() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    var arr = JSON.parse(raw);
+    var map = {};
+    for (var i = 0; i < arr.length; i++) map[arr[i]] = true;
+    return map;
+  } catch (e) { return {}; }
+}
+
+function saveKnown() {
+  try {
+    var arr = [];
+    for (var k in known) { if (known[k]) arr.push(k); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function knownCount() {
+  var n = 0;
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    if (known[cardId(ALL_FLASHCARDS[i])]) n++;
+  }
+  return n;
+}
+
+function plural(n, one, few, many) {
+  var n10 = n % 10, n100 = n % 100;
+  if (n === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+  return many;
+}
+
+function updateStats() {
+  var n = knownCount();
+  if (n === 0) { statsRow.innerHTML = ''; return; }
+  statsRow.innerHTML =
+    '<span>' + n + ' ' + plural(n, 'fiszka odłożona', 'fiszki odłożone', 'fiszek odłożonych') + '</span>' +
+    '<button class="link-btn" onclick="restoreAll()">Przywróć wszystkie</button>';
+}
+
+function toggleKnown() {
+  if (isAnimating || filteredCards.length === 0) return;
+  var id = cardId(filteredCards[currentIndex]);
+  if (known[id]) { delete known[id]; } else { known[id] = true; }
+  saveKnown();
+
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  card.classList.add('slide-left');
+  setTimeout(function() {
+    filteredCards.splice(currentIndex, 1);
+    if (currentIndex > filteredCards.length - 1) {
+      currentIndex = Math.max(0, filteredCards.length - 1);
+    }
+    if (isKnownView() && knownCount() === 0) {
+      activeTopic = "Wszystkie";
+      buildTopicBar();
+      updateStats();
+      applyFilters();
+    } else {
+      buildTopicBar();
+      updateStats();
+      renderCard();
+    }
+  }, 140);
+  setTimeout(function() { card.classList.remove('slide-left'); isAnimating = false; }, 350);
+}
+
+function restoreAll() {
+  known = {};
+  saveKnown();
+  if (isKnownView()) activeTopic = "Wszystkie";
+  buildTopicBar();
+  updateStats();
+  applyFilters();
+}
+
+function renderCard() {
+  markBtn.innerHTML = isKnownView() ? '&#8617; Przywróć' : '&#10003; Umiem';
+
+  if (filteredCards.length === 0) {
+    var msg = isKnownView()
+      ? 'Nie ma jeszcze odłożonych fiszek'
+      : (knownCount() > 0
+          ? (activeTopic === "Wszystkie"
+              ? 'Wszystko opanowane! Aby wrócić do nauki, użyj „Przywróć wszystkie” nad kartą.'
+              : 'Cały dział opanowany! Wybierz inny dział albo użyj „Przywróć wszystkie” nad kartą.')
+          : 'Brak fiszek dla tego filtra');
+    cardFront.className = 'card-face card-front';
+    cardFront.innerHTML = '<div class="card-question">' + msg + '</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    markBtn.disabled = true;
+    return;
+  }
+  markBtn.disabled = false;
+  var fc = filteredCards[currentIndex];
+
+  cardFront.className = 'card-face card-front';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div></div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedź</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrócić do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); toggleKnown(); }
+});
+
+buildTopicBar();
+updateStats();
+applyFilters();
+</script>
+</body>
+</html>

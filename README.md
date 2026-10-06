@@ -3,6 +3,7 @@
 ### LO
 - [Chemia 2: Układ okresowy — pierwiastki 1–112](https://zgolus.github.io/fiszki/pierwiastki_1-112.html)
 - [Historia 1: Starożytny Rzym](https://zgolus.github.io/fiszki/rzym.html)
+- [Historia 2: Europa i Nowy Świat (odkrycia, renesans, reformacja)](https://zgolus.github.io/fiszki/historia_europa_i_nowy_swiat.html)
 ### SP
 - [Język polski: Pan Tadeusz — Księga X (Emigracja. Jacek)](https://zgolus.github.io/fiszki/pan_tadeusz_ksiega_x.html)
 - [Język polski: Pan Tadeusz — Księgi XI i XII (Rok 1812, Kochajmy się)](https://zgolus.github.io/fiszki/pan_tadeusz_ksiegi_xi_xii.html)
