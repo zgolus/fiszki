@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Biologia 8 — Podstawy dziedziczenia</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1510;
+    --card-front: #f1f6f2;
+    --card-back: #12261b;
+    --accent: #2e8b57;
+    --accent-light: #a9dcbc;
+    --text-dark: #12261b;
+    --text-light: #f1f6f2;
+    --text-muted: #8aa596;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #23402f;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #23402f;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #7f978a;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .topic-pill.known-pill {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .topic-pill.known-pill.active {
+    background: var(--accent);
+    border-style: solid;
+    color: #ffffff;
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 480px;
+    padding: 4px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #23402f;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #23402f;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+  .mark-btn {
+    padding: 11px 18px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mark-btn:active {
+    background: var(--accent);
+    color: #ffffff;
+    transform: scale(0.95);
+  }
+  .mark-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+  @media (max-width: 400px) {
+    .nav-area { gap: 8px; padding: 6px 14px 30px; }
+    .nav-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+    .shuffle-btn, .mark-btn { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.03em; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .stats-row { animation: fadeUp 0.5s 0.15s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Podstawy dziedziczenia</h1>
+  <div class="subtitle">Biologia kl. 8 &middot; dział I &middot; 57 pytań</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="mark-btn" id="markBtn" onclick="toggleKnown()">&#10003; Umiem</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+var ALL_FLASHCARDS = [
+  // =============================================
+  // 1. ROLA DNA W DZIEDZICZENIU CECH
+  // =============================================
+
+  { topic: "Rola DNA", q: "Czym zajmuje się genetyka?", a: [
+    "Genetyka to nauka zajmująca się dziedziczeniem cech oraz zmiennością organizmów"
+  ] },
+  { topic: "Rola DNA", q: "Czym są cechy dziedziczne? Podaj przykłady.", a: [
+    "Cechy przekazywane przez rodziców potomstwu (z pokolenia na pokolenie)",
+    "Są zapisane w DNA w każdej komórce człowieka",
+    "Np. kolor oczu, kształt nosa, kształt małżowiny usznej, obecność piegów, długość rzęs"
+  ] },
+  { topic: "Rola DNA", q: "Czym są cechy nabyte? Podaj przykłady.", a: [
+    "Cechy, które pojawiają się w trakcie życia organizmu pod wpływem środowiska",
+    "Nie są dziedziczone przez potomstwo",
+    "Np. blizny, tatuaże, zmiany po operacjach plastycznych, kolor włosów po farbowaniu"
+  ] },
+  { topic: "Rola DNA", q: "Czym różni się cecha dziedziczna od cechy nabytej?", a: [
+    "Cecha dziedziczna jest zapisana w DNA i przekazywana potomstwu (np. kolor oczu)",
+    "Cecha nabyta pojawia się w trakcie życia, nie jest zapisana w DNA i nie jest dziedziczona (np. blizna)"
+  ] },
+  { topic: "Rola DNA", q: "Czym są cechy gatunkowe? Podaj przykłady u człowieka.", a: [
+    "Cechy wspólne dla wszystkich osobników tego samego gatunku",
+    "U człowieka (Homo sapiens): zdolność mowy, wyprostowana sylwetka, dwunożność, przeciwstawny kciuk, duża pojemność mózgu, krzywizny kręgosłupa, niewielkie owłosienie"
+  ] },
+  { topic: "Rola DNA", q: "Czym są cechy indywidualne? Podaj przykłady.", a: [
+    "Cechy unikatowe (wyjątkowe) dla jednego osobnika — odpowiadają za naszą niepowtarzalność",
+    "Np. rysy twarzy, układ linii papilarnych, ton głosu"
+  ] },
+  { topic: "Rola DNA", q: "Czym jest informacja genetyczna?", a: [
+    "Informacja o wszystkich cechach dziedzicznych zapisana w materiale genetycznym",
+    "U człowieka i innych organizmów jest przechowywana w DNA"
+  ] },
+  { topic: "Rola DNA", q: "Co oznacza skrót DNA?", a: [
+    "Kwas deoksyrybonukleinowy",
+    "Skrót pochodzi od angielskiej nazwy deoxyribonucleic acid"
+  ] },
+  { topic: "Rola DNA", q: "Gdzie w komórce człowieka znajduje się DNA?", a: [
+    "W jądrze komórkowym — tam jest nośnikiem informacji o wszystkich cechach dziedzicznych",
+    "Niewielka ilość DNA znajduje się też w mitochondriach (a w komórkach roślin także w chloroplastach)"
+  ] },
+  { topic: "Rola DNA", q: "Do czego służy informacja zapisana w DNA?", a: [
+    "DNA jest instrukcją do produkcji białek",
+    "Białka odpowiadają m.in. za budowę i funkcjonowanie komórek — dzięki temu organizm może sprawnie funkcjonować"
+  ] },
+  { topic: "Rola DNA", q: "Czym jest zmienność organizmów i od czego zależy?", a: [
+    "Zróżnicowanie cech (różnice) między osobnikami tego samego gatunku",
+    "Odpowiada za nią DNA (zmienność genetyczna) oraz środowisko",
+    "Zwiększa szanse przeżycia gatunku przy zmieniających się warunkach środowiska"
+  ] },
+  { topic: "Rola DNA", q: "Dlaczego rodzeństwo różni się od siebie, choć ma tych samych rodziców?", a: [
+    "W wyniku rozmnażania płciowego każde dziecko otrzymuje unikatowy zestaw genów od obojga rodziców",
+    "Takie różnice to zmienność genetyczna (np. różne umaszczenie kotów z jednego miotu)"
+  ] },
+  { topic: "Rola DNA", q: "Podaj przykład wpływu środowiska na zmienność organizmów.", a: [
+    "Bliźnięta jednojajowe mają identyczny materiał genetyczny, a mogą wyglądać inaczej — np. mieć inną masę ciała"
+  ] },
+  { topic: "Rola DNA", q: "Dlaczego odciski palców pozwalają odróżnić bliźnięta jednojajowe, a DNA nie?", a: [
+    "DNA bliźniąt jednojajowych jest identyczne",
+    "Układ linii papilarnych jest unikatowy — nawet u bliźniąt jednojajowych"
+  ] },
+  { topic: "Rola DNA", q: "W jakich dziedzinach wykorzystuje się wiedzę genetyczną?", a: [
+    "Ochrona zdrowia: tworzenie szczepionek i leków, badania nad nowotworami, terapie genowe",
+    "Działania prawne: identyfikacja sprawców przestępstw i osób zaginionych, badanie śladów zbrodni, testy na ustalenie ojcostwa",
+    "Przemysł spożywczy i rolniczy: nowe odmiany owoców i warzyw, nowe rasy zwierząt (np. krowy mleczne, kury brojlery), rośliny odporne na niekorzystne warunki i transport"
+  ] },
+
+  // =============================================
+  // 2. BUDOWA MATERIAŁU GENETYCZNEGO
+  // =============================================
+
+  { topic: "Budowa DNA", q: "Kto i kiedy skonstruował model cząsteczki DNA?", a: [
+    "James Watson i Francis Crick w 1953 r.",
+    "Oparli się m.in. na badaniach Rosalind Franklin"
+  ] },
+  { topic: "Budowa DNA", q: "Czym jest gen?", a: [
+    "Odcinek DNA, w którym zazwyczaj zakodowana jest informacja o budowie białka",
+    "DNA człowieka zawiera tysiące genów"
+  ] },
+  { topic: "Budowa DNA", q: "Czym jest podwójna helisa DNA?", a: [
+    "Postać cząsteczki DNA: dwie nici ułożone równolegle i skręcone spiralnie względem siebie",
+    "Nici łączą się ze sobą za pomocą zasad azotowych",
+    "Dostęp do zapisanej informacji jest możliwy po rozpleceniu podwójnej helisy"
+  ] },
+  { topic: "Budowa DNA", q: "Co jest podstawową jednostką budującą DNA?", a: [
+    "Nukleotyd"
+  ] },
+  { topic: "Budowa DNA", q: "Z jakich elementów składa się nukleotyd?", a: [
+    "Cukier — deoksyryboza",
+    "Reszta kwasu fosforowego",
+    "Zasada azotowa (jedna z czterech)"
+  ] },
+  { topic: "Budowa DNA", q: "Wymień cztery zasady azotowe występujące w DNA.", a: [
+    "Adenina (A)",
+    "Tymina (T)",
+    "Guanina (G)",
+    "Cytozyna (C)"
+  ] },
+  { topic: "Budowa DNA", q: "Czym różnią się od siebie nukleotydy w DNA?", a: [
+    "Rodzajem zasady azotowej (A, T, G lub C)"
+  ] },
+  { topic: "Budowa DNA", q: "Uporządkuj strukturę materiału genetycznego od najmniejszej jednostki.", a: [
+    "Nukleotydy → podwójna helisa → chromosom"
+  ] },
+  { topic: "Budowa DNA", q: "Czym jest chromosom?", a: [
+    "Najbardziej upakowana (zagęszczona) forma DNA — zwinięte DNA z białkami",
+    "Powstaje tylko na czas podziału komórki",
+    "Chromosom (przed replikacją) zawiera jedną cząsteczkę DNA"
+  ] },
+  { topic: "Budowa DNA", q: "Z czego zbudowany jest chromosom?", a: [
+    "Z dwóch ramion połączonych w miejscu zwanym centromerem"
+  ] },
+  { topic: "Budowa DNA", q: "Czym jest centromer?", a: [
+    "Przewężenie chromosomu (chromatydy), które dzieli go na dwa ramiona"
+  ] },
+  { topic: "Budowa DNA", q: "Czym jest kariotyp?", a: [
+    "Zestaw chromosomów charakterystyczny dla danego gatunku",
+    "Każdy gatunek organizmów ma swój charakterystyczny kariotyp"
+  ] },
+  { topic: "Budowa DNA", q: "Ile chromosomów znajduje się w komórce ciała człowieka i skąd pochodzą?", a: [
+    "46 chromosomów, czyli 23 pary",
+    "23 chromosomy pochodzą od matki (z komórki jajowej), a 23 od ojca (z plemnika)"
+  ] },
+  { topic: "Budowa DNA", q: "Czym są chromosomy homologiczne?", a: [
+    "Dwa chromosomy tej samej pary — jeden od matki, drugi od ojca",
+    "Mają tę samą wielkość i kształt oraz zawierają informację genetyczną na ten sam temat"
+  ] },
+  { topic: "Budowa DNA", q: "Jak oznacza się pary chromosomów w kariotypie człowieka?", a: [
+    "Pary są ponumerowane od 1 do 23",
+    "Każda para zawiera inne informacje"
+  ] },
+  { topic: "Budowa DNA", q: "Czy DNA jest takie samo we wszystkich komórkach ciała człowieka?", a: [
+    "Tak — DNA jednego człowieka jest identyczne w każdej komórce jego ciała i znajduje się w jądrze komórkowym",
+    "Układ nukleotydów DNA jest indywidualny dla każdego człowieka (z wyjątkiem bliźniąt jednojajowych)"
+  ] },
+  { topic: "Budowa DNA", q: "Jakich cech nie zawiera DNA?", a: [
+    "DNA nie zawiera informacji o cechach nabytych (np. o bliznach)",
+    "Są w nim zapisane cechy dziedziczne (np. kolor oczu) i gatunkowe (np. dwunożność, zdolność mowy)"
+  ] },
+
+  // =============================================
+  // 3. MECHANIZM KOPIOWANIA MATERIAŁU GENETYCZNEGO
+  // =============================================
+
+  { topic: "Replikacja", q: "Jak długie jest DNA człowieka i ile zawiera genów?", a: [
+    "Ma długość około 2 metrów",
+    "Składają się na nie setki tysięcy nukleotydów i tysiące genów",
+    "Brak całego genu lub jego fragmentu może mieć katastrofalne skutki dla komórki i całego organizmu"
+  ] },
+  { topic: "Replikacja", q: "Na czym polega reguła komplementarności?", a: [
+    "Zasady azotowe nukleotydów leżących na przeciwległych niciach DNA łączą się zawsze w ten sam sposób:",
+    "adenina (A) — tymina (T)",
+    "guanina (G) — cytozyna (C)"
+  ] },
+  { topic: "Replikacja", q: "Jakie znaczenie ma reguła komplementarności?", a: [
+    "Zapewnia stabilność cząsteczki DNA",
+    "Umożliwia kopiowanie materiału genetycznego — nowe cząsteczki DNA są identyczne z cząsteczką macierzystą"
+  ] },
+  { topic: "Replikacja", q: "Dobierz nić komplementarną do nici: A T T G C A C", a: [
+    "T A A C G T G",
+    "(A łączy się z T, G łączy się z C)"
+  ] },
+  { topic: "Replikacja", q: "Dobierz nić komplementarną do nici: G G C A T A G", a: [
+    "C C G T A T C",
+    "(G łączy się z C, A łączy się z T)"
+  ] },
+  { topic: "Replikacja", q: "Czym jest replikacja DNA?", a: [
+    "Proces podwojenia (kopiowania) materiału genetycznego zawartego w komórce"
+  ] },
+  { topic: "Replikacja", q: "Kiedy zachodzi replikacja DNA?", a: [
+    "Zawsze przed podziałem komórki — zarówno przed mitozą, jak i przed mejozą"
+  ] },
+  { topic: "Replikacja", q: "Jakie znaczenie ma replikacja DNA dla organizmu?", a: [
+    "Wszystkie komórki ciała powinny mieć taki sam materiał genetyczny",
+    "Dzięki replikacji komórki potomne mają taką samą ilość materiału genetycznego jak komórka macierzysta"
+  ] },
+  { topic: "Replikacja", q: "Opisz przebieg replikacji DNA.", a: [
+    "1. Rozplecenie podwójnej helisy na dwie nici DNA",
+    "2. Do każdej starej nici dołączane są nowe nukleotydy zgodnie z regułą komplementarności",
+    "3. Powstają dwie cząsteczki DNA — każda złożona z jednej starej i jednej nowej nici"
+  ] },
+  { topic: "Replikacja", q: "Czym jest chromatyda?", a: [
+    "Połówka chromosomu po replikacji; zawiera jedną cząsteczkę DNA",
+    "Chromatyda = dwa ramiona chromosomu + centromer"
+  ] },
+  { topic: "Replikacja", q: "Jak zbudowany jest chromosom po replikacji (na początku podziału komórki)?", a: [
+    "Z dwóch chromatyd połączonych ze sobą w centromerze",
+    "Zawiera więc dwie cząsteczki DNA"
+  ] },
+  { topic: "Replikacja", q: "Co może się stać, gdy podczas replikacji powstanie błąd?", a: [
+    "Błędy replikacji powodują mutacje — zmiany w materiale genetycznym"
+  ] },
+
+  // =============================================
+  // 4. ZNACZENIE PODZIAŁÓW KOMÓRKOWYCH
+  // =============================================
+
+  { topic: "Podziały komórkowe", q: "Czym są komórki haploidalne?", a: [
+    "Komórki z pojedynczym (jednym) zestawem chromosomów — oznaczenie n",
+    "U człowieka to gamety (komórki rozrodcze: plemniki i komórki jajowe) — mają 23 chromosomy"
+  ] },
+  { topic: "Podziały komórkowe", q: "Czym są komórki diploidalne?", a: [
+    "Komórki z podwójnym zestawem chromosomów — oznaczenie 2n",
+    "U człowieka to wszystkie komórki ciała (oprócz gamet) — mają 46 chromosomów (23 pary)"
+  ] },
+  { topic: "Podziały komórkowe", q: "Czym jest zygota i ile ma zestawów chromosomów?", a: [
+    "Pierwsza komórka nowego organizmu, powstała z połączenia plemnika i komórki jajowej (zapłodnienie)",
+    "plemnik (n) + komórka jajowa (n) → zygota (2n)",
+    "Ma podwójny zestaw chromosomów — kompletny materiał genetyczny nowego organizmu"
+  ] },
+  { topic: "Podziały komórkowe", q: "Czym jest mitoza?", a: [
+    "Podział komórkowy, w którym powstają dwie komórki potomne",
+    "Komórki potomne mają taką samą ilość materiału genetycznego jak komórka macierzysta (2n → 2n)"
+  ] },
+  { topic: "Podziały komórkowe", q: "Opisz przebieg mitozy.", a: [
+    "Przed mitozą DNA podwaja się w procesie replikacji",
+    "Na początku podziału chromosomy są zbudowane z dwóch chromatyd",
+    "Chromatydy rozchodzą się do nowo powstających jąder komórkowych, a następnie komórka się dzieli",
+    "Powstają 2 komórki potomne 2n"
+  ] },
+  { topic: "Podziały komórkowe", q: "Jakie znaczenie ma mitoza?", a: [
+    "Wzrost liczby komórek ciała, a więc wzrost organizmu",
+    "Regeneracja tkanek (np. zrastanie kości po złamaniu)",
+    "Dla niektórych organizmów (np. eugleny) jest sposobem rozmnażania bezpłciowego — potomstwo ma identyczny materiał genetyczny"
+  ] },
+  { topic: "Podziały komórkowe", q: "Czym jest mejoza?", a: [
+    "Podział komórkowy, w którym powstają cztery komórki potomne",
+    "Komórki potomne mają zmniejszoną o połowę ilość materiału genetycznego w porównaniu z komórką macierzystą (2n → n)",
+    "U człowieka w wyniku mejozy powstają gamety: komórki jajowe i plemniki"
+  ] },
+  { topic: "Podziały komórkowe", q: "Gdzie w organizmie człowieka zachodzi mejoza?", a: [
+    "W narządach rozrodczych: w jądrach u mężczyzn i w jajnikach u kobiet"
+  ] },
+  { topic: "Podziały komórkowe", q: "Opisz przebieg mejozy.", a: [
+    "Przed mejozą zachodzi replikacja DNA; mejoza jest procesem dwuetapowym",
+    "I podział mejotyczny: powstają dwie komórki, do których rozdzielają się chromosomy homologiczne",
+    "II podział mejotyczny: do komórek potomnych losowo przechodzą pojedyncze chromatydy",
+    "Powstają 4 komórki potomne n"
+  ] },
+  { topic: "Podziały komórkowe", q: "Na czym polega rekombinacja genetyczna i jakie ma znaczenie?", a: [
+    "Wymiana fragmentów (genów) między chromosomami homologicznymi",
+    "Zachodzi podczas mejozy (w pierwszym podziale mejotycznym)",
+    "Zwiększa zmienność genetyczną — dlatego np. rodzeństwo różni się od siebie"
+  ] },
+  { topic: "Podziały komórkowe", q: "Porównaj mitozę i mejozę.", a: [
+    "Liczba komórek potomnych: mitoza — 2, mejoza — 4",
+    "Materiał genetyczny: mitoza — taki sam (2n), mejoza — o połowę mniejszy (n)",
+    "Liczba etapów: mitoza — 1, mejoza — 2",
+    "Replikacja przed podziałem: w obu tak",
+    "Rekombinacja genetyczna: mitoza — nie, mejoza — tak",
+    "Znaczenie: mitoza — komórki ciała, wzrost i regeneracja; mejoza — komórki rozrodcze"
+  ] },
+  { topic: "Podziały komórkowe", q: "Co jest przyczyną powstawania nowotworów?", a: [
+    "Niekontrolowane, nadmierne podziały komórkowe wywołane zaburzeniami genetycznymi",
+    "Schemat: czynnik zewnętrzny lub wewnętrzny → zaburzenia genetyczne → komórki nowotworowe → niekontrolowane podziały komórkowe",
+    "Komórki nowotworowe nie funkcjonują prawidłowo i osłabiają zdrowe komórki w pobliżu"
+  ] },
+  { topic: "Podziały komórkowe", q: "Jakie czynniki mogą wywoływać nowotwory?", a: [
+    "Niektóre używki (np. alkohol, papierosy)",
+    "Promieniowanie UV",
+    "Zanieczyszczenia środowiska",
+    "Niewłaściwa dieta i tryb życia"
+  ] },
+];
+
+// --- Engine ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var DECK_ID = 'biologia_podstawy_dziedziczenia';
+var STORE_KEY = 'fiszki:' + DECK_ID + ':opanowane';
+var KNOWN_VIEW = "__odlozone__";
+
+var activeTopic = "Wszystkie";
+var known = loadKnown();
+var filteredCards = [];
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var markBtn = document.getElementById('markBtn');
+var statsRow = document.getElementById('statsRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    var isKnown = !!known[cardId(f)];
+    if (isKnownView()) {
+      if (!isKnown) continue;
+    } else {
+      if (isKnown) continue;
+      if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    }
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+    if (i === 0) appendKnownPill();
+  }
+}
+
+function appendKnownPill() {
+  var kn = knownCount();
+  if (kn === 0) return;
+  var knownPill = document.createElement('button');
+  knownPill.className = 'topic-pill known-pill' + (isKnownView() ? ' active' : '');
+  knownPill.innerHTML = '&#10003; Odłożone (' + kn + ')';
+  knownPill.setAttribute('data-topic', KNOWN_VIEW);
+  knownPill.onclick = function() {
+    activeTopic = this.getAttribute('data-topic');
+    buildTopicBar();
+    applyFilters();
+  };
+  topicBar.appendChild(knownPill);
+}
+
+// --- odkładanie opanowanych fiszek ---
+function cardId(f) { return f.q; }
+function isKnownView() { return activeTopic === KNOWN_VIEW; }
+
+function loadKnown() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    var arr = JSON.parse(raw);
+    var map = {};
+    for (var i = 0; i < arr.length; i++) map[arr[i]] = true;
+    return map;
+  } catch (e) { return {}; }
+}
+
+function saveKnown() {
+  try {
+    var arr = [];
+    for (var k in known) { if (known[k]) arr.push(k); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function knownCount() {
+  var n = 0;
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    if (known[cardId(ALL_FLASHCARDS[i])]) n++;
+  }
+  return n;
+}
+
+function plural(n, one, few, many) {
+  var n10 = n % 10, n100 = n % 100;
+  if (n === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+  return many;
+}
+
+function updateStats() {
+  var n = knownCount();
+  if (n === 0) { statsRow.innerHTML = ''; return; }
+  statsRow.innerHTML =
+    '<span>' + n + ' ' + plural(n, 'fiszka odłożona', 'fiszki odłożone', 'fiszek odłożonych') + '</span>' +
+    '<button class="link-btn" onclick="restoreAll()">Przywróć wszystkie</button>';
+}
+
+function toggleKnown() {
+  if (isAnimating || filteredCards.length === 0) return;
+  var id = cardId(filteredCards[currentIndex]);
+  if (known[id]) { delete known[id]; } else { known[id] = true; }
+  saveKnown();
+
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  card.classList.add('slide-left');
+  setTimeout(function() {
+    filteredCards.splice(currentIndex, 1);
+    if (currentIndex > filteredCards.length - 1) {
+      currentIndex = Math.max(0, filteredCards.length - 1);
+    }
+    if (isKnownView() && knownCount() === 0) {
+      activeTopic = "Wszystkie";
+      buildTopicBar();
+      updateStats();
+      applyFilters();
+    } else {
+      buildTopicBar();
+      updateStats();
+      renderCard();
+    }
+  }, 140);
+  setTimeout(function() { card.classList.remove('slide-left'); isAnimating = false; }, 350);
+}
+
+function restoreAll() {
+  known = {};
+  saveKnown();
+  if (isKnownView()) activeTopic = "Wszystkie";
+  buildTopicBar();
+  updateStats();
+  applyFilters();
+}
+
+function renderCard() {
+  markBtn.innerHTML = isKnownView() ? '&#8617; Przywróć' : '&#10003; Umiem';
+
+  if (filteredCards.length === 0) {
+    var msg = isKnownView()
+      ? 'Nie ma jeszcze odłożonych fiszek'
+      : (knownCount() > 0
+          ? (activeTopic === "Wszystkie"
+              ? 'Wszystko opanowane! Aby wrócić do nauki, użyj „Przywróć wszystkie” nad kartą.'
+              : 'Cały dział opanowany! Wybierz inny dział albo użyj „Przywróć wszystkie” nad kartą.')
+          : 'Brak fiszek dla tego filtra');
+    cardFront.className = 'card-face card-front';
+    cardFront.innerHTML = '<div class="card-question">' + msg + '</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    markBtn.disabled = true;
+    return;
+  }
+  markBtn.disabled = false;
+  var fc = filteredCards[currentIndex];
+
+  cardFront.className = 'card-face card-front';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div></div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedź</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrócić do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); toggleKnown(); }
+});
+
+buildTopicBar();
+updateStats();
+applyFilters();
+</script>
+</body>
+</html>
