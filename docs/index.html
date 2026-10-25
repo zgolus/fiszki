@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiszki</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #121820;
+    --card: #1c2530;
+    --card-hover: #233040;
+    --border: #2a3644;
+    --text: #eef2f5;
+    --text-muted: #8a9aa8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    padding: 40px 16px 48px;
+  }
+
+  .wrap { max-width: 560px; margin: 0 auto; }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-weight: 400;
+    font-size: 2.4rem;
+    text-align: center;
+  }
+
+  .lead {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 6px;
+  }
+
+  h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 36px 0 12px 4px;
+  }
+
+  .deck {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--c);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .deck:hover { background: var(--card-hover); transform: translateX(2px); }
+
+  .deck-body { flex: 1; min-width: 0; }
+
+  .deck-subject {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c);
+    filter: brightness(1.5);
+  }
+
+  .deck-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    line-height: 1.25;
+    margin-top: 2px;
+  }
+
+  .deck-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  .deck-meta {
+    flex-shrink: 0;
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .deck-meta strong { display: block; font-size: 1.1rem; color: var(--text); font-weight: 600; }
+  .deck-known { display: block; margin-top: 2px; font-size: 0.72rem; color: #7fc49a; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Fiszki</h1>
+  <p class="lead">Wybierz zestaw do nauki</p>
+
+  <h2>Szkoła podstawowa</h2>
+
+  <a class="deck" href="historia_ii_wojna_swiatowa.html" style="--c:#6f7f35" data-total="27">
+    <div class="deck-body">
+      <div class="deck-subject">Historia &middot; kl. 8</div>
+      <div class="deck-title">II wojna światowa</div>
+      <div class="deck-desc">1939–1945: kampania wrześniowa, okupacja, Holokaust, droga do zwycięstwa</div>
+    </div>
+    <div class="deck-meta"><strong>27</strong>fiszek</div>
+  </a>
+
+  <a class="deck" href="biologia_podstawy_dziedziczenia.html" style="--c:#2e8b57" data-total="57">
+    <div class="deck-body">
+      <div class="deck-subject">Biologia &middot; kl. 8</div>
+      <div class="deck-title">Podstawy dziedziczenia</div>
+      <div class="deck-desc">DNA, replikacja, mitoza i mejoza</div>
+    </div>
+    <div class="deck-meta"><strong>57</strong>fiszek</div>
+  </a>
+
+  <a class="deck" href="chemia_kwasy.html" style="--c:#5b9bd5" data-total="45">
+    <div class="deck-body">
+      <div class="deck-subject">Chemia &middot; kl. 8</div>
+      <div class="deck-title">Kwasy</div>
+      <div class="deck-desc">Kwasy tlenowe i beztlenowe</div>
+    </div>
+    <div class="deck-meta"><strong>45</strong>fiszek</div>
+  </a>
+
+  <a class="deck" href="pan_tadeusz_ksiegi_xi_xii.html" style="--c:#a8791f" data-total="33">
+    <div class="deck-body">
+      <div class="deck-subject">Język polski</div>
+      <div class="deck-title">Pan Tadeusz — Księgi XI i XII</div>
+      <div class="deck-desc">Rok 1812 &middot; Kochajmy się</div>
+    </div>
+    <div class="deck-meta"><strong>33</strong>fiszki</div>
+  </a>
+
+  <a class="deck" href="pan_tadeusz_ksiega_x.html" style="--c:#a8791f" data-total="54">
+    <div class="deck-body">
+      <div class="deck-subject">Język polski</div>
+      <div class="deck-title">Pan Tadeusz — Księga X</div>
+      <div class="deck-desc">Emigracja. Jacek</div>
+    </div>
+    <div class="deck-meta"><strong>54</strong>fiszki</div>
+  </a>
+
+  <a class="deck" href="historia_ziemie_polskie_po_wiosnie_ludow.html" style="--c:#b03030" data-total="46">
+    <div class="deck-body">
+      <div class="deck-subject">Historia &middot; kl. 7</div>
+      <div class="deck-title">Ziemie polskie po Wiośnie Ludów</div>
+      <div class="deck-desc">„Wczoraj i dziś” &middot; dział IV</div>
+    </div>
+    <div class="deck-meta"><strong>46</strong>fiszek</div>
+  </a>
+
+  <a class="deck" href="chemia_kod_chemiczny_budowa_materii.html" style="--c:#5b9bd5" data-total="56">
+    <div class="deck-body">
+      <div class="deck-subject">Chemia &middot; kl. 7</div>
+      <div class="deck-title">Kod chemiczny, budowa materii</div>
+      <div class="deck-desc">Budowa atomu, izotopy, układ okresowy, wzory</div>
+    </div>
+    <div class="deck-meta"><strong>56</strong>fiszek</div>
+  </a>
+
+  <h2>Liceum</h2>
+
+  <a class="deck" href="historia_europa_i_nowy_swiat.html" style="--c:#2b7bb5" data-total="35">
+    <div class="deck-body">
+      <div class="deck-subject">Historia &middot; kl. 2</div>
+      <div class="deck-title">Europa i Nowy Świat</div>
+      <div class="deck-desc">Odkrycia geograficzne, renesans, reformacja</div>
+    </div>
+    <div class="deck-meta"><strong>35</strong>fiszek</div>
+  </a>
+
+  <a class="deck" href="pierwiastki_1-112.html" style="--c:#5b9bd5" data-total="112">
+    <div class="deck-body">
+      <div class="deck-subject">Chemia &middot; kl. 2</div>
+      <div class="deck-title">Układ okresowy — pierwiastki 1–112</div>
+      <div class="deck-desc">Symbole i nazwy pierwiastków</div>
+    </div>
+    <div class="deck-meta"><strong>112</strong>pierwiastków</div>
+  </a>
+
+  <a class="deck" href="rzym.html" style="--c:#c4956a" data-total="84">
+    <div class="deck-body">
+      <div class="deck-subject">Historia &middot; kl. 1</div>
+      <div class="deck-title">Starożytny Rzym</div>
+      <div class="deck-desc">Poziom podstawowy</div>
+    </div>
+    <div class="deck-meta"><strong>84</strong>fiszki</div>
+  </a>
+</div>
+
+<script>
+// Pokaż liczbę fiszek oznaczonych jako „Umiem” (zapisanych przez strony zestawów)
+Array.from(document.querySelectorAll('.deck')).forEach(function (el) {
+  var deckId = el.getAttribute('href').replace(/\.html$/, '');
+  var known = 0;
+  try {
+    var raw = localStorage.getItem('fiszki:' + deckId + ':opanowane');
+    known = raw ? JSON.parse(raw).length : 0;
+  } catch (e) { known = 0; }
+  if (known > 0) {
+    var tag = document.createElement('span');
+    tag.className = 'deck-known';
+    tag.textContent = '✓ ' + known + ' / ' + el.dataset.total;
+    el.querySelector('.deck-meta').appendChild(tag);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Historia 8 — II wojna światowa</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12140e;
+    --card-front: #f2f1e6;
+    --card-back: #1f2416;
+    --accent: #6f7f35;
+    --accent-light: #cdd79a;
+    --text-dark: #1f2416;
+    --text-light: #f2f1e6;
+    --text-muted: #979b84;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #363c24;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #363c24;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #8c8f78;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .topic-pill.known-pill {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .topic-pill.known-pill.active {
+    background: var(--accent);
+    border-style: solid;
+    color: #ffffff;
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 480px;
+    padding: 4px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #363c24;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #363c24;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+  .mark-btn {
+    padding: 11px 18px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mark-btn:active {
+    background: var(--accent);
+    color: #ffffff;
+    transform: scale(0.95);
+  }
+  .mark-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+  @media (max-width: 400px) {
+    .nav-area { gap: 8px; padding: 6px 14px 30px; }
+    .nav-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+    .shuffle-btn, .mark-btn { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.03em; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .stats-row { animation: fadeUp 0.5s 0.15s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>II wojna światowa</h1>
+  <div class="subtitle">Historia kl. 8 &middot; rozdział I &middot; 27 pytań</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="mark-btn" id="markBtn" onclick="toggleKnown()">&#10003; Umiem</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+var ALL_FLASHCARDS = [
+  // =============================================
+  // 1. NAPAŚĆ NA POLSKĘ
+  // =============================================
+
+  { topic: "Napaść na Polskę", q: "Kiedy i jak wybuchła II wojna światowa?", a: [
+    "1 września 1939 r. Niemcy zaatakowały Polskę bez wypowiedzenia wojny — ta data to początek II wojny światowej",
+    "O godz. 4.45 pancernik „Schleswig-Holstein” ostrzelał polską placówkę na Westerplatte; tego samego dnia Luftwaffe zbombardowała Wieluń",
+    "Niemcy działali według planu wojny błyskawicznej (Blitzkrieg): uderzenie czołgów wspieranych przez lotnictwo, przerwanie frontu, okrążenie i zniszczenie wroga",
+    "3 września Wielka Brytania i Francja wypowiedziały Niemcom wojnę, ale nie podjęły walki — tzw. dziwna wojna"
+  ] },
+  { topic: "Napaść na Polskę", q: "Jakie są najważniejsze bitwy wojny obronnej 1939 r.?", a: [
+    "Westerplatte (1–7 IX) — ok. 200 żołnierzy mjr. Henryka Sucharskiego broniło się 7 dni zamiast kilkunastu godzin",
+    "Obrona Poczty Polskiej w Gdańsku (1 IX)",
+    "Bitwa nad Bzurą (9–22 IX) — największa bitwa kampanii; gen. Tadeusz Kutrzeba",
+    "Wizna (7–10 IX) — „polskie Termopile”; kpt. Władysław Raginis",
+    "Obrona Warszawy (8–28 IX) — prezydent miasta Stefan Starzyński",
+    "Kock (2–6 X) — gen. Franciszek Kleeberg; ostatnia bitwa kampanii"
+  ] },
+  { topic: "Napaść na Polskę", q: "Co się stało 17 września 1939 r.?", a: [
+    "Armia Czerwona wkroczyła do Polski od wschodu — zgodnie z paktem Ribbentrop–Mołotow",
+    "Stalin tłumaczył agresję koniecznością ochrony ludności zachodniej Białorusi i Ukrainy, bo państwo polskie rzekomo upadło (nota Mołotowa)",
+    "Naczelny wódz Edward Rydz-Śmigły rozkazał: „Z bolszewikami nie walczyć” (chyba że zaatakują), co wywołało chaos",
+    "Symbol obrony Kresów — walki o Grodno"
+  ] },
+  { topic: "Napaść na Polskę", q: "Co stało się z polskimi władzami we wrześniu 1939 r.?", a: [
+    "W nocy z 17 na 18 września 1939 r. prezydent Ignacy Mościcki, rząd i naczelny wódz Rydz-Śmigły przekroczyli granicę z Rumunią",
+    "Ewakuacja miała zachować ciągłość prawną państwa polskiego",
+    "W Rumunii władze zostały internowane (przymusowo zatrzymane)",
+    "To, że Rydz-Śmigły opuścił walczące wojsko, wywołało powszechne oburzenie"
+  ] },
+  { topic: "Napaść na Polskę", q: "Jak zakończyła się kampania wrześniowa i dlaczego Polska przegrała?", a: [
+    "Koniec: kapitulacja Warszawy 28 IX, Helu 2 X, ostatnia bitwa pod Kockiem 6 X 1939 r.",
+    "Zginęło ok. 90 tys. polskich żołnierzy i cywilów",
+    "Przyczyny klęski: przewaga armii niemieckiej i sowieckiej; brak pomocy Francji i Wielkiej Brytanii",
+    "Skutki: podział terytorium Polski między Niemcy i ZSRS; ewakuacja i internowanie władz w Rumunii"
+  ] },
+
+  // =============================================
+  // 2. PODBÓJ EUROPY 1939–1941
+  // =============================================
+
+  { topic: "Podbój Europy", q: "Czym była wojna zimowa i jakie ziemie zajął ZSRS w latach 1939–1940?", a: [
+    "Wojna zimowa — wojna ZSRS z Finlandią: 30 listopada 1939 r. – marzec 1940 r.",
+    "Finlandia straciła 10% terytorium, ale zachowała niepodległość",
+    "Latem (czerwiec) 1940 r. ZSRS zaanektował państwa bałtyckie: Litwę, Łotwę i Estonię",
+    "Rumunia musiała oddać ZSRS Besarabię"
+  ] },
+  { topic: "Podbój Europy", q: "Jak przebiegał atak Niemiec na Francję w 1940 r.?", a: [
+    "10 maja 1940 r. Niemcy zaatakowali Holandię, Belgię, Luksemburg i Francję",
+    "Ominęli francuską linię Maginota — główne uderzenie przeszło przez Ardeny",
+    "Brytyjczycy ewakuowali swoje wojska z Dunkierki do Anglii",
+    "10 czerwca do wojny po stronie Niemiec przystąpiły Włochy (Mussolini)",
+    "22 czerwca 1940 r. Francja skapitulowała (podpisała zawieszenie broni)"
+  ] },
+  { topic: "Podbój Europy", q: "Czym było państwo Vichy?", a: [
+    "Marionetkowe państwo francuskie utworzone po klęsce Francji na południu kraju (północ i Paryż okupowali Niemcy)",
+    "Na czele stał marszałek Philippe Pétain",
+    "Władze Vichy kolaborowały z III Rzeszą (współpracowały z okupantem) i były jej podporządkowane",
+    "Przeciwnicy kapitulacji pod wodzą gen. Charles’a de Gaulle’a walczyli dalej z Wielkiej Brytanii (Komitet Wolnej Francji)"
+  ] },
+  { topic: "Podbój Europy", q: "Czym była bitwa o Anglię i jak się skończyła?", a: [
+    "Bitwa powietrzna nad Wielką Brytanią od lipca do października 1940 r.",
+    "Hitler chciał zniszczyć brytyjskie lotnictwo (RAF), a potem dokonać desantu na wyspy",
+    "Premier Winston Churchill odrzucił niemieckie propozycje pokojowe",
+    "RAF wygrał — było to pierwsze niepowodzenie Niemiec na zachodzie Europy; Hitler zrezygnował z desantu"
+  ] },
+  { topic: "Podbój Europy", q: "Jak przebiegała wojna na Bałkanach?", a: [
+    "W październiku 1940 r. Włochy zaatakowały Grecję, ale przegrywały — Hitler musiał im pomóc",
+    "Sojusznikami III Rzeszy w regionie zostały Węgry, Rumunia i Bułgaria",
+    "W kwietniu 1941 r. Niemcy zaatakowali Jugosławię i Grecję i szybko je pokonali",
+    "Klęskę Jugosławii przyspieszyli chorwaccy faszyści — dostali od Hitlera marionetkowe Niepodległe Państwo Chorwackie"
+  ] },
+
+  // =============================================
+  // 3. WOJNA III RZESZY Z ZSRS
+  // =============================================
+
+  { topic: "Wojna z ZSRS", q: "Kiedy Niemcy zaatakowały ZSRS i jak nazywał się ten plan?", a: [
+    "22 czerwca 1941 r. — plan „Barbarossa”",
+    "Hitler chciał zdobyć „przestrzeń życiową” (Lebensraum) na wschodzie",
+    "Armia Czerwona była zaskoczona; sowieccy żołnierze masowo się poddawali (ok. 3 mln jeńców)",
+    "Niemcy szybko zajmowali kolejne ziemie i w listopadzie 1941 r. podeszli pod Moskwę",
+    "Skutki: Niemcy walczyli na dwóch frontach; powstał sojusz ZSRS, Wielkiej Brytanii i USA"
+  ] },
+  { topic: "Wojna z ZSRS", q: "Co oznacza określenie „Wielka Wojna Ojczyźniana”?", a: [
+    "Tak w ZSRS nazywano wojnę z III Rzeszą",
+    "Stalin chciał tą nazwą wzbudzić patriotyczne nastroje w sowieckim społeczeństwie"
+  ] },
+  { topic: "Wojna z ZSRS", q: "Dlaczego Niemcy przegrali bitwę pod Moskwą (1941)?", a: [
+    "Jesienią deszcze zamieniły drogi w błoto, w którym grzązł ciężki sprzęt",
+    "Sroga zima — Niemcy nie byli na nią przygotowani (brak zimowej odzieży, smarów do silników)",
+    "Niemcy rozproszyli siły na ogromnym froncie; Sowieci przenieśli fabryki za Ural i ściągnęli wojska z Dalekiego Wschodu",
+    "Kontratak 5–6 grudnia 1941 r. (gen. Gieorgij Żukow) odepchnął Niemców od Moskwy — pierwsza lądowa porażka armii niemieckiej"
+  ] },
+  { topic: "Wojna z ZSRS", q: "Jakie były przełomowe bitwy na froncie wschodnim?", a: [
+    "Stalingrad (VIII 1942 – II 1943) — największa bitwa II wojny światowej; Sowieci okrążyli Niemców, klęska Niemiec 2 II 1943 r.",
+    "Łuk Kurski (VII–VIII 1943) — największa bitwa pancerna II wojny światowej; od tej pory Niemcy cofali się aż do końca wojny",
+    "Blokada Leningradu (IX 1941 – I 1944) — 900 dni; blisko 1 mln mieszkańców zmarło z głodu, ale miasta nie zdobyto"
+  ] },
+
+  // =============================================
+  // 4. POLITYKA OKUPACYJNA
+  // =============================================
+
+  { topic: "Okupacja i Holokaust", q: "Czym różniła się okupacja niemiecka na wschodzie i na zachodzie Europy?", a: [
+    "Europa Środkowo-Wschodnia miała być „przestrzenią życiową” dla niemieckiej „rasy panów”",
+    "Słowian, Żydów i Romów Niemcy uznali za „podludzi” — terror, wysiedlenia, praca niewolnicza, obozy koncentracyjne, odpowiedzialność zbiorowa",
+    "Mieszkańców Europy Zachodniej traktowano znacznie łagodniej — życie toczyło się prawie jak przed wojną; działały marionetkowe rządy kolaborujące z Niemcami"
+  ] },
+  { topic: "Okupacja i Holokaust", q: "Jak Niemcy prześladowali Żydów przed rozpoczęciem masowej zagłady?", a: [
+    "Musieli nosić opaski z gwiazdą Dawida",
+    "Zamykano ich w oddzielnych dzielnicach — gettach, gdzie byli głodzeni",
+    "Mordowano ich w masowych egzekucjach (np. Ponary koło Wilna, Babi Jar koło Kijowa)"
+  ] },
+  { topic: "Okupacja i Holokaust", q: "Czym był Holokaust?", a: [
+    "Zagłada europejskich Żydów dokonana przez Niemców (po hebrajsku: Szoa)",
+    "Skutek decyzji o „ostatecznym rozwiązaniu kwestii żydowskiej” podjętej w 1942 r. (konferencja w Wannsee)",
+    "Obozy zagłady założono na terenie okupowanej Polski; największy — Auschwitz-Birkenau (komory gazowe, krematoria)",
+    "Zamordowano ok. 6 mln europejskich Żydów"
+  ] },
+  { topic: "Okupacja i Holokaust", q: "Jakie były postawy wobec zagłady Żydów? Czym była „Żegota”?", a: [
+    "Postawy były różne: niektóre państwa pomagały Niemcom (np. Vichy, Słowacja); zdarzali się szmalcownicy — wydawali ukrywających się Żydów",
+    "Wiele osób ratowało Żydów, choć w Polsce groziła za to kara śmierci",
+    "„Żegota” — Rada Pomocy Żydom, działająca w polskiej konspiracji",
+    "Irena Sendlerowa i inni członkowie „Żegoty” ratowali Żydów (np. fałszywe dokumenty, ukrywanie); uratowano ok. 100 tys. osób"
+  ] },
+
+  // =============================================
+  // 5. WOJNA POZA EUROPĄ
+  // =============================================
+
+  { topic: "Wojna poza Europą", q: "Jak przebiegały walki w Afryce Północnej?", a: [
+    "W sierpniu 1940 r. Włosi zaatakowali Brytyjczyków w Egipcie, ale ponieśli klęskę",
+    "Na początku 1941 r. Hitler wysłał im na pomoc Afrika Korps gen. Erwina Rommla",
+    "Bitwa pod El Alamein (X–XI 1942) — Brytyjczycy gen. Montgomery’ego pokonali Rommla",
+    "W maju 1943 r. wojska Niemiec i Włoch w Afryce skapitulowały"
+  ] },
+  { topic: "Wojna poza Europą", q: "Czego dotyczyła wojna na Atlantyku?", a: [
+    "Szlaków morskich między Ameryką Północną a Europą",
+    "Konwoje z zaopatrzeniem dla Wielkiej Brytanii i ZSRS atakowały niemieckie okręty podwodne (U-booty) — taktyka „wilczych stad”",
+    "Pomogło złamanie szyfru Enigmy (dzięki polskim matematykom: Rejewskiemu, Różyckiemu i Zygalskiemu)",
+    "W maju 1943 r. Niemcy stracili wiele U-bootów i zrezygnowali z większych akcji"
+  ] },
+  { topic: "Wojna poza Europą", q: "Jak USA przystąpiły do II wojny światowej?", a: [
+    "7 grudnia 1941 r. Japonia zaatakowała amerykańską bazę Pearl Harbor na Hawajach",
+    "Prezydent Franklin Delano Roosevelt poprosił Kongres o wypowiedzenie wojny Japonii",
+    "11 grudnia wojnę USA wypowiedzieli Hitler i Mussolini",
+    "Japonia, Niemcy i Włochy były sojusznikami od 1940 r. (pakt trzech) — tzw. państwa Osi"
+  ] },
+  { topic: "Wojna poza Europą", q: "Jak przebiegała wojna na Pacyfiku?", a: [
+    "Front dalekowschodni: USA kontra Japonia",
+    "Na początku Japończycy odnosili sukcesy (zajęli m.in. Hongkong, Singapur, Filipiny)",
+    "Bitwa o Midway (czerwiec 1942) — USA zatopiły 4 japońskie lotniskowce i przejęły inicjatywę",
+    "Decydującą rolę odgrywały lotniskowce"
+  ] },
+
+  // =============================================
+  // 6. DROGA DO ZWYCIĘSTWA
+  // =============================================
+
+  { topic: "Droga do zwycięstwa", q: "Kto należał do Wielkiej Koalicji i czym była Karta atlantycka?", a: [
+    "Wielka Koalicja (koalicja antyhitlerowska): USA, Wielka Brytania i ZSRS",
+    "Karta atlantycka (14 VIII 1941) — dokument podpisany przez Roosevelta i Churchilla: zmiany granic tylko za zgodą mieszkańców, narody same wybierają formę rządów",
+    "Wcześniej USA wspierały Wielką Brytanię dostawami broni (ustawa Lend-Lease Act)"
+  ] },
+  { topic: "Droga do zwycięstwa", q: "Jak alianci otworzyli front zachodni?", a: [
+    "Lipiec 1943 r. — lądowanie na Sycylii, potem walki we Włoszech; Mussolini obalony",
+    "Maj 1944 r. — polski 2. Korpus zdobył klasztor Monte Cassino",
+    "6 czerwca 1944 r. — lądowanie aliantów w Normandii (gen. Dwight Eisenhower) — otwarcie drugiego frontu",
+    "W sierpniu 1944 r. wyzwolono Paryż"
+  ] },
+  { topic: "Droga do zwycięstwa", q: "Co ustaliła Wielka Trójka w Teheranie i w Jałcie?", a: [
+    "Teheran (koniec 1943 r.): w 1944 r. alianci otworzą drugi front we Francji; Europę Zachodnią zajmą wojska amerykańsko-brytyjskie, a wschodnią — sowieckie",
+    "Jałta (luty 1945 r.): Europa Środkowo-Wschodnia, w tym Polska, w strefie wpływów ZSRS",
+    "W Jałcie: podział Niemiec na 4 strefy okupacyjne; o przyszłości Polski zdecydowano bez udziału Polaków",
+    "ZSRS obiecał przystąpić do wojny z Japonią"
+  ] },
+  { topic: "Droga do zwycięstwa", q: "Kiedy i jak zakończyła się II wojna światowa w Europie?", a: [
+    "2 maja 1945 r. Armia Czerwona (z udziałem polskich żołnierzy) zdobyła Berlin; 30 kwietnia Hitler popełnił samobójstwo",
+    "W nocy z 8 na 9 maja 1945 r. Niemcy podpisały bezwarunkową kapitulację",
+    "Podpisali ją przedstawiciele Wielkiej Brytanii, USA, ZSRS i Francji"
+  ] },
+  { topic: "Droga do zwycięstwa", q: "Jak zakończyła się wojna na Dalekim Wschodzie?", a: [
+    "Amerykanie stosowali taktykę „żabich skoków” (gen. Douglas MacArthur) — zajmowali tylko wybrane wyspy",
+    "W sierpniu 1945 r. zrzucili bomby atomowe na Hiroszimę (6 VIII) i Nagasaki (9 VIII)",
+    "2 września 1945 r. Japonia podpisała kapitulację na pancerniku „Missouri” — koniec II wojny światowej"
+  ] },
+];
+
+// --- Engine ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var DECK_ID = 'historia_ii_wojna_swiatowa';
+var STORE_KEY = 'fiszki:' + DECK_ID + ':opanowane';
+var KNOWN_VIEW = "__odlozone__";
+
+var activeTopic = "Wszystkie";
+var known = loadKnown();
+var filteredCards = [];
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var markBtn = document.getElementById('markBtn');
+var statsRow = document.getElementById('statsRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    var isKnown = !!known[cardId(f)];
+    if (isKnownView()) {
+      if (!isKnown) continue;
+    } else {
+      if (isKnown) continue;
+      if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    }
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+    if (i === 0) appendKnownPill();
+  }
+}
+
+function appendKnownPill() {
+  var kn = knownCount();
+  if (kn === 0) return;
+  var knownPill = document.createElement('button');
+  knownPill.className = 'topic-pill known-pill' + (isKnownView() ? ' active' : '');
+  knownPill.innerHTML = '&#10003; Odłożone (' + kn + ')';
+  knownPill.setAttribute('data-topic', KNOWN_VIEW);
+  knownPill.onclick = function() {
+    activeTopic = this.getAttribute('data-topic');
+    buildTopicBar();
+    applyFilters();
+  };
+  topicBar.appendChild(knownPill);
+}
+
+// --- odkładanie opanowanych fiszek ---
+function cardId(f) { return f.q; }
+function isKnownView() { return activeTopic === KNOWN_VIEW; }
+
+function loadKnown() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    var arr = JSON.parse(raw);
+    var map = {};
+    for (var i = 0; i < arr.length; i++) map[arr[i]] = true;
+    return map;
+  } catch (e) { return {}; }
+}
+
+function saveKnown() {
+  try {
+    var arr = [];
+    for (var k in known) { if (known[k]) arr.push(k); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function knownCount() {
+  var n = 0;
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    if (known[cardId(ALL_FLASHCARDS[i])]) n++;
+  }
+  return n;
+}
+
+function plural(n, one, few, many) {
+  var n10 = n % 10, n100 = n % 100;
+  if (n === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+  return many;
+}
+
+function updateStats() {
+  var n = knownCount();
+  if (n === 0) { statsRow.innerHTML = ''; return; }
+  statsRow.innerHTML =
+    '<span>' + n + ' ' + plural(n, 'fiszka odłożona', 'fiszki odłożone', 'fiszek odłożonych') + '</span>' +
+    '<button class="link-btn" onclick="restoreAll()">Przywróć wszystkie</button>';
+}
+
+function toggleKnown() {
+  if (isAnimating || filteredCards.length === 0) return;
+  var id = cardId(filteredCards[currentIndex]);
+  if (known[id]) { delete known[id]; } else { known[id] = true; }
+  saveKnown();
+
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  card.classList.add('slide-left');
+  setTimeout(function() {
+    filteredCards.splice(currentIndex, 1);
+    if (currentIndex > filteredCards.length - 1) {
+      currentIndex = Math.max(0, filteredCards.length - 1);
+    }
+    if (isKnownView() && knownCount() === 0) {
+      activeTopic = "Wszystkie";
+      buildTopicBar();
+      updateStats();
+      applyFilters();
+    } else {
+      buildTopicBar();
+      updateStats();
+      renderCard();
+    }
+  }, 140);
+  setTimeout(function() { card.classList.remove('slide-left'); isAnimating = false; }, 350);
+}
+
+function restoreAll() {
+  known = {};
+  saveKnown();
+  if (isKnownView()) activeTopic = "Wszystkie";
+  buildTopicBar();
+  updateStats();
+  applyFilters();
+}
+
+function renderCard() {
+  markBtn.innerHTML = isKnownView() ? '&#8617; Przywróć' : '&#10003; Umiem';
+
+  if (filteredCards.length === 0) {
+    var msg = isKnownView()
+      ? 'Nie ma jeszcze odłożonych fiszek'
+      : (knownCount() > 0
+          ? (activeTopic === "Wszystkie"
+              ? 'Wszystko opanowane! Aby wrócić do nauki, użyj „Przywróć wszystkie” nad kartą.'
+              : 'Cały dział opanowany! Wybierz inny dział albo użyj „Przywróć wszystkie” nad kartą.')
+          : 'Brak fiszek dla tego filtra');
+    cardFront.className = 'card-face card-front';
+    cardFront.innerHTML = '<div class="card-question">' + msg + '</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    markBtn.disabled = true;
+    return;
+  }
+  markBtn.disabled = false;
+  var fc = filteredCards[currentIndex];
+
+  cardFront.className = 'card-face card-front';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div></div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedź</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrócić do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); toggleKnown(); }
+});
+
+buildTopicBar();
+updateStats();
+applyFilters();
+</script>
+</body>
+</html>

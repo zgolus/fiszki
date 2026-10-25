@@ -1,5 +1,7 @@
 # Fiszki
 
+Wszystkie zestawy: https://zgolus.github.io/fiszki/
+
 ### LO
 - [Chemia 2: Układ okresowy — pierwiastki 1–112](https://zgolus.github.io/fiszki/pierwiastki_1-112.html)
 - [Historia 1: Starożytny Rzym](https://zgolus.github.io/fiszki/rzym.html)
@@ -11,3 +13,4 @@
 - [Chemia 7: Kod chemiczny, budowa materii](https://zgolus.github.io/fiszki/chemia_kod_chemiczny_budowa_materii.html)
 - [Chemia 8: Kwasy](https://zgolus.github.io/fiszki/chemia_kwasy.html)
 - [Historia 7: Ziemie polskie po Wiośnie Ludów](https://zgolus.github.io/fiszki/historia_ziemie_polskie_po_wiosnie_ludow.html)
+- [Historia 8: II wojna światowa (1939–1945)](https://zgolus.github.io/fiszki/historia_ii_wojna_swiatowa.html)
