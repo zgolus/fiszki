@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>zDolny Ślązak — angielski</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1320;
+    --card-front: #f4f2ec;
+    --card-back: #17213a;
+    --accent: #c8102e;
+    --accent-light: #f3a7b1;
+    --text-dark: #17213a;
+    --text-light: #f4f2ec;
+    --text-muted: #9098aa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #2b3552;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #2b3552;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #8a91a3;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .topic-pill.known-pill {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .topic-pill.known-pill.active {
+    background: var(--accent);
+    border-style: solid;
+    color: #ffffff;
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 480px;
+    padding: 4px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #2b3552;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #2b3552;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+  .mark-btn {
+    padding: 11px 18px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mark-btn:active {
+    background: var(--accent);
+    color: #ffffff;
+    transform: scale(0.95);
+  }
+  .mark-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+  @media (max-width: 400px) {
+    .nav-area { gap: 8px; padding: 6px 14px 30px; }
+    .nav-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+    .shuffle-btn, .mark-btn { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.03em; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .stats-row { animation: fadeUp 0.5s 0.15s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>English-speaking countries</h1>
+  <div class="subtitle">zDolny Ślązak &middot; angielski &middot; etap powiatowy &middot; 183 pytań</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="mark-btn" id="markBtn" onclick="toggleKnown()">&#10003; Umiem</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+var ALL_FLASHCARDS = [
+  {"topic": "Szybkie fakty", "q": "Stolice 6 krajów anglojęzycznych z konkursu", "a": ["USA — <b>Washington, D.C.</b>", "UK — <b>London</b>", "Canada — <b>Ottawa</b> (nie Toronto!)", "Australia — <b>Canberra</b> (nie Sydney!)", "New Zealand — <b>Wellington</b>", "Ireland — <b>Dublin</b>"]},
+  {"topic": "Szybkie fakty", "q": "Waluty 6 krajów anglojęzycznych", "a": ["USA — <b>US dollar</b>", "UK — <b>pound sterling</b> (£)", "Canada — <b>Canadian dollar</b>", "Australia — <b>Australian dollar</b>", "New Zealand — <b>New Zealand dollar</b>", "Ireland — <b>euro</b> (od 2002)"]},
+  {"topic": "Szybkie fakty", "q": "Jak nazywają się kanadyjskie monety 1 i 2 dolary?", "a": ["<b>loonie</b> — $1 (na monecie nur, ang. loon)", "<b>toonie</b> — $2"]},
+  {"topic": "Szybkie fakty", "q": "Co oznaczają gwiazdy i pasy na fladze USA? Jak nazywa się flaga?", "a": ["<b>Stars and Stripes</b>", "50 gwiazd = 50 stanów", "13 pasów = 13 pierwszych kolonii"]},
+  {"topic": "Szybkie fakty", "q": "Union Jack — z jakich krzyży się składa?", "a": ["Krzyż <b>św. Jerzego</b> (Anglia)", "Krzyż <b>św. Andrzeja</b> (Szkocja)", "Krzyż <b>św. Patryka</b> (Irlandia)", "Walia nie ma swojego elementu na fladze UK"]},
+  {"topic": "Szybkie fakty", "q": "Flaga Kanady", "a": ["<b>Maple Leaf</b> — czerwony liść klonu na białym tle z czerwonymi pasami", "Wprowadzona w <b>1965</b> r."]},
+  {"topic": "Szybkie fakty", "q": "Czym różnią się flagi Australii i Nowej Zelandii?", "a": ["Obie: <b>Union Jack</b> + <b>Southern Cross</b> (Krzyż Południa)", "Australia: <b>5 białych</b> gwiazd Krzyża Południa + duża <b>Commonwealth Star</b> (Gwiazda Wspólnoty)", "Nowa Zelandia: <b>4 czerwone</b> gwiazdy"]},
+  {"topic": "Szybkie fakty", "q": "Flaga Irlandii", "a": ["Trójkolorowa: <b>green – white – orange</b> (zielony–biały–pomarańczowy), pasy pionowe"]},
+  {"topic": "Szybkie fakty", "q": "Zwierzę narodowe Kanady?", "a": ["<b>beaver</b> — bóbr", "Inne symbole: <b>maple leaf</b>, <b>Mountie</b> (policjant konny)"]},
+  {"topic": "Szybkie fakty", "q": "Symbole USA", "a": ["<b>bald eagle</b> — bielik amerykański (ptak narodowy)", "<b>bison</b> — ssak narodowy", "<b>Statue of Liberty</b>", "<b>Uncle Sam</b> — personifikacja kraju"]},
+  {"topic": "Szybkie fakty", "q": "Symbole Australii", "a": ["<b>kangaroo</b> i <b>emu</b> — na godle", "<b>koala</b>", "<b>wattle</b> — złota akacja (kwiat narodowy)"]},
+  {"topic": "Szybkie fakty", "q": "Symbole Nowej Zelandii", "a": ["<b>kiwi</b> — nielotny ptak (narodowy)", "<b>silver fern</b> — srebrna paproć", "Nazwa maoryska kraju: <b>Aotearoa</b>"]},
+  {"topic": "Szybkie fakty", "q": "Symbole Irlandii", "a": ["<b>shamrock</b> — koniczyna", "<b>harp</b> — harfa (także na irlandzkich monetach euro)", "Nazwa gaelicka: <b>Éire</b>"]},
+  {"topic": "Szybkie fakty", "q": "Gaelicka nazwa „Éire” oznacza…", "a": ["<b>Ireland</b> — Irlandię", "Język irlandzki to <b>Gaeilge</b>"]},
+  {"topic": "Szybkie fakty", "q": "Święta narodowe 6 krajów (daty)", "a": ["USA — <b>Independence Day</b>, 4 July", "Canada — <b>Canada Day</b>, 1 July", "Australia — <b>Australia Day</b>, 26 January", "New Zealand — <b>Waitangi Day</b>, 6 February", "Ireland — <b>St Patrick's Day</b>, 17 March", "UK — brak jednego święta; dni patronów 4 krajów"]},
+  {"topic": "Szybkie fakty", "q": "Podział administracyjny 6 krajów", "a": ["USA — <b>50 states</b> + D.C.", "UK — <b>4 countries</b>: England, Scotland, Wales, Northern Ireland", "Canada — <b>10 provinces + 3 territories</b>", "Australia — <b>6 states + 2 territories</b>", "New Zealand — <b>16 regions</b>", "Ireland — <b>4 provinces</b>, 26 counties (hrabstw)"]},
+  {"topic": "Szybkie fakty", "q": "4 prowincje Irlandii", "a": ["<b>Leinster</b> (z Dublinem)", "<b>Munster</b>", "<b>Connacht</b>", "<b>Ulster</b> (większość w UK jako Irlandia Płn.)"]},
+  {"topic": "Szybkie fakty", "q": "Hymny 6 krajów", "a": ["USA — <b>The Star-Spangled Banner</b>", "UK — <b>God Save the King</b>", "Canada — <b>O Canada</b>", "Australia — <b>Advance Australia Fair</b>", "New Zealand — <b>God Defend New Zealand</b>", "Ireland — <b>Amhrán na bhFiann</b> (The Soldier's Song)"]},
+  {"topic": "Szybkie fakty", "q": "Najczęstsze pułapki w pytaniach o stolice i waluty", "a": ["Stolica Australii to <b>Canberra</b>, nie Sydney", "Stolica Kanady to <b>Ottawa</b>, nie Toronto", "Irlandia Północna należy do UK → płaci <b>funtem</b>; Republika Irlandii → <b>euro</b>", "Krzyż Południa jest na flagach i Australii, i NZ"]},
+  {"topic": "USA", "q": "USA — podstawowe liczby i największe stany", "a": ["Ok. <b>340 mln</b> mieszkańców — najludniejszy z 6 krajów", "<b>50 states</b>", "Największy stan: <b>Alaska</b>, potem <b>Texas</b> i <b>California</b>", "<b>Hawaii</b> — stan na wyspach Pacyfiku"]},
+  {"topic": "USA", "q": "Najważniejsze rzeki USA", "a": ["<b>Mississippi</b> i <b>Missouri</b> — najdłuższe", "<b>Colorado</b> — wyrzeźbiła Grand Canyon", "<b>Hudson</b> — płynie przez Nowy Jork"]},
+  {"topic": "USA", "q": "Góry USA i najwyższy szczyt", "a": ["<b>Rocky Mountains</b> — na zachodzie", "<b>Appalachians</b> — na wschodzie", "Najwyższy szczyt: <b>Denali</b> (Alaska)"]},
+  {"topic": "USA", "q": "Wielkie Jeziora — skrót i nazwy", "a": ["Skrót <b>HOMES</b>: <b>H</b>uron, <b>O</b>ntario, <b>M</b>ichigan, <b>E</b>rie, <b>S</b>uperior", "Wspólne z Kanadą", "<b>Niagara Falls</b> — na granicy USA i Kanady"]},
+  {"topic": "USA", "q": "Death Valley — co to i gdzie?", "a": ["Dolina Śmierci w <b>California</b>", "Najgorętsze i najniższe miejsce w Ameryce Północnej"]},
+  {"topic": "USA", "q": "Yellowstone — gdzie i z czego słynie?", "a": ["Stan <b>Wyoming</b>", "<b>Pierwszy park narodowy świata</b> (1872)", "Gejzer <b>Old Faithful</b>, bizony"]},
+  {"topic": "USA", "q": "Grand Canyon — gdzie i co go wyrzeźbiło?", "a": ["Stan <b>Arizona</b>", "Kanion rzeki <b>Colorado</b>, ok. 446 km długości"]},
+  {"topic": "USA", "q": "Yosemite, Everglades, Sequoia — gdzie i z czego słyną?", "a": ["<b>Yosemite</b> (California) — skały El Capitan i Half Dome, wodospady", "<b>Everglades</b> (Florida) — bagna, aligatory, manaty", "<b>Sequoia</b> (California) — sekwoje olbrzymie, drzewo General Sherman"]},
+  {"topic": "USA", "q": "Mount Rushmore — gdzie i kto jest na nim wyrzeźbiony?", "a": ["Stan <b>South Dakota</b>", "Twarze 4 prezydentów: <b>Washington, Jefferson, Theodore Roosevelt, Lincoln</b>"]},
+  {"topic": "USA", "q": "Nowy Jork — przydomek i najważniejsze zabytki", "a": ["<b>the Big Apple</b>", "<b>Statue of Liberty</b>, Empire State Building, Times Square", "Central Park, Brooklyn Bridge, Wall Street"]},
+  {"topic": "USA", "q": "Statua Wolności — skąd i kiedy?", "a": ["Dar <b>Francji</b>, 1886 r.", "Stoi w Nowym Jorku"]},
+  {"topic": "USA", "q": "Zabytki Waszyngtonu (D.C.)", "a": ["<b>White House</b> — Biały Dom", "<b>Capitol</b> — Kapitol (Kongres)", "<b>Lincoln Memorial</b>"]},
+  {"topic": "USA", "q": "W jakim mieście stoi napis Hollywood?", "a": ["<b>Los Angeles</b>", "Tam też Walk of Fame (Aleja Gwiazd)"]},
+  {"topic": "USA", "q": "San Francisco — z czego słynie?", "a": ["<b>Golden Gate Bridge</b>", "Więzienie <b>Alcatraz</b>", "Tramwaje linowe — <b>cable cars</b>"]},
+  {"topic": "USA", "q": "Miasta USA — z czym je kojarzyć?", "a": ["<b>Chicago</b> — the Windy City", "<b>Las Vegas</b> (Nevada) — kasyna", "<b>New Orleans</b> — jazz, Mardi Gras", "<b>Philadelphia</b> — Liberty Bell (Dzwon Wolności)", "<b>Seattle</b> — Space Needle", "<b>Orlando</b> — Disney World"]},
+  {"topic": "USA", "q": "USA: 1492 i 1620", "a": ["<b>1492</b> — Krzysztof Kolumb dociera do Ameryki", "<b>1620</b> — Pielgrzymi (<b>Pilgrims</b>) przypływają statkiem <b>Mayflower</b> do Plymouth"]},
+  {"topic": "USA", "q": "Czym była Boston Tea Party (1773)?", "a": ["Protest kolonistów przeciw <b>brytyjskim podatkom</b> — wrzucili herbatę do portu w Bostonie"]},
+  {"topic": "USA", "q": "Deklaracja Niepodległości USA", "a": ["<b>Declaration of Independence</b> — <b>4 lipca 1776</b>", "Autor: <b>Thomas Jefferson</b>", "Stąd święto Independence Day"]},
+  {"topic": "USA", "q": "Pierwszy prezydent USA", "a": ["<b>George Washington</b>, od <b>1789</b> r."]},
+  {"topic": "USA", "q": "Wojna secesyjna w USA", "a": ["<b>Civil War</b>, <b>1861–1865</b>", "Prezydent <b>Abraham Lincoln</b> znosi niewolnictwo"]},
+  {"topic": "USA", "q": "USA w XX w.: 1903, 1929, 1941", "a": ["<b>1903</b> — bracia <b>Wright</b>: pierwszy lot samolotem z silnikiem", "<b>1929</b> — <b>Wall Street Crash</b>, początek Wielkiego Kryzysu", "<b>1941</b> — atak na <b>Pearl Harbor</b>, USA wchodzą do II wojny światowej"]},
+  {"topic": "USA", "q": "USA w XX i XXI w.: 1963, 1969, 2001", "a": ["<b>1963</b> — Martin Luther King: przemowa „I Have a Dream”", "<b>1969</b> — <b>Apollo 11</b>, Neil Armstrong pierwszym człowiekiem na Księżycu", "<b>2001</b> — zamachy 11 września (<b>9/11</b>)"]},
+  {"topic": "USA", "q": "Amerykańscy wynalazcy — kto co wynalazł?", "a": ["<b>Benjamin Franklin</b> — piorunochron", "<b>Thomas Edison</b> — żarówka, fonograf", "<b>Alexander Graham Bell</b> — telefon (1876), z pochodzenia Szkot", "<b>Henry Ford</b> — Model T, taśma produkcyjna", "<b>Bracia Wright</b> — samolot"]},
+  {"topic": "USA", "q": "Znani Amerykanie — biznes, polityka, sport, literatura", "a": ["<b>Walt Disney</b>; <b>Steve Jobs</b> — Apple; <b>Bill Gates</b> — Microsoft", "<b>Barack Obama</b> — pierwszy czarnoskóry prezydent", "<b>Michael Jordan</b> — koszykówka; <b>Serena Williams</b> — tenis", "<b>Mark Twain</b> — Przygody Tomka Sawyera"]},
+  {"topic": "USA", "q": "Amerykańskie marki", "a": ["Coca-Cola, McDonald's, Apple, Microsoft, Google, Disney, Nike, Ford", "<b>Levi's</b> — dżinsy", "<b>Harley-Davidson</b> — motocykle"]},
+  {"topic": "USA", "q": "Sporty w USA", "a": ["<b>American football</b> — finał: <b>Super Bowl</b> (luty)", "<b>baseball</b>", "<b>basketball</b> — liga <b>NBA</b>", "<b>ice hockey</b>"]},
+  {"topic": "Wielka Brytania", "q": "Czym różni się United Kingdom od Great Britain?", "a": ["<b>UK</b> = 4 kraje: England, Scotland, Wales, Northern Ireland", "<b>Great Britain</b> = sama wyspa: Anglia, Szkocja, Walia — <b>bez</b> Irlandii Płn."]},
+  {"topic": "Wielka Brytania", "q": "Kto jest monarchą Wielkiej Brytanii?", "a": ["<b>King Charles III</b> — od 2022 r.", "Po śmierci <b>Elżbiety II</b> (panowała 70 lat, koronacja 1953)"]},
+  {"topic": "Wielka Brytania", "q": "Anglia — stolica, symbole, patron", "a": ["Stolica: <b>London</b>", "Symbol: czerwona <b>róża</b>, <b>lew</b>", "Patron: <b>St George</b>, 23 April", "Stonehenge, Oxford, Cambridge, Lake District"]},
+  {"topic": "Wielka Brytania", "q": "Szkocja — stolica, symbole, patron", "a": ["Stolica: <b>Edinburgh</b> (nie Glasgow!)", "Symbol: <b>thistle</b> (oset), <b>unicorn</b> (jednorożec)", "Patron: <b>St Andrew</b>, 30 November", "kilt, tartan, bagpipes (dudy), haggis"]},
+  {"topic": "Wielka Brytania", "q": "Walia — stolica, symbole, patron", "a": ["Stolica: <b>Cardiff</b>", "Symbol: <b>red dragon</b>, <b>daffodil</b> (żonkil), <b>leek</b> (por)", "Patron: <b>St David</b>, 1 March", "Język walijski — <b>Cymraeg</b>; zamki, rugby, góra <b>Snowdon</b>"]},
+  {"topic": "Wielka Brytania", "q": "Irlandia Północna — stolica, symbole, z czego słynie", "a": ["Stolica: <b>Belfast</b>", "Symbol: <b>shamrock</b>, <b>flax</b> (len); patron St Patrick, 17 March", "<b>Giant's Causeway</b> (Grobla Olbrzyma)", "W Belfaście zbudowano <b>Titanica</b>"]},
+  {"topic": "Wielka Brytania", "q": "Szkocja — atrakcje i przyroda", "a": ["<b>Loch Ness</b> — potwór Nessie", "<b>Highlands</b> — Szkockie Wyżyny", "<b>Ben Nevis</b> — najwyższy szczyt UK", "Golf narodził się w Szkocji (<b>St Andrews</b>)"]},
+  {"topic": "Wielka Brytania", "q": "Geografia UK — szczyt, rzeki", "a": ["Najwyższy szczyt: <b>Ben Nevis</b> (Szkocja)", "Najdłuższa rzeka: <b>Severn</b>", "Przez Londyn płynie <b>Thames</b> (Tamiza)"]},
+  {"topic": "Wielka Brytania", "q": "Co oddziela Wielką Brytanię od Francji i jak tam dojechać?", "a": ["<b>English Channel</b> — kanał La Manche", "<b>Channel Tunnel</b> — otwarty w 1994", "<b>White Cliffs of Dover</b> — białe klify nad kanałem"]},
+  {"topic": "Wielka Brytania", "q": "Hadrian's Wall — co to?", "a": ["Rzymski mur obronny na <b>północy Anglii</b>"]},
+  {"topic": "Wielka Brytania", "q": "Big Ben — czym dokładnie jest?", "a": ["To <b>dzwon</b> w wieży <b>Elizabeth Tower</b>", "Przy <b>Houses of Parliament</b>"]},
+  {"topic": "Wielka Brytania", "q": "Zabytki Londynu (1)", "a": ["<b>Buckingham Palace</b> — zmiana warty", "<b>Tower of London</b> — klejnoty koronne, strażnicy Beefeaters", "<b>Tower Bridge</b>", "<b>London Eye</b> — diabelski młyn"]},
+  {"topic": "Wielka Brytania", "q": "Zabytki Londynu (2)", "a": ["<b>Westminster Abbey</b> — koronacje i śluby królewskie", "<b>St Paul's Cathedral</b>", "<b>British Museum</b>", "<b>Trafalgar Square</b> — kolumna Nelsona"]},
+  {"topic": "Wielka Brytania", "q": "Miejsca w UK poza Londynem — z czym je kojarzyć?", "a": ["<b>Windsor Castle</b> — zamek królewski", "<b>Bath</b> — rzymskie łaźnie", "<b>Stratford-upon-Avon</b> — miasto Szekspira", "<b>Liverpool</b> — The Beatles"]},
+  {"topic": "Wielka Brytania", "q": "Stonehenge — gdzie i kiedy?", "a": ["W <b>England</b> (Anglia)", "Zbudowany ok. 3000–2000 p.n.e."]},
+  {"topic": "Wielka Brytania", "q": "UK: 43 n.e. i 1066", "a": ["<b>43</b> — Rzymianie podbijają Brytanię", "<b>1066</b> — bitwa pod <b>Hastings</b>: Wilhelm Zdobywca (Normanowie)"]},
+  {"topic": "Wielka Brytania", "q": "Magna Carta", "a": ["<b>1215</b> r.", "Dokument ograniczający władzę króla"]},
+  {"topic": "Wielka Brytania", "q": "UK: 1534 i 1588", "a": ["<b>1534</b> — <b>Henryk VIII</b> zakłada Kościół anglikański", "<b>1588</b> — za <b>Elżbiety I</b> pokonanie hiszpańskiej Armady"]},
+  {"topic": "Wielka Brytania", "q": "Gunpowder Plot (1605)", "a": ["Spisek prochowy — <b>Guy Fawkes</b> chciał wysadzić parlament", "Stąd <b>Bonfire Night</b>, 5 listopada"]},
+  {"topic": "Wielka Brytania", "q": "UK: 1666 i 1707", "a": ["<b>1666</b> — <b>Great Fire of London</b> (wielki pożar Londynu)", "<b>1707</b> — unia Anglii i Szkocji, powstaje <b>Great Britain</b>"]},
+  {"topic": "Wielka Brytania", "q": "Rewolucja przemysłowa i epoka wiktoriańska", "a": ["XVIII–XIX w. — rewolucja przemysłowa, maszyna parowa <b>Jamesa Watta</b>", "<b>1837–1901</b> — epoka wiktoriańska (królowa <b>Wiktoria</b>)"]},
+  {"topic": "Wielka Brytania", "q": "UK w XX i XXI w.: 1940, 1953, 2020", "a": ["<b>1940</b> — <b>Bitwa o Anglię</b>, premier <b>Winston Churchill</b>; walczyli polscy piloci (<b>Dywizjon 303</b>)", "<b>1953</b> — koronacja Elżbiety II", "<b>2020</b> — <b>Brexit</b>, wyjście z UE (referendum 2016)"]},
+  {"topic": "Wielka Brytania", "q": "Brytyjscy naukowcy — kto co odkrył?", "a": ["<b>Isaac Newton</b> — grawitacja", "<b>Charles Darwin</b> — ewolucja", "<b>Alexander Fleming</b> — penicylina (Szkot)", "<b>Alan Turing</b> — złamanie Enigmy (z dorobkiem polskich kryptologów)", "<b>Tim Berners-Lee</b> — World Wide Web", "<b>Stephen Hawking</b> — fizyk"]},
+  {"topic": "Wielka Brytania", "q": "Brytyjscy pisarze i artyści", "a": ["<b>William Shakespeare</b> — Romeo i Julia, Hamlet", "<b>Charles Dickens</b> — Opowieść wigilijna", "<b>J.K. Rowling</b> — Harry Potter", "<b>Agatha Christie</b> — kryminały", "<b>The Beatles</b> (Liverpool); <b>David Beckham</b> — piłka nożna"]},
+  {"topic": "Wielka Brytania", "q": "Brytyjskie marki i symbole ulicy", "a": ["<b>BBC</b>, <b>Rolls-Royce</b>, <b>Jaguar</b>, <b>Land Rover</b>, <b>Mini</b>, <b>Cadbury</b>, <b>Burberry</b>", "Piętrowe czerwone autobusy — <b>double-decker</b>", "Czarne taksówki — <b>black cab</b>", "Czerwone budki telefoniczne"]},
+  {"topic": "Wielka Brytania", "q": "Sporty w UK", "a": ["<b>football</b> — Premier League", "<b>Wimbledon</b> — tenis na trawie, truskawki ze śmietaną", "<b>rugby</b>, <b>cricket</b>", "<b>golf</b> — narodził się w Szkocji"]},
+  {"topic": "Wielka Brytania", "q": "Zwierzęta herbowe 4 krajów UK", "a": ["<b>lion</b> — Anglia", "<b>unicorn</b> — Szkocja", "<b>red dragon</b> — Walia"]},
+  {"topic": "Wielka Brytania", "q": "Rośliny-symbole 4 krajów UK", "a": ["<b>rose</b> (róża) — Anglia", "<b>thistle</b> (oset) — Szkocja", "<b>leek</b> (por) / <b>daffodil</b> (żonkil) — Walia", "<b>shamrock</b> (koniczyna) — Irlandia Płn."]},
+  {"topic": "Irlandia", "q": "Przydomek Irlandii i języki urzędowe", "a": ["<b>the Emerald Isle</b> — Szmaragdowa Wyspa", "Języki: <b>irlandzki</b> (Gaeilge) i <b>angielski</b>", "Republika zajmuje większość wyspy; płn.-wsch. część to Northern Ireland (UK)"]},
+  {"topic": "Irlandia", "q": "Geografia Irlandii — rzeka i szczyt", "a": ["Najdłuższa rzeka: <b>Shannon</b>", "Najwyższy szczyt: <b>Carrauntoohil</b>", "Miasta: Dublin, Cork, Galway, Limerick"]},
+  {"topic": "Irlandia", "q": "Cliffs of Moher i Ring of Kerry — co to?", "a": ["<b>Cliffs of Moher</b> — klify nad Atlantykiem", "<b>Ring of Kerry</b> — trasa widokowa"]},
+  {"topic": "Irlandia", "q": "Newgrange — co to?", "a": ["Grobowiec z ok. <b>3200 p.n.e.</b>", "<b>Starszy niż Stonehenge i piramidy</b>"]},
+  {"topic": "Irlandia", "q": "Blarney Stone — co daje pocałunek?", "a": ["Kamień w <b>Blarney Castle</b>", "Daje <b>„gift of the gab”</b> — dar wymowy"]},
+  {"topic": "Irlandia", "q": "Dublin — najważniejsze miejsca", "a": ["<b>Trinity College</b> — Księga z Kells (<b>Book of Kells</b>)", "<b>Guinness Storehouse</b>", "<b>Temple Bar</b> — dzielnica pubów", "<b>The Spire</b> na O'Connell Street", "<b>Ha'penny Bridge</b> nad rzeką <b>Liffey</b>"]},
+  {"topic": "Irlandia", "q": "Św. Patryk — kim był i jakie są o nim legendy?", "a": ["W <b>V w.</b> szerzył chrześcijaństwo w Irlandii", "Koniczyną (<b>shamrock</b>) tłumaczył Trójcę Świętą", "Wygnał węże z wyspy"]},
+  {"topic": "Irlandia", "q": "Great Famine — co to było?", "a": ["Wielki głód <b>1845–1849</b> po zarazie ziemniaczanej", "Ok. <b>1 mln</b> zmarłych, masowa emigracja do <b>USA</b>"]},
+  {"topic": "Irlandia", "q": "Droga Irlandii do niepodległości (1916, 1922, 1949)", "a": ["<b>1916</b> — <b>Easter Rising</b>, powstanie wielkanocne w Dublinie", "<b>1922</b> — <b>Irish Free State</b>, niezależna od UK (bez Irlandii Płn.)", "<b>1949</b> — oficjalnie <b>Republika Irlandii</b>"]},
+  {"topic": "Irlandia", "q": "Irlandia i Unia Europejska", "a": ["<b>1973</b> — wejście do EWG (dziś UE)", "Od <b>2002</b> — waluta <b>euro</b>"]},
+  {"topic": "Irlandia", "q": "Irlandzcy pisarze i muzycy", "a": ["<b>James Joyce</b> — Ulysses", "<b>Oscar Wilde</b>", "<b>Jonathan Swift</b> — Podróże Guliwera", "<b>Bram Stoker</b> — Dracula", "<b>W.B. Yeats</b> i <b>Samuel Beckett</b> — Nagrody Nobla", "Zespół <b>U2</b> (Bono)"]},
+  {"topic": "Irlandia", "q": "Kultura irlandzka — taniec, muzyka, sport", "a": ["<b>Irish dance</b>, show <b>Riverdance</b>", "Muzyka celtycka: skrzypce (<b>fiddle</b>), harfa", "Sporty gaelickie: <b>Gaelic football</b> i <b>hurling</b>"]},
+  {"topic": "Irlandia", "q": "Leprechaun i pochodzenie Halloween", "a": ["<b>Leprechaun</b> — skrzat z garnkiem złota na końcu tęczy", "Halloween wywodzi się z celtyckiego święta <b>Samhain</b>"]},
+  {"topic": "Irlandia", "q": "Kuchnia irlandzka", "a": ["<b>Irish stew</b> — gulasz z baraniny", "<b>soda bread</b>", "<b>colcannon</b> — ziemniaki z kapustą", "<b>full Irish breakfast</b>", "piwo <b>Guinness</b>"]},
+  {"topic": "Irlandia", "q": "Co łączy Irlandię i Polskę?", "a": ["Oba kraje <b>katolickie</b>", "Historia walki o <b>niepodległość</b>", "Po <b>2004</b> r. jeden z głównych kierunków polskiej emigracji zarobkowej"]},
+  {"topic": "Kanada", "q": "Kanada — powierzchnia, ludność, języki", "a": ["<b>Drugi</b> co do powierzchni kraj świata (po Rosji)", "Ok. <b>41 mln</b> mieszkańców", "Języki urzędowe: <b>angielski i francuski</b>; francuskojęzyczna prowincja <b>Quebec</b>", "Głowa państwa: brytyjski monarcha; członek <b>Commonwealth</b>"]},
+  {"topic": "Kanada", "q": "Ontario — najważniejsze miasta", "a": ["<b>Toronto</b> — największe miasto, wieża <b>CN Tower</b>", "<b>Ottawa</b> — stolica, <b>Parliament Hill</b>"]},
+  {"topic": "Kanada", "q": "Quebec — miasta i ciekawostka", "a": ["<b>Montreal</b>", "<b>Quebec City</b> — jedyne miasto z murami obronnymi na północ od Meksyku"]},
+  {"topic": "Kanada", "q": "British Columbia i Alberta — miasta", "a": ["<b>Vancouver</b> (British Columbia) — port na Pacyfiku", "<b>Calgary</b> (Alberta) — rodeo <b>Calgary Stampede</b>", "<b>Edmonton</b> — stolica Alberty"]},
+  {"topic": "Kanada", "q": "Pozostałe prowincje Kanady — z czym je kojarzyć?", "a": ["<b>Nova Scotia</b> — Halifax", "<b>Prince Edward Island</b> — Ania z Zielonego Wzgórza", "<b>Newfoundland and Labrador</b>", "<b>Manitoba</b> — Winnipeg; <b>Churchill</b> = „światowa stolica niedźwiedzi polarnych”"]},
+  {"topic": "Kanada", "q": "Terytoria Kanady", "a": ["<b>Yukon</b>", "<b>Northwest Territories</b>", "<b>Nunavut</b> — od 1999, zamieszkany głównie przez <b>Inuitów</b>"]},
+  {"topic": "Kanada", "q": "Parki narodowe Kanady", "a": ["<b>Banff</b> — pierwszy park narodowy Kanady (1885); jeziora <b>Lake Louise</b> i <b>Moraine Lake</b>", "<b>Jasper</b>", "Oba w <b>Rocky Mountains</b>"]},
+  {"topic": "Kanada", "q": "Wodospad Niagara — jak nazywa się część kanadyjska?", "a": ["<b>Horseshoe Falls</b> (Podkowa)", "Niagara leży na granicy USA i Kanady"]},
+  {"topic": "Kanada", "q": "Geografia Kanady — rzeki, zatoka, szczyt", "a": ["<b>St. Lawrence</b> — rzeka Św. Wawrzyńca", "<b>Mackenzie</b> — najdłuższa rzeka", "<b>Hudson Bay</b> — Zatoka Hudsona", "<b>Mount Logan</b> — najwyższy szczyt"]},
+  {"topic": "Kanada", "q": "Bay of Fundy — z czego słynie?", "a": ["Najwyższe <b>pływy</b> na świecie"]},
+  {"topic": "Kanada", "q": "Zwierzęta Kanady", "a": ["<b>beaver</b> — bóbr (narodowe)", "<b>moose</b> — łoś", "niedźwiedź polarny i <b>grizzly</b>", "<b>loon</b> — nur (na monecie $1)"]},
+  {"topic": "Kanada", "q": "Rdzenni mieszkańcy Kanady", "a": ["<b>First Nations</b> — totemy (<b>totem poles</b>)", "<b>Inuit</b> — igloo, kamienne kopczyki <b>inukshuk</b>", "<b>Métis</b>"]},
+  {"topic": "Kanada", "q": "Kanada: ok. 1000, 1534, 1608", "a": ["<b>ok. 1000</b> — Wikingowie w <b>L'Anse aux Meadows</b> (Nowa Fundlandia)", "<b>1534</b> — <b>Jacques Cartier</b> zajmuje ziemie dla Francji", "<b>1608</b> — <b>Samuel de Champlain</b> zakłada Quebec"]},
+  {"topic": "Kanada", "q": "Kanada: 1763, 1867, 1885", "a": ["<b>1763</b> — Nowa Francja przechodzi pod panowanie Wielkiej Brytanii", "<b>1867</b> — Konfederacja, Dominium Kanady (1 lipca → <b>Canada Day</b>)", "<b>1885</b> — kolej transkontynentalna <b>Canadian Pacific Railway</b>"]},
+  {"topic": "Kanada", "q": "Kanadyjscy wynalazcy i sportowcy", "a": ["<b>James Naismith</b> — wymyślił koszykówkę", "<b>Frederick Banting</b> — insulina", "<b>Wayne Gretzky</b> — hokej", "<b>Terry Fox</b> — bieg przez Kanadę z protezą nogi"]},
+  {"topic": "Kanada", "q": "Kanadyjscy pisarze i muzycy", "a": ["<b>L.M. Montgomery</b> — Ania z Zielonego Wzgórza", "<b>Celine Dion</b>", "<b>Justin Bieber</b>", "<b>Drake</b>"]},
+  {"topic": "Kanada", "q": "Kuchnia kanadyjska", "a": ["<b>maple syrup</b> — syrop klonowy", "<b>poutine</b> — frytki z serem i sosem", "<b>Nanaimo bars</b>, <b>butter tarts</b>"]},
+  {"topic": "Kanada", "q": "Kanadyjskie marki i policja konna", "a": ["<b>Tim Hortons</b> — kawa i pączki", "<b>Canada Goose</b>, <b>Lululemon</b>", "<b>Royal Canadian Mounted Police</b> — „Mounties”"]},
+  {"topic": "Kanada", "q": "Sporty narodowe Kanady", "a": ["<b>ice hockey</b> — narodowy sport zimowy", "<b>lacrosse</b> — narodowy sport letni"]},
+  {"topic": "Australia", "q": "Australia — kontynent, ludność, Outback", "a": ["Jedyne państwo zajmujące <b>cały kontynent</b>", "Ok. <b>27 mln</b> mieszkańców, głównie na wybrzeżach", "Pustynny środek kraju — <b>Outback</b>", "Pory roku odwrotne niż w Polsce: Boże Narodzenie latem, na plaży"]},
+  {"topic": "Australia", "q": "New South Wales — stolica i atrakcje", "a": ["Stolica: <b>Sydney</b>", "<b>Sydney Opera House</b>, <b>Harbour Bridge</b>", "Plaża <b>Bondi</b>"]},
+  {"topic": "Australia", "q": "Victoria — stolica i atrakcje", "a": ["Stolica: <b>Melbourne</b>", "<b>Australian Open</b> (tenis)", "<b>Great Ocean Road</b>, skały <b>Twelve Apostles</b>"]},
+  {"topic": "Australia", "q": "Wielka Rafa Koralowa leży u wybrzeży stanu…", "a": ["<b>Queensland</b> (stolica <b>Brisbane</b>)", "<b>Great Barrier Reef</b> — największa rafa koralowa świata", "Tam też <b>Gold Coast</b>"]},
+  {"topic": "Australia", "q": "Uluru — gdzie leży i czym jest?", "a": ["<b>Northern Territory</b> (stolica Darwin)", "Inaczej <b>Ayers Rock</b> — święta skała Aborygenów", "Tam też park <b>Kakadu</b>"]},
+  {"topic": "Australia", "q": "Western Australia, South Australia, Tasmania — stolice i z czego słyną", "a": ["<b>Western Australia</b> — <b>Perth</b>; wyspa Rottnest i <b>quokki</b>", "<b>South Australia</b> — <b>Adelaide</b>; winnice", "<b>Tasmania</b> (wyspa) — <b>Hobart</b>; diabeł tasmański"]},
+  {"topic": "Australia", "q": "Australian Capital Territory", "a": ["Terytorium ze stolicą kraju — <b>Canberra</b>"]},
+  {"topic": "Australia", "q": "Najwyższy szczyt Australii — nazwa i polski ślad", "a": ["<b>Mount Kosciuszko</b>", "Nazwał go w <b>1840</b> r. polski podróżnik <b>Paweł Edmund Strzelecki</b>", "Na cześć <b>Tadeusza Kościuszki</b>"]},
+  {"topic": "Australia", "q": "Geografia Australii — rzeka i góry", "a": ["Najdłuższa rzeka: <b>Murray</b>", "Góry: <b>Great Dividing Range</b>"]},
+  {"topic": "Australia", "q": "Zwierzęta Australii", "a": ["<b>kangaroo</b>, <b>koala</b>, <b>wombat</b>, <b>emu</b>, <b>dingo</b>", "<b>platypus</b> — dziobak", "<b>echidna</b> — kolczatka", "<b>kookaburra</b> — ptak „śmiejący się”"]},
+  {"topic": "Australia", "q": "Aborygeni — kultura", "a": ["Żyją w Australii od ponad <b>60 000 lat</b>", "<b>didgeridoo</b> — instrument dęty", "<b>boomerang</b> — bumerang", "<b>Dreamtime</b> — opowieści o czasie snu", "Malarstwo kropkowe"]},
+  {"topic": "Australia", "q": "Pierwsi Europejczycy w Australii (1606, 1770)", "a": ["<b>1606</b> — Holender <b>Willem Janszoon</b>", "<b>1770</b> — <b>James Cook</b> ląduje w <b>Botany Bay</b>, ogłasza wschodnie wybrzeże brytyjskim"]},
+  {"topic": "Australia", "q": "First Fleet (1788) i Australia Day", "a": ["Pierwsza flota założyła <b>kolonię karną</b> w Sydney", "<b>26 stycznia 1788</b> → stąd <b>Australia Day</b>"]},
+  {"topic": "Australia", "q": "Australia: 1851, 1901, 2000", "a": ["<b>1851</b> — gorączka złota", "<b>1901</b> — Federacja, powstaje Związek Australijski", "<b>2000</b> — igrzyska olimpijskie w <b>Sydney</b>"]},
+  {"topic": "Australia", "q": "Gallipoli i ANZAC Day", "a": ["<b>1915</b> — bitwa pod <b>Gallipoli</b>", "<b>ANZAC Day</b> — 25 kwietnia, w Australii i NZ", "Nabożeństwa o świcie — <b>dawn service</b>"]},
+  {"topic": "Australia", "q": "Znani Australijczycy", "a": ["<b>Steve Irwin</b> — „Łowca krokodyli”", "Aktorzy: <b>Hugh Jackman</b>, <b>Nicole Kidman</b>, <b>Chris Hemsworth</b>", "Muzyka: <b>Kylie Minogue</b>, <b>AC/DC</b>", "Sport: <b>Cathy Freeman</b> (lekkoatletka), <b>Don Bradman</b> (krykiet)"]},
+  {"topic": "Australia", "q": "Kuchnia australijska", "a": ["<b>Vegemite</b> — pasta drożdżowa na kanapki", "<b>meat pie</b>", "<b>lamingtons</b> — ciastka z kokosem", "<b>Anzac biscuits</b>", "<b>pavlova</b> (spór z NZ o autorstwo); barbecue — „<b>barbie</b>”"]},
+  {"topic": "Australia", "q": "Australijskie marki i wynalazki", "a": ["Linia lotnicza <b>Qantas</b>", "Buty <b>UGG</b>; <b>Billabong</b>, <b>Quiksilver</b>", "<b>Wi-Fi</b> (CSIRO)", "<b>Czarna skrzynka</b> samolotu"]},
+  {"topic": "Australia", "q": "Sporty w Australii", "a": ["<b>cricket</b>", "<b>Australian rules football</b>", "<b>rugby</b>", "<b>surfing</b>"]},
+  {"topic": "Australia", "q": "Australijski slang: G'day, mate! / arvo / brekkie", "a": ["<b>G'day, mate!</b> — Dzień dobry, kolego", "<b>arvo</b> — popołudnie (afternoon)", "<b>brekkie</b> — śniadanie (breakfast)"]},
+  {"topic": "Nowa Zelandia", "q": "Nowa Zelandia — wyspy, ludność, języki", "a": ["Dwie główne wyspy: <b>North Island</b> i <b>South Island</b>", "Ok. <b>5 mln</b> mieszkańców (owiec kilka razy więcej)", "Mieszkańcy to „<b>Kiwis</b>”", "Języki: angielski, <b>maoryski</b> (te reo Māori), język migowy NZ"]},
+  {"topic": "Nowa Zelandia", "q": "Miasta Wyspy Północnej", "a": ["<b>Auckland</b> — największe miasto", "<b>Wellington</b> — stolica", "<b>Rotorua</b> — gejzery, gorące źródła, kultura maoryska"]},
+  {"topic": "Nowa Zelandia", "q": "Atrakcje Wyspy Północnej", "a": ["<b>Hobbiton</b> w Matamata — plan Władcy Pierścieni", "<b>Tongariro</b> — wulkan „Góra Przeznaczenia”", "<b>Waitomo Caves</b> — jaskinie ze świecącymi larwami (<b>glowworms</b>)", "<b>Bay of Islands</b>"]},
+  {"topic": "Nowa Zelandia", "q": "Queenstown — z czego słynie?", "a": ["Stolica <b>sportów ekstremalnych</b> (South Island)", "<b>1988</b> — A.J. Hackett otworzył tu pierwszy komercyjny skok na <b>bungee</b>"]},
+  {"topic": "Nowa Zelandia", "q": "Atrakcje Wyspy Południowej", "a": ["<b>Christchurch</b> — największe miasto wyspy", "<b>Milford Sound</b> — fiord", "<b>Aoraki / Mount Cook</b> — najwyższy szczyt NZ", "Lodowiec <b>Franz Josef</b>, <b>Southern Alps</b>"]},
+  {"topic": "Nowa Zelandia", "q": "Zwierzęta Nowej Zelandii", "a": ["<b>kiwi</b> — nielotny, nocny ptak (narodowy)", "<b>kea</b> — górska papuga", "<b>tuatara</b> — „żywa skamielina”", "W NZ <b>nie ma węży</b>"]},
+  {"topic": "Nowa Zelandia", "q": "Maorysi — skąd i kiedy przybyli?", "a": ["Z <b>Polinezji</b>, ok. <b>XIII w.</b> (ok. 1300)"]},
+  {"topic": "Nowa Zelandia", "q": "Kultura maoryska — haka, hongi, moko", "a": ["<b>haka</b> — taniec wojenny (tańczą go rugbyści All Blacks)", "<b>hongi</b> — powitanie przez zetknięcie nosami", "<b>moko</b> — tradycyjny tatuaż"]},
+  {"topic": "Nowa Zelandia", "q": "Słowa maoryskie: waka, marae, Kia ora, Aotearoa", "a": ["<b>waka</b> — łódź", "<b>marae</b> — miejsce spotkań", "<b>Kia ora</b> — cześć", "<b>Aotearoa</b> — Nowa Zelandia"]},
+  {"topic": "Nowa Zelandia", "q": "Pierwsi Europejczycy w Nowej Zelandii", "a": ["<b>1642</b> — Holender <b>Abel Tasman</b>", "<b>1769</b> — <b>James Cook</b> opływa i mapuje wyspy"]},
+  {"topic": "Nowa Zelandia", "q": "Treaty of Waitangi", "a": ["<b>1840</b> — traktat Maorysów z Brytyjczykami", "<b>6 lutego</b> → <b>Waitangi Day</b>, święto narodowe"]},
+  {"topic": "Nowa Zelandia", "q": "Nowa Zelandia: 1893 i 1953", "a": ["<b>1893</b> — pierwszy kraj, w którym <b>kobiety mogły głosować</b> (<b>Kate Sheppard</b>)", "<b>1953</b> — <b>Edmund Hillary</b> i Tenzing Norgay jako pierwsi na <b>Mount Everest</b>"]},
+  {"topic": "Nowa Zelandia", "q": "Znani Nowozelandczycy", "a": ["<b>Edmund Hillary</b> — Everest; jest na banknocie <b>$5</b>", "<b>Ernest Rutherford</b> — fizyk, „rozbił atom”", "<b>Peter Jackson</b> — reżyser Władcy Pierścieni i Hobbita", "<b>Lorde</b> — piosenkarka; <b>Taika Waititi</b> — reżyser"]},
+  {"topic": "Nowa Zelandia", "q": "Kuchnia Nowej Zelandii", "a": ["<b>hāngī</b> — maoryskie pieczenie w ziemnym piecu", "jagnięcina", "<b>pavlova</b>", "lody <b>Hokey Pokey</b>", "Owoc kiwi pochodzi z <b>Chin</b> — Nowozelandczycy nadali mu nazwę"]},
+  {"topic": "Nowa Zelandia", "q": "Sporty w Nowej Zelandii", "a": ["<b>rugby</b> — drużyna <b>All Blacks</b>", "<b>netball</b>", "żeglarstwo — <b>America's Cup</b>"]},
+  {"topic": "Święta i festiwale", "q": "Hogmanay — kiedy, gdzie, zwyczaje", "a": ["<b>31 Dec – 1 Jan</b>, <b>Szkocja</b> (sylwester)", "Śpiew „<b>Auld Lang Syne</b>”", "<b>first-footing</b> — pierwszy gość w nowym roku przynosi szczęście"]},
+  {"topic": "Święta i festiwale", "q": "Burns Night", "a": ["<b>25 January</b>, Szkocja", "Wiersze <b>Roberta Burnsa</b>", "<b>haggis</b> z „neeps and tatties” (rzepa i ziemniaki)"]},
+  {"topic": "Święta i festiwale", "q": "Groundhog Day", "a": ["<b>2 February</b>, USA i Kanada", "Świstak (<b>groundhog</b>) przepowiada, czy zima potrwa jeszcze <b>6 tygodni</b>"]},
+  {"topic": "Święta i festiwale", "q": "Pancake Day", "a": ["<b>Shrove Tuesday</b> — ostatki (luty/marzec), UK i Irlandia", "Naleśniki, wyścigi z patelnią", "Odpowiednik naszego <b>tłustego czwartku</b>"]},
+  {"topic": "Święta i festiwale", "q": "Mardi Gras", "a": ["Luty/marzec, <b>New Orleans</b> (USA)", "Karnawałowa parada", "Kolory: <b>purple, green, gold</b> (fioletowy, zielony, złoty)"]},
+  {"topic": "Święta i festiwale", "q": "Mothering Sunday", "a": ["Dzień Matki w <b>UK</b>", "<b>4. niedziela Wielkiego Postu</b> (marzec)", "W USA Dzień Matki jest w <b>maju</b>"]},
+  {"topic": "Święta i festiwale", "q": "St Patrick's Day", "a": ["<b>17 March</b>, Irlandia i cały świat", "Parady, zielone ubrania, koniczyna", "W <b>Chicago</b> barwią rzekę na zielono"]},
+  {"topic": "Święta i festiwale", "q": "Easter — zwyczaje anglosaskie", "a": ["<b>Easter Bunny</b> — zajączek", "<b>egg hunt</b> — szukanie jajek", "<b>hot cross buns</b> — bułeczki z krzyżykiem", "<b>Egg Roll</b> — toczenie jajek przed Białym Domem"]},
+  {"topic": "Święta i festiwale", "q": "May Day", "a": ["<b>1 May</b>, UK i USA", "<b>maypole</b> — taniec wokół słupa", "<b>Morris dancing</b>, <b>May Queen</b>", "Koszyczki z kwiatami"]},
+  {"topic": "Święta i festiwale", "q": "Thanksgiving — kiedy w Kanadzie, a kiedy w USA?", "a": ["<b>Kanada</b> — 2. poniedziałek <b>października</b>", "<b>USA</b> — 4. czwartek <b>listopada</b>", "Indyk, sos żurawinowy, <b>pumpkin pie</b>", "Parada <b>Macy's</b> w Nowym Jorku"]},
+  {"topic": "Święta i festiwale", "q": "Halloween", "a": ["<b>31 October</b> — USA, UK, Irlandia, Kanada", "<b>trick or treat</b>", "<b>jack-o'-lantern</b> — wydrążona dynia", "Przebrania"]},
+  {"topic": "Święta i festiwale", "q": "Bonfire Night", "a": ["<b>5 November</b>, UK — inaczej <b>Guy Fawkes Night</b>", "Ogniska, fajerwerki, kukła Guya Fawkesa", "Pamiątka spisku prochowego z 1605 r."]},
+  {"topic": "Święta i festiwale", "q": "Remembrance Day / Veterans Day", "a": ["<b>11 November</b>", "<b>Remembrance Day</b> — UK, Kanada; <b>Veterans Day</b> — USA", "Czerwone maki (<b>poppies</b>)", "<b>2 minuty ciszy</b> o 11:00"]},
+  {"topic": "Święta i festiwale", "q": "Christmas Day w krajach anglojęzycznych", "a": ["<b>25 December</b> — główny dzień świąt", "Indyk, <b>Christmas pudding</b>, <b>mince pies</b>, <b>crackers</b>", "Prezenty w skarpetach (<b>stockings</b>) od Father Christmas / Santa Claus", "Przemówienie króla o 15:00"]},
+  {"topic": "Święta i festiwale", "q": "Boxing Day", "a": ["<b>26 December</b> — UK, Kanada, Australia, NZ", "Dzień wolny, wielkie wyprzedaże, mecze"]},
+  {"topic": "Święta i festiwale", "q": "Festiwale latem w UK", "a": ["<b>Edinburgh Festival Fringe</b> (sierpień) — największy festiwal sztuki na świecie", "<b>Notting Hill Carnival</b> (sierpień, Londyn) — karnawał karaibski, steel bands", "<b>Glastonbury</b> — festiwal muzyczny", "<b>Wimbledon</b> — czerwiec–lipiec"]},
+  {"topic": "Święta i festiwale", "q": "Highland Games i Calgary Stampede", "a": ["<b>Highland Games</b> — Szkocja; rzut pniem (<b>caber toss</b>)", "<b>Calgary Stampede</b> — rodeo w Kanadzie (Alberta)"]},
+  {"topic": "Święta i festiwale", "q": "Canada Day i Independence Day — daty i zwyczaje", "a": ["<b>Canada Day</b> — 1 July", "<b>Independence Day</b> (USA) — 4 July", "Fajerwerki, parady, grill"]},
+  {"topic": "Kuchnia i Polska", "q": "Kuchnia angielska", "a": ["<b>fish and chips</b>", "<b>full English breakfast</b>, <b>baked beans</b>", "<b>Sunday roast</b> z <b>Yorkshire pudding</b>", "<b>afternoon tea</b> ze <b>scones</b> (clotted cream i dżem)", "<b>shepherd's pie</b>, <b>bangers and mash</b>"]},
+  {"topic": "Kuchnia i Polska", "q": "Kuchnia szkocka i walijska", "a": ["Szkocja: <b>haggis</b>, <b>porridge</b>, <b>shortbread</b>", "Walia: <b>Welsh rarebit</b> (grzanka z serem), <b>bara brith</b>"]},
+  {"topic": "Kuchnia i Polska", "q": "Kuchnia amerykańska", "a": ["<b>hamburger</b>, <b>hot dog</b>, <b>apple pie</b>", "<b>mac and cheese</b>", "<b>peanut butter and jelly sandwich</b>", "<b>pancakes</b> z syropem, <b>s'mores</b>, BBQ"]},
+  {"topic": "Kuchnia i Polska", "q": "Po której stronie jeździ się w krajach anglojęzycznych?", "a": ["<b>Lewostronnie</b>: UK, Irlandia, Australia, Nowa Zelandia", "<b>Prawostronnie</b> (jak w Polsce): <b>USA i Kanada</b>"]},
+  {"topic": "Kuchnia i Polska", "q": "Jednostki i daty w USA — czym różnią się od polskich?", "a": ["Mile, funty, stopy, stopnie <b>Fahrenheita</b>", "Data: <b>miesiąc/dzień</b> — 7/4 = 4 lipca"]},
+  {"topic": "Kuchnia i Polska", "q": "Boże Narodzenie — różnice z Polską", "a": ["Główny dzień to <b>25 grudnia</b>, nie Wigilia", "Prezenty przynosi Santa <b>przez komin w nocy</b>", "W Australii i NZ święta są <b>latem</b> (lato: grudzień–luty)"]},
+  {"topic": "Kuchnia i Polska", "q": "Które święta nie mają polskich odpowiedników, a które mają?", "a": ["Bez odpowiedników: <b>Thanksgiving</b>, <b>Boxing Day</b>", "<b>Pancake Day</b> ≈ tłusty czwartek", "<b>Halloween</b> (31 X) — dzień przed naszym Wszystkich Świętych (1 XI)"]},
+  {"topic": "Kuchnia i Polska", "q": "Polskie ślady w krajach anglojęzycznych", "a": ["<b>Mount Kosciuszko</b> — nazwany przez <b>Pawła Strzeleckiego</b> (1840)", "<b>Dywizjon 303</b> w Bitwie o Anglię (1940)", "Polscy kryptolodzy i złamanie <b>Enigmy</b> (Alan Turing)", "Irlandia — kierunek emigracji Polaków po 2004 r."]},
+  {"topic": "Film: food & brain", "q": "Jaki film obowiązuje w edycji 2026/27 i kto go przygotował?", "a": ["<b>How the food you eat affects your brain</b>", "<b>Mia Nacamulli</b>, TED-Ed", "Trwa niecałe 5 minut"]},
+  {"topic": "Film: food & brain", "q": "Z czego głównie składa się mózg po odwodnieniu?", "a": ["Z <b>tłuszczów</b> (fats / lipids)", "dehydrated — odwodniony"]},
+  {"topic": "Film: food & brain", "q": "Omega-3 i omega-6 — dlaczego są „essential” i co robią?", "a": ["To <b>essential fatty acids</b> — niezbędne kwasy tłuszczowe: <b>musimy je jeść</b> (must come from our diet)", "Budują <b>błony komórkowe</b> (cell membranes)", "Łączone z ochroną przed chorobami zwyrodnieniowymi mózgu", "Źródła: <b>nuts, seeds, fatty fish</b>"]},
+  {"topic": "Film: food & brain", "q": "Które tłuszcze mogą szkodzić mózgowi?", "a": ["Długotrwałe jedzenie tłuszczów <b>trans</b> i <b>nasyconych</b> (saturated)"]},
+  {"topic": "Film: food & brain", "q": "Z czego powstają neuroprzekaźniki?", "a": ["Z <b>aminokwasów</b> (amino acids) — „surowiec” (<b>precursor</b>)", "Neuroprzekaźniki: <b>norepinephrine, dopamine, serotonin</b>", "Wpływają na nastrój, sen, uwagę i wagę"]},
+  {"topic": "Film: food & brain", "q": "Dlaczego dieta powinna być różnorodna (aminokwasy)?", "a": ["Aminokwasy <b>konkurują</b> o ograniczony dostęp do mózgu", "Po dużym talerzu makaronu — <b>spokój</b>; po posiłku białkowym — większa <b>czujność</b>"]},
+  {"topic": "Film: food & brain", "q": "Mikroelementy w filmie — co robią?", "a": ["<b>Antyoksydanty</b> walczą z wolnymi rodnikami (<b>free radicals</b>), które niszczą komórki mózgu", "Witaminy <b>B6, B12</b> i <b>kwas foliowy</b> chronią przed chorobami i pogorszeniem pracy mózgu", "Minerały: <b>żelazo, miedź, cynk, sód</b> (iron, copper, zinc, sodium)", "Źródło: <b>fruits and vegetables</b>"]},
+  {"topic": "Film: food & brain", "q": "Ile masy ciała stanowi mózg i ile energii zużywa?", "a": ["Ok. <b>2%</b> masy ciała", "Zużywa do <b>20%</b> energii", "Energia głównie z <b>węglowodanów</b> zamienianych na <b>glukozę</b>"]},
+  {"topic": "Film: food & brain", "q": "Która część mózgu jest najbardziej wrażliwa na spadek glukozy?", "a": ["Płaty czołowe — <b>frontal lobes</b>"]},
+  {"topic": "Film: food & brain", "q": "Trzy formy węglowodanów wymienione w filmie", "a": ["<b>starch</b> — skrobia", "<b>sugar</b> — cukier", "<b>fiber</b> — błonnik", "(protein NIE jest węglowodanem!)"]},
+  {"topic": "Film: food & brain", "q": "Jedzenie o wysokim indeksie glikemicznym — co robi? Przykład?", "a": ["<b>High glycemic</b> — szybki skok cukru, potem <b>spadek uwagi i nastroju</b>", "Przykład: <b>white bread</b>"]},
+  {"topic": "Film: food & brain", "q": "Które jedzenie daje wolne, stałe uwalnianie glukozy?", "a": ["<b>oats</b> — owies", "<b>grains</b> — zboża", "<b>legumes</b> — rośliny strączkowe"]},
+  {"topic": "Film: food & brain", "q": "Morał filmu", "a": ["Różnorodna, bogata w składniki dieta daje mózgowi <b>stałą energię</b>", "To, co jemy, ma bezpośredni i długotrwały wpływ na mózg", "Senność po obiedzie lub pobudzenie w nocy mogą być skutkiem jedzenia"]},
+  {"topic": "Film: food & brain", "q": "Słówka z filmu (1)", "a": ["<b>essential fatty acids</b> — niezbędne kwasy tłuszczowe", "<b>cell membrane</b> — błona komórkowa", "<b>building blocks</b> — cegiełki, składniki budulcowe", "<b>neurotransmitters</b> — neuroprzekaźniki", "<b>precursor</b> — prekursor, „surowiec”"]},
+  {"topic": "Film: food & brain", "q": "Słówka z filmu (2)", "a": ["<b>free radicals</b> — wolne rodniki", "<b>mental decline</b> — pogorszenie sprawności umysłowej", "<b>deficiency</b> — niedobór", "<b>attention span</b> — zdolność skupienia uwagi", "<b>sustained</b> — trwały, stały"]}
+];
+
+// --- Engine ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var DECK_ID = 'angielski_zdolny_slazak_kraje';
+var STORE_KEY = 'fiszki:' + DECK_ID + ':opanowane';
+var KNOWN_VIEW = "__odlozone__";
+
+var activeTopic = "Wszystkie";
+var known = loadKnown();
+var filteredCards = [];
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var markBtn = document.getElementById('markBtn');
+var statsRow = document.getElementById('statsRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    var isKnown = !!known[cardId(f)];
+    if (isKnownView()) {
+      if (!isKnown) continue;
+    } else {
+      if (isKnown) continue;
+      if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    }
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+    if (i === 0) appendKnownPill();
+  }
+}
+
+function appendKnownPill() {
+  var kn = knownCount();
+  if (kn === 0) return;
+  var knownPill = document.createElement('button');
+  knownPill.className = 'topic-pill known-pill' + (isKnownView() ? ' active' : '');
+  knownPill.innerHTML = '&#10003; Odłożone (' + kn + ')';
+  knownPill.setAttribute('data-topic', KNOWN_VIEW);
+  knownPill.onclick = function() {
+    activeTopic = this.getAttribute('data-topic');
+    buildTopicBar();
+    applyFilters();
+  };
+  topicBar.appendChild(knownPill);
+}
+
+// --- odkładanie opanowanych fiszek ---
+function cardId(f) { return f.q; }
+function isKnownView() { return activeTopic === KNOWN_VIEW; }
+
+function loadKnown() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    var arr = JSON.parse(raw);
+    var map = {};
+    for (var i = 0; i < arr.length; i++) map[arr[i]] = true;
+    return map;
+  } catch (e) { return {}; }
+}
+
+function saveKnown() {
+  try {
+    var arr = [];
+    for (var k in known) { if (known[k]) arr.push(k); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function knownCount() {
+  var n = 0;
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    if (known[cardId(ALL_FLASHCARDS[i])]) n++;
+  }
+  return n;
+}
+
+function plural(n, one, few, many) {
+  var n10 = n % 10, n100 = n % 100;
+  if (n === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+  return many;
+}
+
+function updateStats() {
+  var n = knownCount();
+  if (n === 0) { statsRow.innerHTML = ''; return; }
+  statsRow.innerHTML =
+    '<span>' + n + ' ' + plural(n, 'fiszka odłożona', 'fiszki odłożone', 'fiszek odłożonych') + '</span>' +
+    '<button class="link-btn" onclick="restoreAll()">Przywróć wszystkie</button>';
+}
+
+function toggleKnown() {
+  if (isAnimating || filteredCards.length === 0) return;
+  var id = cardId(filteredCards[currentIndex]);
+  if (known[id]) { delete known[id]; } else { known[id] = true; }
+  saveKnown();
+
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  card.classList.add('slide-left');
+  setTimeout(function() {
+    filteredCards.splice(currentIndex, 1);
+    if (currentIndex > filteredCards.length - 1) {
+      currentIndex = Math.max(0, filteredCards.length - 1);
+    }
+    if (isKnownView() && knownCount() === 0) {
+      activeTopic = "Wszystkie";
+      buildTopicBar();
+      updateStats();
+      applyFilters();
+    } else {
+      buildTopicBar();
+      updateStats();
+      renderCard();
+    }
+  }, 140);
+  setTimeout(function() { card.classList.remove('slide-left'); isAnimating = false; }, 350);
+}
+
+function restoreAll() {
+  known = {};
+  saveKnown();
+  if (isKnownView()) activeTopic = "Wszystkie";
+  buildTopicBar();
+  updateStats();
+  applyFilters();
+}
+
+function renderCard() {
+  markBtn.innerHTML = isKnownView() ? '&#8617; Przywróć' : '&#10003; Umiem';
+
+  if (filteredCards.length === 0) {
+    var msg = isKnownView()
+      ? 'Nie ma jeszcze odłożonych fiszek'
+      : (knownCount() > 0
+          ? (activeTopic === "Wszystkie"
+              ? 'Wszystko opanowane! Aby wrócić do nauki, użyj „Przywróć wszystkie” nad kartą.'
+              : 'Cały dział opanowany! Wybierz inny dział albo użyj „Przywróć wszystkie” nad kartą.')
+          : 'Brak fiszek dla tego filtra');
+    cardFront.className = 'card-face card-front';
+    cardFront.innerHTML = '<div class="card-question">' + msg + '</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    markBtn.disabled = true;
+    return;
+  }
+  markBtn.disabled = false;
+  var fc = filteredCards[currentIndex];
+
+  cardFront.className = 'card-face card-front';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div></div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedź</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrócić do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); toggleKnown(); }
+});
+
+buildTopicBar();
+updateStats();
+applyFilters();
+</script>
+</body>
+</html>

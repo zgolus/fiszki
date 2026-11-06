@@ -7,6 +7,7 @@ Wszystkie zestawy: https://zgolus.github.io/fiszki/
 - [Historia 1: Starożytny Rzym](https://zgolus.github.io/fiszki/rzym.html)
 - [Historia 2: Europa i Nowy Świat (odkrycia, renesans, reformacja)](https://zgolus.github.io/fiszki/historia_europa_i_nowy_swiat.html)
 ### SP
+- [Angielski: zDolny Ślązak — kraje anglojęzyczne (etap powiatowy)](https://zgolus.github.io/fiszki/angielski_zdolny_slazak_kraje.html)
 - [Język polski: Pan Tadeusz — Księga X (Emigracja. Jacek)](https://zgolus.github.io/fiszki/pan_tadeusz_ksiega_x.html)
 - [Język polski: Pan Tadeusz — Księgi XI i XII (Rok 1812, Kochajmy się)](https://zgolus.github.io/fiszki/pan_tadeusz_ksiegi_xi_xii.html)
 - [Biologia 8: Podstawy dziedziczenia (DNA, replikacja, mitoza i mejoza)](https://zgolus.github.io/fiszki/biologia_podstawy_dziedziczenia.html)
