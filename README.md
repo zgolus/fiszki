@@ -6,6 +6,7 @@ Wszystkie zestawy: https://zgolus.github.io/fiszki/
 - [Chemia 2: Układ okresowy — pierwiastki 1–112](https://zgolus.github.io/fiszki/pierwiastki_1-112.html)
 - [Historia 1: Starożytny Rzym](https://zgolus.github.io/fiszki/rzym.html)
 - [Historia 2: Europa i Nowy Świat (odkrycia, renesans, reformacja)](https://zgolus.github.io/fiszki/historia_europa_i_nowy_swiat.html)
+- [Historia 2: „Złoty wiek” Rzeczypospolitej (ostatni Jagiellonowie, demokracja szlachecka, unia lubelska)](https://zgolus.github.io/fiszki/historia_zloty_wiek_rzeczypospolitej.html)
 ### SP
 - [Angielski: zDolny Ślązak — kraje anglojęzyczne (etap powiatowy)](https://zgolus.github.io/fiszki/angielski_zdolny_slazak_kraje.html)
 - [Język polski: Pan Tadeusz — Księga X (Emigracja. Jacek)](https://zgolus.github.io/fiszki/pan_tadeusz_ksiega_x.html)

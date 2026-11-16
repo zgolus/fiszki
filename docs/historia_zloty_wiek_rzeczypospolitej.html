@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Historia LO 2 — „Złoty wiek” Rzeczypospolitej</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #15110a;
+    --card-front: #f7f2e7;
+    --card-back: #2a2112;
+    --accent: #c08a1e;
+    --accent-light: #f0cf7e;
+    --text-dark: #2a2112;
+    --text-light: #f1f4f6;
+    --text-muted: #a89a80;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-light);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 24px 8px;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    color: var(--accent-light);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .filters {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 20px 6px;
+  }
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .topic-bar::-webkit-scrollbar { display: none; }
+  .topic-pill {
+    flex-shrink: 0;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid #3d3220;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+
+  .progress-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 10px 24px 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: #3d3220;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .card-container {
+    width: 100%;
+    max-width: 480px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    perspective: 1000px;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 420px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card.slide-left { animation: slideLeft 0.35s ease both; }
+  .card.slide-right { animation: slideRight 0.35s ease both; }
+  @keyframes slideLeft {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(-60px); }
+    60% { opacity: 0; transform: translateX(60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideRight {
+    0% { opacity: 1; transform: translateX(0); }
+    40% { opacity: 0; transform: translateX(60px); }
+    60% { opacity: 0; transform: translateX(-60px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 22px;
+    overflow-y: auto;
+  }
+
+  .card-front {
+    background: var(--card-front);
+    color: var(--text-dark);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .card-front .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: auto;
+  }
+  .card-front .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card-front .card-question {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 0 2px;
+  }
+  .card-front .tap-hint {
+    font-size: 0.7rem;
+    color: #7d8b97;
+    text-align: center;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+  .card-back {
+    background: var(--card-back);
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-back .card-topic {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .card-back .answer-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .card-back .answer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+    justify-content: center;
+  }
+  .card-back .answer-list li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: var(--accent-light);
+  }
+  .card-back .answer-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .card-back .tap-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 12px;
+  }
+
+  .topic-pill.known-pill {
+    border-style: dashed;
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .topic-pill.known-pill.active {
+    background: var(--accent);
+    border-style: solid;
+    color: #ffffff;
+  }
+
+  .stats-row {
+    width: 100%;
+    max-width: 480px;
+    padding: 4px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-height: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--accent-light);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .nav-area {
+    width: 100%;
+    max-width: 480px;
+    padding: 6px 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1.5px solid #3d3220;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    transform: scale(0.92);
+  }
+  .nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+  .shuffle-btn {
+    padding: 11px 22px;
+    border-radius: 28px;
+    border: 1.5px solid #3d3220;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+  }
+  .mark-btn {
+    padding: 11px 18px;
+    border-radius: 28px;
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent-light);
+    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .mark-btn:active {
+    background: var(--accent);
+    color: #ffffff;
+    transform: scale(0.95);
+  }
+  .mark-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+  @media (max-width: 400px) {
+    .nav-area { gap: 8px; padding: 6px 14px 30px; }
+    .nav-btn { width: 46px; height: 46px; font-size: 1.15rem; }
+    .shuffle-btn, .mark-btn { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.03em; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .header { animation: fadeUp 0.5s ease both; }
+  .filters { animation: fadeUp 0.5s 0.05s ease both; }
+  .progress-area { animation: fadeUp 0.5s 0.1s ease both; }
+  .card-container { animation: fadeUp 0.5s 0.2s ease both; }
+  .stats-row { animation: fadeUp 0.5s 0.15s ease both; }
+  .nav-area { animation: fadeUp 0.5s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>„Złoty wiek” Rzeczypospolitej</h1>
+  <div class="subtitle">Historia &middot; rozdział II &middot; 61 pytań</div>
+</div>
+
+<div class="filters">
+  <div class="topic-bar" id="topicBar"></div>
+</div>
+
+<div class="progress-area">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="card-container">
+  <div class="card" id="card">
+    <div class="card-face card-front" id="cardFront"></div>
+    <div class="card-face card-back" id="cardBack"></div>
+  </div>
+</div>
+
+<div class="nav-area">
+  <button class="nav-btn" id="prevBtn" onclick="prevCard()">&#8592;</button>
+  <button class="mark-btn" id="markBtn" onclick="toggleKnown()">&#10003; Umiem</button>
+  <button class="shuffle-btn" onclick="shuffleDeck()">Losuj</button>
+  <button class="nav-btn" id="nextBtn" onclick="nextCard()">&#8594;</button>
+</div>
+
+<script>
+var ALL_FLASHCARDS = [
+  { topic: "Ostatni Jagiellonowie", q: "Którzy synowie Kazimierza Jagiellończyka kolejno rządzili Polską?", a: ["Jan Olbracht (1492–1501)", "Aleksander Jagiellończyk (1501–1506)", "Zygmunt I Stary (1506–1548)"] },
+  { topic: "Ostatni Jagiellonowie", q: "Kto był ostatnim królem z dynastii Jagiellonów i kiedy panował?", a: ["<b>Zygmunt II August</b> (1548–1572) — syn Zygmunta Starego i Bony; zmarł bezpotomnie"] },
+  { topic: "Ostatni Jagiellonowie", q: "Skąd powiedzenie „Za króla Olbrachta wyginęła szlachta”?", a: ["Z klęski wyprawy mołdawskiej Jana Olbrachta w <b>1497 r.</b> (bitwa pod Koźminem)"] },
+  { topic: "Ostatni Jagiellonowie", q: "Co wydarzyło się pod Orszą w 1514 r.?", a: ["Armia polsko-litewska <b>Konstantego Ostrogskiego</b> pokonała wojska moskiewskie", "Mimo zwycięstwa nie odzyskano utraconego wcześniej Smoleńska"] },
+  { topic: "Ostatni Jagiellonowie", q: "Co ustalono na zjeździe wiedeńskim w 1515 r.?", a: ["Cesarz Maksymilian I Habsburg przestał popierać Moskwę i Krzyżaków", "Zawarto małżeństwa Jagiellonów z Habsburgami → w 1526 r. Habsburgowie przejęli Czechy i Węgry"] },
+  { topic: "Ostatni Jagiellonowie", q: "Czym był hołd pruski?", a: ["<b>1525 r.</b>, rynek w Krakowie — Albrecht Hohenzollern, ostatni wielki mistrz krzyżacki, złożył hołd Zygmuntowi Staremu", "Zakon zsekularyzowano: powstało świeckie Księstwo Pruskie, lenno Polski; Albrecht przeszedł na luteranizm"] },
+  { topic: "Ostatni Jagiellonowie", q: "Co zapewnił pokój wieczysty z Turcją (1533)?", a: ["Spokój między Polską a Turcją aż do końca XVI w. (wcześniej, w 1531 r., hetman Jan Tarnowski pokonał Mołdawian pod Obertynem)"] },
+  { topic: "Ostatni Jagiellonowie", q: "Kim była królowa Bona Sforza?", a: ["Włoska księżniczka, żona Zygmunta Starego", "Wzmacniała władzę królewską, skupowała dobra, krzewiła kulturę włoską (sprowadziła m.in. nowe warzywa)"] },
+  { topic: "Ostatni Jagiellonowie", q: "Czym była Komisja Morska Zygmunta Augusta?", a: ["Urzędem do budowy floty — tworzyli ją <b>kaprowie</b>, czyli prywatni żeglarze działający na zlecenie króla", "Element walki o <b>dominium Maris Baltici</b> — panowanie nad Bałtykiem"] },
+  { topic: "Ostatni Jagiellonowie", q: "O co toczyła się I wojna północna (1563–1570) i jak się skończyła?", a: ["O Inflanty — walczyły Polska i Litwa, Moskwa, Szwecja i Dania", "Pokój w Szczecinie (1570): większość Inflant przypadła Rzeczypospolitej"] },
+  { topic: "Ostatni Jagiellonowie", q: "Kim był Gotthard Kettler?", a: ["Ostatni mistrz zakonu inflanckiego — w 1561 r. zsekularyzował Inflanty i złożył hołd Zygmuntowi Augustowi; został księciem Kurlandii"] },
+  { topic: "Odrodzenie", q: "Kto przebudował Wawel w stylu renesansowym?", a: ["Włoscy architekci <b>Franciszek Florentczyk</b> i <b>Bartolomeo Berecci</b>, za Zygmunta Starego", "Najbardziej znane: krużganki dziedzińca i <b>Kaplica Zygmuntowska</b> ze złotą kopułą"] },
+  { topic: "Odrodzenie", q: "Czego dokonał Mikołaj Kopernik?", a: ["Ogłosił <b>teorię heliocentryczną</b> (Ziemia krąży wokół Słońca) w dziele „O obrotach sfer niebieskich” (1543)"] },
+  { topic: "Odrodzenie", q: "Kim był Mikołaj Rej?", a: ["„Ojciec literatury polskiej” — pisał po polsku; „Żywot człowieka poczciwego”, „Krótka rozprawa między Panem, Wójtem a Plebanem”"] },
+  { topic: "Odrodzenie", q: "Jakie utwory napisał Jan Kochanowski?", a: ["Fraszki, pieśni, treny oraz dramat „Odprawa posłów greckich”"] },
+  { topic: "Odrodzenie", q: "Kto napisał „O poprawie Rzeczypospolitej” i o co w nim apelował?", a: ["<b>Andrzej Frycz Modrzewski</b>", "Postulował reformy państwa, wzmocnienie władzy królewskiej i równość wszystkich wobec prawa"] },
+  { topic: "Odrodzenie", q: "Dlaczego Zamość nazywa się „miastem idealnym”?", a: ["Założony w 1580 r. przez <b>Jana Zamojskiego</b>, zaprojektowany przez Bernarda Morando — symetryczny, renesansowy plan, otoczony fortyfikacjami"] },
+  { topic: "Odrodzenie", q: "Gdzie działały uczelnie wyższe (akademie) w Rzeczypospolitej XVI w.?", a: ["W Krakowie, Wilnie (jezuicka, 1579), Zamościu i Rakowie (ariańska)"] },
+  { topic: "Demokracja szlachecka", q: "Co oznacza zasada <i>neminem captivabimus</i>?", a: ["„Nikogo nie uwięzimy bez wyroku sądowego” — nietykalność osobista szlachty (przywilej jedlneńsko-krakowski, 1430/1433)"] },
+  { topic: "Demokracja szlachecka", q: "Co dawały szlachcie przywileje cerekwicko-nieszawskie (1454)?", a: ["Król nie mógł bez zgody sejmików zwołać pospolitego ruszenia, nakładać podatków ani stanowić nowych praw"] },
+  { topic: "Demokracja szlachecka", q: "Co postanowiła konstytucja <i>Nihil novi</i> (1505)?", a: ["Nic nowego bez zgody sejmu — król nie mógł wprowadzić nowego prawa bez zgody senatu i izby poselskiej", "Uważana za początek demokracji szlacheckiej"] },
+  { topic: "Demokracja szlachecka", q: "Jakie trzy stany sejmujące tworzyły sejm walny?", a: ["<b>Król</b>, <b>senat</b> i <b>izba poselska</b>"] },
+  { topic: "Demokracja szlachecka", q: "Kiedy i gdzie odbył się pierwszy sejm walny?", a: ["W <b>1468 r.</b> w Piotrkowie"] },
+  { topic: "Demokracja szlachecka", q: "Kto zasiadał w senacie, a kto w izbie poselskiej?", a: ["Senat: najwyżsi urzędnicy świeccy i biskupi — z racji urzędu, nie z wyboru", "Izba poselska: posłowie wybrani na sejmikach"] },
+  { topic: "Demokracja szlachecka", q: "Czym różnił się sejm zwyczajny od nadzwyczajnego?", a: ["Zwyczajny: co 2 lata, przez 6 tygodni", "Nadzwyczajny: zwoływany w razie potrzeby, np. wojny"] },
+  { topic: "Demokracja szlachecka", q: "Czym były sejmiki przedsejmowe i instrukcje poselskie?", a: ["Na sejmikach przedsejmowych szlachta wybierała posłów i dawała im <b>instrukcje</b> — wskazówki, jak głosować na sejmie"] },
+  { topic: "Demokracja szlachecka", q: "Jaki procent społeczeństwa stanowiła szlachta w XVI w.?", a: ["Ok. <b>6–7%</b>"] },
+  { topic: "Demokracja szlachecka", q: "Na jakie grupy dzieliła się szlachta?", a: ["Magnateria, szlachta średnia, szlachta zagrodowa (zaściankowa), gołota"] },
+  { topic: "Demokracja szlachecka", q: "Co znaczy powiedzenie „Szlachcic na zagrodzie równy wojewodzie”?", a: ["Zasada równości wszystkich szlachciców — bez względu na majątek"] },
+  { topic: "Demokracja szlachecka", q: "Czym była wojna kokosza (1537)?", a: ["<b>Rokoszem</b> (zbrojnym wystąpieniem szlachty przeciw królowi) pod Lwowem — zamiast walczyć, szlachta obradowała, a jedyne ofiary to zjedzone kury"] },
+  { topic: "Demokracja szlachecka", q: "Czego domagał się ruch egzekucyjny?", a: ["<b>Egzekucji dóbr</b> — zwrotu królewszczyzn bezprawnie trzymanych przez magnatów", "<b>Egzekucji praw</b> — m.in. zakazu łączenia urzędów"] },
+  { topic: "Demokracja szlachecka", q: "Co osiągnięto na sejmie egzekucyjnym (1562–1563)?", a: ["Odebrano magnatom część królewszczyzn; z 1/4 dochodów z nich utrzymywano <b>wojsko kwarciane</b>"] },
+  { topic: "Demokracja szlachecka", q: "Na czym polegała monarchia mieszana?", a: ["Połączenie trzech ustrojów: monarchii (król), arystokracji (senat) i demokracji (izba poselska), które się wzajemnie kontrolują"] },
+  { topic: "Reformacja", q: "Kto w Polsce przyjmował luteranizm, a kto kalwinizm?", a: ["Luteranizm — mieszczanie, głównie w Prusach Królewskich (Gdańsk, Toruń, Elbląg)", "Kalwinizm — szlachta i magnaci (np. Radziwiłłowie)"] },
+  { topic: "Reformacja", q: "Kim byli bracia polscy (arianie)?", a: ["Radykalny odłam protestantów: nie uznawali Trójcy Świętej (boskości Chrystusa), część głosiła pacyfizm", "Ośrodek: <b>Raków</b>; przywódca: Faust Socyn; w XVII w. wygnani z kraju"] },
+  { topic: "Reformacja", q: "Czym była ugoda sandomierska (1570)?", a: ["Porozumieniem luteranów, kalwinów i braci czeskich — bez arian"] },
+  { topic: "Reformacja", q: "Co zapewniła konfederacja warszawska (1573)?", a: ["Pokój religijny i wolność wyznania dla szlachty — jako pierwsze państwo w Europie"] },
+  { topic: "Reformacja", q: "Dlaczego Rzeczpospolitą nazywano „państwem bez stosów”?", a: ["Nie było wojen religijnych ani prześladowań innowierców; Zygmunt August: „Nie jestem królem sumień waszych”"] },
+  { topic: "Reformacja", q: "Kto i kiedy sprowadził jezuitów do Polski?", a: ["Kardynał <b>Stanisław Hozjusz</b> w <b>1564 r.</b>"] },
+  { topic: "Reformacja", q: "Kim byli Piotr Skarga i Jakub Wujek?", a: ["Jezuici: Skarga — słynny kaznodzieja; Wujek — przetłumaczył Biblię na polski"] },
+  { topic: "Reformacja", q: "Co powstało w wyniku unii brzeskiej (1596)?", a: ["<b>Kościół greckokatolicki</b> — unici uznali papieża, ale zachowali liturgię wschodnią i kalendarz juliański"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Jakie cztery stany tworzyły społeczeństwo Rzeczypospolitej?", a: ["Szlachta, duchowieństwo, mieszczaństwo i chłopstwo"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Który stan był najliczniejszy?", a: ["Chłopi — ok. <b>78%</b> ludności"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Na czym polegała gospodarka folwarczno-pańszczyźniana?", a: ["Szlachta zakładała <b>folwarki</b> i uprawiała zboże na eksport", "Pracowali na nich chłopi w ramach <b>pańszczyzny</b> — przymusowej, darmowej pracy na polu pana"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Dlaczego rozwinęły się folwarki?", a: ["W Europie Zachodniej rosła liczba ludności i miast → rósł popyt na zboże i jego ceny"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Czym było poddaństwo chłopów?", a: ["Całkowite podporządkowanie chłopa panu — nie mógł bez zgody pana opuścić wsi"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Które miasto było największe i najważniejsze w Rzeczypospolitej?", a: ["<b>Gdańsk</b> — ok. 40 tys. mieszkańców, przez jego port szło ok. 80% handlu zagranicznego"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Jakie towary eksportowano, a jakie importowano przez Gdańsk?", a: ["Eksport: głównie <b>zboże</b>, a także drewno, potaż, sól", "Import: towary luksusowe — wino, przyprawy, owoce cytrusowe, cukier"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Jak transportowano zboże do Gdańska?", a: ["Spławem — <b>Wisłą</b> i jej dopływami"] },
+  { topic: "Społeczeństwo i gospodarka", q: "Kto rządził w miastach i jak zorganizowane było rzemiosło?", a: ["Władza: patrycjat — rada z burmistrzem, sąd miejski (ława)", "Rzemieślnicy zrzeszeni w <b>cechach</b>; poza cechami działali partacze"] },
+  { topic: "Unia lubelska i elekcja", q: "Dlaczego doszło do unii lubelskiej?", a: ["Litwa potrzebowała pomocy w wojnie z <b>Moskwą</b>", "Zygmunt August nie miał potomka — groził rozpad unii personalnej"] },
+  { topic: "Unia lubelska i elekcja", q: "Kiedy zawarto unię lubelską?", a: ["<b>1 lipca 1569 r.</b> na sejmie w Lublinie"] },
+  { topic: "Unia lubelska i elekcja", q: "Jak złamano opór magnatów litewskich podczas sejmu lubelskiego?", a: ["Król wcielił do Korony Podlasie, Wołyń, Bracławszczyznę i Kijowszczyznę — Litwini musieli wrócić na obrady"] },
+  { topic: "Unia lubelska i elekcja", q: "Co było wspólne, a co odrębne w Rzeczypospolitej Obojga Narodów?", a: ["Wspólne: król (wybierany wspólnie), sejm walny, moneta, polityka zagraniczna", "Odrębne: wojsko, skarb, urzędy, prawo"] },
+  { topic: "Unia lubelska i elekcja", q: "Kto zastępował króla w czasie bezkrólewia?", a: ["<b>Interrex</b> — prymas (w 1572 r. Jakub Uchański)"] },
+  { topic: "Unia lubelska i elekcja", q: "Jakie trzy sejmy zwoływano w czasie bezkrólewia?", a: ["Konwokacyjny (zasady elekcji) → elekcyjny (wybór króla) → koronacyjny (w Krakowie)"] },
+  { topic: "Unia lubelska i elekcja", q: "Co oznacza elekcja <i>viritim</i>?", a: ["Każdy szlachcic mógł osobiście wziąć udział w wyborze króla"] },
+  { topic: "Unia lubelska i elekcja", q: "Kto wygrał pierwszą wolną elekcję w 1573 r.?", a: ["<b>Henryk Walezy</b> — brat króla Francji"] },
+  { topic: "Unia lubelska i elekcja", q: "Czym różnią się artykuły henrykowskie od pacta conventa?", a: ["Artykuły henrykowskie — stałe zasady ustroju, przysięgał je każdy król", "Pacta conventa — osobiste zobowiązania danego króla"] },
+  { topic: "Unia lubelska i elekcja", q: "Podaj 3 zasady z artykułów henrykowskich.", a: ["Wolna elekcja — król nie wskazuje następcy", "Sejm walny co 2 lata; wolność religijna", "Prawo wypowiedzenia królowi posłuszeństwa, gdy łamie prawa"] },
+  { topic: "Unia lubelska i elekcja", q: "Dlaczego Henryk Walezy uciekł z Polski?", a: ["Po kilku miesiącach (1574 r.) zmarł jego brat, król Francji — Henryk wrócił, by objąć tron francuski"] }
+];
+
+// --- Engine ---
+var TOPICS = ["Wszystkie"];
+var seen = {};
+for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+  var t = ALL_FLASHCARDS[i].topic;
+  if (!seen[t]) { seen[t] = true; TOPICS.push(t); }
+}
+
+var DECK_ID = 'historia_zloty_wiek_rzeczypospolitej';
+var STORE_KEY = 'fiszki:' + DECK_ID + ':opanowane';
+var KNOWN_VIEW = "__odlozone__";
+
+var activeTopic = "Wszystkie";
+var known = loadKnown();
+var filteredCards = [];
+var currentIndex = 0;
+var isFlipped = false;
+var isAnimating = false;
+
+var card = document.getElementById('card');
+var cardFront = document.getElementById('cardFront');
+var cardBack = document.getElementById('cardBack');
+var progressFill = document.getElementById('progressFill');
+var progressLabel = document.getElementById('progressLabel');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var topicBar = document.getElementById('topicBar');
+var markBtn = document.getElementById('markBtn');
+var statsRow = document.getElementById('statsRow');
+
+function applyFilters() {
+  var cards = [];
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    var f = ALL_FLASHCARDS[i];
+    var isKnown = !!known[cardId(f)];
+    if (isKnownView()) {
+      if (!isKnown) continue;
+    } else {
+      if (isKnown) continue;
+      if (activeTopic !== "Wszystkie" && f.topic !== activeTopic) continue;
+    }
+    cards.push(f);
+  }
+  filteredCards = cards;
+  currentIndex = 0;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  renderCard();
+}
+
+function buildTopicBar() {
+  topicBar.innerHTML = '';
+  for (var i = 0; i < TOPICS.length; i++) {
+    var t = TOPICS[i];
+    var pill = document.createElement('button');
+    pill.className = 'topic-pill' + (t === activeTopic ? ' active' : '');
+    pill.textContent = t;
+    pill.setAttribute('data-topic', t);
+    pill.onclick = function() {
+      activeTopic = this.getAttribute('data-topic');
+      buildTopicBar();
+      applyFilters();
+    };
+    topicBar.appendChild(pill);
+    if (i === 0) appendKnownPill();
+  }
+}
+
+function appendKnownPill() {
+  var kn = knownCount();
+  if (kn === 0) return;
+  var knownPill = document.createElement('button');
+  knownPill.className = 'topic-pill known-pill' + (isKnownView() ? ' active' : '');
+  knownPill.innerHTML = '&#10003; Odłożone (' + kn + ')';
+  knownPill.setAttribute('data-topic', KNOWN_VIEW);
+  knownPill.onclick = function() {
+    activeTopic = this.getAttribute('data-topic');
+    buildTopicBar();
+    applyFilters();
+  };
+  topicBar.appendChild(knownPill);
+}
+
+// --- odkładanie opanowanych fiszek ---
+function cardId(f) { return f.q; }
+function isKnownView() { return activeTopic === KNOWN_VIEW; }
+
+function loadKnown() {
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return {};
+    var arr = JSON.parse(raw);
+    var map = {};
+    for (var i = 0; i < arr.length; i++) map[arr[i]] = true;
+    return map;
+  } catch (e) { return {}; }
+}
+
+function saveKnown() {
+  try {
+    var arr = [];
+    for (var k in known) { if (known[k]) arr.push(k); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(arr));
+  } catch (e) {}
+}
+
+function knownCount() {
+  var n = 0;
+  for (var i = 0; i < ALL_FLASHCARDS.length; i++) {
+    if (known[cardId(ALL_FLASHCARDS[i])]) n++;
+  }
+  return n;
+}
+
+function plural(n, one, few, many) {
+  var n10 = n % 10, n100 = n % 100;
+  if (n === 1) return one;
+  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return few;
+  return many;
+}
+
+function updateStats() {
+  var n = knownCount();
+  if (n === 0) { statsRow.innerHTML = ''; return; }
+  statsRow.innerHTML =
+    '<span>' + n + ' ' + plural(n, 'fiszka odłożona', 'fiszki odłożone', 'fiszek odłożonych') + '</span>' +
+    '<button class="link-btn" onclick="restoreAll()">Przywróć wszystkie</button>';
+}
+
+function toggleKnown() {
+  if (isAnimating || filteredCards.length === 0) return;
+  var id = cardId(filteredCards[currentIndex]);
+  if (known[id]) { delete known[id]; } else { known[id] = true; }
+  saveKnown();
+
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  card.classList.add('slide-left');
+  setTimeout(function() {
+    filteredCards.splice(currentIndex, 1);
+    if (currentIndex > filteredCards.length - 1) {
+      currentIndex = Math.max(0, filteredCards.length - 1);
+    }
+    if (isKnownView() && knownCount() === 0) {
+      activeTopic = "Wszystkie";
+      buildTopicBar();
+      updateStats();
+      applyFilters();
+    } else {
+      buildTopicBar();
+      updateStats();
+      renderCard();
+    }
+  }, 140);
+  setTimeout(function() { card.classList.remove('slide-left'); isAnimating = false; }, 350);
+}
+
+function restoreAll() {
+  known = {};
+  saveKnown();
+  if (isKnownView()) activeTopic = "Wszystkie";
+  buildTopicBar();
+  updateStats();
+  applyFilters();
+}
+
+function renderCard() {
+  markBtn.innerHTML = isKnownView() ? '&#8617; Przywróć' : '&#10003; Umiem';
+
+  if (filteredCards.length === 0) {
+    var msg = isKnownView()
+      ? 'Nie ma jeszcze odłożonych fiszek'
+      : (knownCount() > 0
+          ? (activeTopic === "Wszystkie"
+              ? 'Wszystko opanowane! Aby wrócić do nauki, użyj „Przywróć wszystkie” nad kartą.'
+              : 'Cały dział opanowany! Wybierz inny dział albo użyj „Przywróć wszystkie” nad kartą.')
+          : 'Brak fiszek dla tego filtra');
+    cardFront.className = 'card-face card-front';
+    cardFront.innerHTML = '<div class="card-question">' + msg + '</div>';
+    cardBack.innerHTML = '';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = '0 / 0';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    markBtn.disabled = true;
+    return;
+  }
+  markBtn.disabled = false;
+  var fc = filteredCards[currentIndex];
+
+  cardFront.className = 'card-face card-front';
+
+  cardFront.innerHTML =
+    '<div class="card-header"><div class="card-topic">' + fc.topic + '</div></div>' +
+    '<div class="card-question">' + fc.q + '</div>' +
+    '<div class="tap-hint">dotknij, aby odkryć odpowiedź</div>';
+
+  var answersHTML = '';
+  for (var i = 0; i < fc.a.length; i++) {
+    answersHTML += '<li>' + fc.a[i] + '</li>';
+  }
+
+  cardBack.innerHTML =
+    '<div class="card-topic">' + fc.topic + '</div>' +
+    '<div class="answer-label">Odpowiedź</div>' +
+    '<ul class="answer-list">' + answersHTML + '</ul>' +
+    '<div class="tap-hint">dotknij, aby wrócić do pytania</div>';
+
+  var progress = ((currentIndex + 1) / filteredCards.length) * 100;
+  progressFill.style.width = progress + '%';
+  progressLabel.textContent = (currentIndex + 1) + ' / ' + filteredCards.length;
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === filteredCards.length - 1;
+}
+
+function flipCard() {
+  if (isAnimating) return;
+  isFlipped = !isFlipped;
+  card.classList.toggle('flipped', isFlipped);
+}
+
+function navigateTo(newIndex, direction) {
+  if (isAnimating || newIndex < 0 || newIndex >= filteredCards.length) return;
+  isAnimating = true;
+  isFlipped = false;
+  card.classList.remove('flipped');
+  var animClass = direction === 'left' ? 'slide-left' : 'slide-right';
+  card.classList.add(animClass);
+  setTimeout(function() { currentIndex = newIndex; renderCard(); }, 140);
+  setTimeout(function() { card.classList.remove(animClass); isAnimating = false; }, 350);
+}
+
+function prevCard() { navigateTo(currentIndex - 1, 'right'); }
+function nextCard() { navigateTo(currentIndex + 1, 'left'); }
+
+function shuffleDeck() {
+  if (isAnimating) return;
+  for (var i = filteredCards.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = filteredCards[i];
+    filteredCards[i] = filteredCards[j];
+    filteredCards[j] = tmp;
+  }
+  isFlipped = false;
+  card.classList.remove('flipped');
+  navigateTo(0, 'left');
+}
+
+card.addEventListener('click', flipCard);
+
+var touchStartX = 0;
+var cardContainer = document.querySelector('.card-container');
+cardContainer.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+cardContainer.addEventListener('touchend', function(e) {
+  var diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 60) { if (diff > 0) nextCard(); else prevCard(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); toggleKnown(); }
+});
+
+buildTopicBar();
+updateStats();
+applyFilters();
+</script>
+</body>
+</html>
